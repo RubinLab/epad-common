@@ -20,7 +20,9 @@
     <aim3api.version>1.0</aim3api.version>
     <gwt.version>2.5.1</gwt.version>
     <servlet.api.version>2.5</servlet.api.version>
+    <dcm4chee.version>2.0.27</dcm4chee.version>
     <commons.httpclient.version>3.1</commons.httpclient.version>
+    <commons.io.version>1.4</commons.io.version>
     <log4j.version>1.2.16</log4j.version>
     <slf4j.version>1.6.1</slf4j.version>
     <junit.version>3.8.1</junit.version>
@@ -29,6 +31,28 @@
   </properties>
 
   <repositories>
+
+    <repository>
+      <id>dcm4che</id>
+      <name>DCM4CHE Maven Repository</name>
+      <url>http://www.dcm4che.org/maven2/</url>
+    </repository>
+
+    <!-- Create repository in ./lib for JARs that can not be found in public Maven repositories. -->
+    <!-- See: http://blog.dub.podval.org/2010/01/maven-in-project-repository.html -->
+    <!-- Ultimately create a local Nexus repository or the like for these. -->
+    <repository>
+      <id>lib</id>
+      <name>lib</name>
+      <releases>
+        <enabled>true</enabled>
+        <checksumPolicy>ignore</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <url>file://${project.basedir}/lib</url>
+    </repository>
 
   </repositories>
 
@@ -39,6 +63,29 @@
      <artifactId>aim3api</artifactId>
      <version>${aim3api.version}</version>
    </dependency>
+
+   <!-- This is in the project repository because we could not find a public Maven repository containing it. -->
+   <dependency>
+     <groupId>com.pixelmed</groupId>
+     <artifactId>pixelmed</artifactId>
+     <version>1.0</version>
+   </dependency>
+
+    <!-- Start of DCM4CHEE dependencies -->
+
+    <dependency>
+      <groupId>dcm4che</groupId>
+      <artifactId>dcm4che-core</artifactId>
+      <version>${dcm4chee.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>dcm4che</groupId>
+      <artifactId>dcm4che-imageio</artifactId>
+      <version>${dcm4chee.version}</version>
+    </dependency>
+
+    <!-- End of DCM4CHEE dependencies -->
 
    <dependency>
      <groupId>javax.servlet</groupId>
@@ -58,6 +105,12 @@
 	<artifactId>commons-httpclient</artifactId>
         <version>${commons.httpclient.version}</version>
     </dependency>
+
+   <dependency>
+     <groupId>commons-io</groupId>
+     <artifactId>commons-io</artifactId>
+     <version>${commons.io.version}</version>
+   </dependency>
 
    <dependency>
      <groupId>log4j</groupId>

@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.plugin.client;
+package edu.stanford.isis.epad.common;
 
 import java.io.BufferedReader;
 import java.io.File;

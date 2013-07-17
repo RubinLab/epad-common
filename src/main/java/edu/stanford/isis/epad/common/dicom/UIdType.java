@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.plugin.server;
+package edu.stanford.isis.epad.common.dicom;
 
 /**
  * The DicomUID type.

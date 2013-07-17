@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import edu.stanford.isis.epad.common.dicom.UIdType;
+
 /**
  * This is the interface for getting files from the DICOM proxy.
  */

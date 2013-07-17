@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.plugin.server;
+package edu.stanford.isis.epad.common;
 /**
  *   This interface defines a class that will obtain the parameters from the
  *   proxy-config.properties file.

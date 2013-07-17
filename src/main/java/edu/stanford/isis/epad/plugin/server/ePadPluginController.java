@@ -4,6 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
+import edu.stanford.isis.epad.common.EPadProxyConfig;
+
 /**
  * Request all server-side interfaces from here
  */
