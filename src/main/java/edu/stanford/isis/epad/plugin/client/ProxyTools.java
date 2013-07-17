@@ -16,21 +16,21 @@ import org.apache.commons.httpclient.methods.GetMethod;
 public class ProxyTools
 {
 	public static String serverProxy = ProxyConfig.getInstance().getParam("serverProxy");
-	public static String namespace = "gme://caCORE.caCORE/3.2/edu.northwestern.radiology.AIM";
-	public static String serverUrl = "http://localhost:8899/exist/";
-	public static String username = "epaduser";
-	public static String password = "3p4dus3r";
 	public static String baseAnnotationDir = ProxyConfig.getInstance().getParam("baseAnnotationDir");
-	public static String xsdFile = "/home/epad/DicomProxy/resources/schema/AIM_v3.xsd";
-	public static String collection = "aim.dbxml";
 	public static String dbpath = ProxyConfig.getInstance().getParam("dbpath");
 	public static String templatePath = ProxyConfig.getInstance().getParam("baseTemplatesDir");
 	public static String wadoProxy = ProxyConfig.getInstance().getParam("wadoProxy");
 
+	// TODO Specify all literals here in proxy config file.
+	public static String xsdFile = "/home/epad/DicomProxy/resources/schema/AIM_v3.xsd";
+	public static String collection = "aim.dbxml";
+	public static String namespace = "gme://caCORE.caCORE/3.2/edu.northwestern.radiology.AIM";
+	public static String serverUrl = "http://localhost:8899/exist/";
+	public static String username = "epaduser";
+	public static String password = "3p4dus3r";
 	public static String serviceAIM = "http://localhost:8080/aimresource/";
 	public static String serviceEvent = "http://localhost:8080/eventresource/";
 	public static String seriesOrder = "http://localhost:8080/seriesorder/";
-
 	public static String aeTitle = "EPAD_DCM";
 	public static String dsPort = "11112";
 
@@ -60,7 +60,7 @@ public class ProxyTools
 		int port = 9080;
 		String base = "/wado?";
 
-		WadoUrlBuilder wadoUrlBuilder = new WadoUrlBuilder(host, port, base, WadoUrlBuilder.Type.FILE);
+		WadoUrlBuilder wadoUrlBuilder = new WadoUrlBuilder(host, port, base, WadoUrlBuilder.ContentType.FILE);
 
 		// GET WADO call result.
 		wadoUrlBuilder.setStudyUID(studyUID);

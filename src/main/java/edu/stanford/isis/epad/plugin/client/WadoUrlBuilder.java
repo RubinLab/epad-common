@@ -17,14 +17,13 @@ import java.net.URLEncoder;
  */
 public class WadoUrlBuilder
 {
-
 	private static final int INVALID = -1;
 	private static final float INVALID_FLOAT = -1.0f;
 
 	private final String hostPath;
 	private final int port;
 	private final String baseParam;
-	private final Type contentType;
+	private final ContentType contentType;
 
 	private String studyUID = null;
 	private String seriesUID = null;
@@ -41,7 +40,7 @@ public class WadoUrlBuilder
 	private int zoomHeight = INVALID;
 	private int zoomWidth = INVALID;
 
-	public WadoUrlBuilder(String host, int port, String base, Type type)
+	public WadoUrlBuilder(String host, int port, String base, ContentType type)
 	{
 		hostPath = host;
 		this.port = port;
@@ -117,7 +116,6 @@ public class WadoUrlBuilder
 			throw new IllegalArgumentException("Value relations incorrect: " + zoomA + "<" + zoomC + " , " + zoomB + "<"
 					+ zoomD);
 		}
-
 	}
 
 	/**
@@ -142,16 +140,14 @@ public class WadoUrlBuilder
 	 */
 	public void setZoomSize(int height, int width)
 	{
-
 		throwExceptionIfNotImage();
 		zoomHeight = height;
 		zoomWidth = width;
-
 	}
 
 	private void throwExceptionIfNotImage()
 	{
-		if (contentType != Type.IMAGE) {
+		if (contentType != ContentType.IMAGE) {
 			throw new IllegalStateException("Only images should have window level/width set! type=" + contentType.name());
 		}
 	}
@@ -190,13 +186,14 @@ public class WadoUrlBuilder
 			sb.append("?");
 		}
 
+		// TODO Constants for these literals
 		sb.append("requestType=WADO");
 		sb.append("&studyUID=").append(studyUID);
 		sb.append("&seriesUID=").append(seriesUID);
 		sb.append("&objectUID=").append(objectUID);
 		sb.append("&contentType=").append(contentType.urlEncodedContentType());
 
-		if (contentType == Type.IMAGE) {
+		if (contentType == ContentType.IMAGE) {
 			buildWindowLevel(sb);
 			buildZoomRegion(sb);
 			buildZoomSize(sb);
@@ -238,10 +235,10 @@ public class WadoUrlBuilder
 	 * 
 	 * 
 	 */
-	public static enum Type {
+	public static enum ContentType {
 		FILE("application/dicom"), IMAGE("image/jpeg"), TEXT("text/html"), XML("text/xml");
 
-		Type(String type)
+		ContentType(String type)
 		{
 			contentType = type;
 		}
