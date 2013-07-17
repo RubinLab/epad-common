@@ -20,6 +20,7 @@
     <aim3api.version>1.0</aim3api.version>
     <gwt.version>2.5.1</gwt.version>
     <servlet.api.version>2.5</servlet.api.version>
+    <commons.httpclient.version>3.1</commons.httpclient.version>
     <log4j.version>1.2.16</log4j.version>
     <slf4j.version>1.6.1</slf4j.version>
     <junit.version>3.8.1</junit.version>
@@ -51,6 +52,12 @@
      <version>${gwt.version}</version>
      <scope>provided</scope>
    </dependency>
+
+    <dependency>
+	<groupId>commons-httpclient</groupId>
+	<artifactId>commons-httpclient</artifactId>
+        <version>${commons.httpclient.version}</version>
+    </dependency>
 
    <dependency>
      <groupId>log4j</groupId>
