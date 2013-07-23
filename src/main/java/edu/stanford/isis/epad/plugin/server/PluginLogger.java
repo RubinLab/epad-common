@@ -30,7 +30,7 @@ public class PluginLogger
 		FileHandler fileHandler;
 		try {
 			String timeStamp = createTimestamp();
-			fileHandler = new FileHandler("../log/epad-plugin-" + timeStamp + ".log", true);
+			fileHandler = new FileHandler("./log/epad-plugin-" + timeStamp + ".log", true); // TODO From config file
 			SimpleFormatter formatter = new SimpleFormatter();
 			fileHandler.setFormatter(formatter);
 

@@ -11,7 +11,6 @@
 
   <groupId>edu.stanford.isis.epad</groupId>
   <artifactId>epad-common</artifactId>
-  <!-- Inherit version from parent -->
   <packaging>jar</packaging>
   <name>ePAD Common Components</name>
 

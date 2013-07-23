@@ -36,7 +36,7 @@ public class ProxyLogger
 		// setup logging.
 		try {
 
-			FileHandler fh = new FileHandler("../log/dicom-proxy.log");
+			FileHandler fh = new FileHandler("./log/dicom-proxy.log"); // TODO Get from config file
 			fh.setFormatter(new LogFormatter());
 			log.addHandler(fh);
 
