@@ -9,7 +9,6 @@
     <relativePath>../isis-epad-project/pom.xml</relativePath>
   </parent>
 
-  <groupId>edu.stanford.isis.epad</groupId>
   <artifactId>epad-common</artifactId>
   <packaging>jar</packaging>
   <name>ePAD Common Components</name>
