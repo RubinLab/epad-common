@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>edu.stanford.isis</groupId>
+    <groupId>edu.stanford.isis.epad</groupId>
     <artifactId>epad-project</artifactId>
     <version>1.2-SNAPSHOT</version>
     <relativePath>../isis-epad-project/pom.xml</relativePath>
