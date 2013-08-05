@@ -11,7 +11,7 @@ package edu.stanford.isis.epad.common.dicom;
  *
  * @author amsnyder
  */
-public enum DicomSearchType
+public enum DicomStudySearchType
 {
 
     PATIENT_NAME("patientName"),
@@ -23,7 +23,7 @@ public enum DicomSearchType
 
     private String name;
 
-    DicomSearchType(String type){
+    DicomStudySearchType(String type){
         this.name =type;
     }
 
