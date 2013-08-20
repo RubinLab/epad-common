@@ -25,7 +25,6 @@ import edu.stanford.isis.epad.common.dicom.DicomStudyUID;
  */
 public class ResourceUtils
 {
-
 	private static final ProxyLogger log = ProxyLogger.getInstance();
 
 	private ResourceUtils()
@@ -33,7 +32,7 @@ public class ResourceUtils
 	}
 
 	/**
-	 * Write a jpg URL to a file
+	 * Write a JPG URL to a file
 	 * 
 	 * @param jpgUrl URL of a jpg image.
 	 * @param file Filename to write this image
@@ -77,16 +76,71 @@ public class ResourceUtils
 	}
 
 	/**
-	 * The base directory for the DicomProxy as a File.
+	 * Get the base directory for the ePAD web server as a File.
+	 * <p>
+	 * For the moment, we use ~/DicomProxy as the base directory for compatibility with pre-Restlet calls. Ultimately we
+	 * will change location to something more general.
 	 * 
 	 * @return File - base directory for DicomProxy.
 	 */
-	public static File getDicomProxyBaseDir()
+	public static String getEPADWebServerBaseDir()
 	{
-		String pwd = System.getProperty("user.dir");
-		// WTF String parent = pwd.substring(0,pwd.length()-4);
+		return System.getProperty("user.home") + "/DicomProxy/";
+	}
 
-		return new File(pwd);
+	public static String getEPADWebServerResourcesDir()
+	{
+		return getEPADWebServerBaseDir() + "resources/";
+	}
+
+	public static String getEPADWebServerEtcDir()
+	{
+		return getEPADWebServerBaseDir() + "etc/";
+	}
+
+	public static String getEPADWebServerUploadDir()
+	{
+		return getEPADWebServerResourcesDir() + "upload/";
+	}
+
+	public static String getEPADWebServerLogDir()
+	{
+		return getEPADWebServerBaseDir() + "log/";
+	}
+
+	public static String getEPADWebServerPNGDir()
+	{
+		return getEPADWebServerResourcesDir() + "dicom/";
+	}
+
+	public static String getEPADWebServerDicomTagDir()
+	{
+		return getEPADWebServerResourcesDir() + "dicom/";
+	}
+
+	public static String getEPADWebServerDicomDir()
+	{
+		return getEPADWebServerResourcesDir() + "dicom/";
+	}
+
+	public static String getEPADWebServerPNGGridDir()
+	{
+		return getEPADWebServerResourcesDir() + "dicom_grid/";
+	}
+
+	public static String getEPADWebServerPluginConfigFilePath()
+	{
+		return getEPADWebServerEtcDir() + "plugin-config.txt";
+	}
+
+	public static String getEPADWebServerConfigFilePath()
+	{
+		return getEPADWebServerEtcDir() + "proxy-config.properties";
+	}
+
+	public static String getEPADWebServerLogFilePath()
+	{
+		return getEPADWebServerLogDir() + "dicom-proxy.log";
 	}
 
 	/**
@@ -102,7 +156,6 @@ public class ResourceUtils
 		String studyDir = DicomFormatUtil.formatUidToDir(studyUID.toString());
 		String seriesName = DicomFormatUtil.formatUidToDir(seriesUID.toString());
 
-		return "resources/dicom/" + studyDir + "/thumbnail_" + seriesName + ".jpg";
+		return getEPADWebServerResourcesDir() + "/dicom/" + studyDir + "/thumbnail_" + seriesName + ".jpg";
 	}
-
 }

@@ -18,10 +18,9 @@ import java.util.logging.Logger;
  */
 public class ProxyLogger
 {
-	private static ProxyLogger ourInstance = new ProxyLogger();
-
-	final Logger log;
-	boolean useDebug = false;
+	private final static ProxyLogger ourInstance = new ProxyLogger();
+	private final Logger log;
+	private boolean useDebug = false;
 
 	public static ProxyLogger getInstance()
 	{
@@ -30,20 +29,23 @@ public class ProxyLogger
 
 	private ProxyLogger()
 	{
-
 		log = Logger.getAnonymousLogger();
 
-		// setup logging.
 		try {
-
-			FileHandler fh = new FileHandler("./log/dicom-proxy.log"); // TODO Get from config file
+			FileHandler fh = new FileHandler(getLogFilePath());
 			fh.setFormatter(new LogFormatter());
 			log.addHandler(fh);
-
 		} catch (Exception e) {
 			System.out.println("Failed to setup logging!" + e.getMessage());
 		}
+	}
 
+	private String getLogFilePath()
+	{
+		String logFilePath = ResourceUtils.getEPADWebServerLogFilePath();
+		log.info("ePAD web service log file: " + logFilePath);
+
+		return logFilePath;
 	}
 
 	/**
@@ -53,9 +55,8 @@ public class ProxyLogger
 	 */
 	public void debug(String message)
 	{
-		if (useDebug) {
+		if (useDebug)
 			info(message);
-		}
 	}
 
 	/**

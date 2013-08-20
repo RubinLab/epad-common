@@ -5,16 +5,16 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 
+import org.apache.log4j.Logger;
 import org.dcm4che2.data.DicomObject;
 import org.dcm4che2.data.Tag;
 
-/**
- * Class extracted from https://bmir-gforge.stanford.edu/svn/dirac/trunk/ePAD/ePAD-2012/DicomInterface to remove
- * dependency.
- * 
- */
 public class RasterProcessor
 {
+	/**
+	 * Logger object.
+	 */
+	Logger logger = Logger.getLogger(this.getClass());
 	/**
 	 * Controls amount of diagnostic output.
 	 */
@@ -662,11 +662,11 @@ public class RasterProcessor
 	 * @param propertiesValue object containing values
 	 */
 	/*
-	 * public RasterProcessor(Properties propertiesValue) { if (propertiesValue.containsKey("PixelRepresentation")) { try
-	 * { pixelRepresentation = (int) Integer.parseInt(propertiesValue.getProperty("PropertiesValue")); } catch (Exception
-	 * e) { ; } } if (propertiesValue.containsKey("PhotometricInterpretation")) { try { photometricInterpretation =
-	 * propertiesValue.getProperty("PhotometricInterpretation"); } catch (Exception e) { ; } } if
-	 * (propertiesValue.containsKey("WindowCenter")) { try { windowCenter[0] = (float)
+	 * public RasterProcessorDP(Properties propertiesValue) { if (propertiesValue.containsKey("PixelRepresentation")) {
+	 * try { pixelRepresentation = (int) Integer.parseInt(propertiesValue.getProperty("PropertiesValue")); } catch
+	 * (Exception e) { ; } } if (propertiesValue.containsKey("PhotometricInterpretation")) { try {
+	 * photometricInterpretation = propertiesValue.getProperty("PhotometricInterpretation"); } catch (Exception e) { ; } }
+	 * if (propertiesValue.containsKey("WindowCenter")) { try { windowCenter[0] = (float)
 	 * Float.parseFloat(propertiesValue.getProperty("windowCenter")); } catch (Exception e) { ; } } if
 	 * (propertiesValue.containsKey("WindowWidth")) { try { windowWidth[0] = (float)
 	 * Float.parseFloat(propertiesValue.getProperty("windowWidth")); } catch (Exception e) { ; } } if
@@ -716,6 +716,12 @@ public class RasterProcessor
 	 * @param value content of PixelData
 	 * @return grayscale
 	 */
+	/*
+	 * protected int dataValue(int value) { int working = value; if (pixelRepresentation == 0) { // unsigned DataPixel
+	 * values return working & dataMask; } else { if (working > (1<<(bitsStored-1) - 1)) { working = (working & dataMask)
+	 * - (1<<(bitsStored )); } working = working + adjustment; if (working < 0) { return 0; } else { return working; } } }
+	 */
+
 	protected int dataValue(int value)
 	{
 		int working = value;
@@ -728,7 +734,8 @@ public class RasterProcessor
 			}
 			working = working + adjustment;
 			if (working < 0) {
-				return 0;
+				/* previously read return 0 */
+				return (1 << (bitsStored)) - 1;
 			} else {
 				return working;
 			}

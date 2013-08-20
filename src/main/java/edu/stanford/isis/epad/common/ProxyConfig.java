@@ -52,9 +52,7 @@ public class ProxyConfig
 	private static ProxyLogger log = ProxyLogger.getInstance();
 	private static ProxyConfig ourInstance = new ProxyConfig();
 
-	// private static String PROXY_CONFIG_FILE_PATH = "../etc/proxy-config.properties";
-
-	Properties properties;
+	private Properties properties;
 
 	public static ProxyConfig getInstance()
 	{
@@ -63,13 +61,11 @@ public class ProxyConfig
 
 	private ProxyConfig()
 	{
-
 		try {
 			properties = new Properties();
 			File configFile = getConfigFile();
-			if (!configFile.exists()) {
+			if (!configFile.exists())
 				throw new IllegalStateException("Could not find file: " + configFile.getAbsolutePath());
-			}
 
 			FileInputStream fis = new FileInputStream(configFile);
 			try {
@@ -77,9 +73,7 @@ public class ProxyConfig
 			} finally {
 				fis.close();
 			}
-
 			readProxyLoggerDebugState();
-
 		} catch (Exception e) {
 			System.out.println("Error reading config file: " + e.getMessage());
 			log.sever("Error reading config file", e);
@@ -88,16 +82,8 @@ public class ProxyConfig
 
 	private File getConfigFile()
 	{
-		File base = ResourceUtils.getDicomProxyBaseDir();
-
-		String configPath = base.getAbsolutePath();
-		if (!configPath.endsWith("/")) {
-			configPath = configPath + "/";
-		}
-		File configFile = new File(configPath + "etc/proxy-config.properties");
-
-		System.out.println("Proxy config File: " + configFile.getAbsolutePath());
-		// log.info("Config File: "+configFile.getAbsolutePath());
+		File configFile = new File(ResourceUtils.getEPADWebServerConfigFilePath());
+		log.info("Proxy config file: " + configFile.getAbsolutePath());
 
 		return configFile;
 	}
@@ -110,7 +96,6 @@ public class ProxyConfig
 	 */
 	public String getParam(String name)
 	{
-
 		return properties.getProperty(name);
 	}
 
@@ -157,5 +142,4 @@ public class ProxyConfig
 			log.setDebug(true);
 		}
 	}
-
 }
