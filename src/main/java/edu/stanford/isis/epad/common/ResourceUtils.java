@@ -128,11 +128,6 @@ public class ResourceUtils
 		return getEPADWebServerResourcesDir() + "schema/";
 	}
 
-	public static String getAIM3Namespace()
-	{
-		return "gme://caCORE.caCORE/3.2/edu.northwestern.radiology.AIM";
-	}
-
 	public static String getEPADWebServerAIM3XSDFilePath()
 	{
 		return getEPADWebServerSchemaDir() + "AIM_v3.xsd";
