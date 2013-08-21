@@ -88,6 +88,11 @@ public class ResourceUtils
 		return System.getProperty("user.home") + "/DicomProxy/";
 	}
 
+	public static String getEPADWebServerWebappsDir()
+	{
+		return getEPADWebServerBaseDir() + "webapps/";
+	}
+
 	public static String getEPADWebServerResourcesDir()
 	{
 		return getEPADWebServerBaseDir() + "resources/";
@@ -101,6 +106,36 @@ public class ResourceUtils
 	public static String getEPADWebServerUploadDir()
 	{
 		return getEPADWebServerResourcesDir() + "upload/";
+	}
+
+	public static String getEPADWebServerRSNADir()
+	{
+		return getEPADWebServerResourcesDir() + "rsna/";
+	}
+
+	public static String getEPADWebServerAnnotationsDir()
+	{
+		return getEPADWebServerResourcesDir() + "annotations/";
+	}
+
+	public static String getEPADWebServerAnnotationsUploadDir()
+	{
+		return getEPADWebServerAnnotationsDir() + "upload/";
+	}
+
+	public static String getEPADWebServerSchemaDir()
+	{
+		return getEPADWebServerResourcesDir() + "schema/";
+	}
+
+	public static String getAIM3Namespace()
+	{
+		return "gme://caCORE.caCORE/3.2/edu.northwestern.radiology.AIM";
+	}
+
+	public static String getEPADWebServerAIM3XSDFilePath()
+	{
+		return getEPADWebServerSchemaDir() + "AIM_v3.xsd";
 	}
 
 	public static String getEPADWebServerLogDir()

@@ -22,9 +22,7 @@ public class ProxyTools
 	public static String wadoProxy = ProxyConfig.getInstance().getParam("wadoProxy");
 
 	// TODO Specify all literals here in proxy config file.
-	public static String xsdFile = "/home/epad/DicomProxy/resources/schema/AIM_v3.xsd";
 	public static String collection = "aim.dbxml";
-	public static String namespace = "gme://caCORE.caCORE/3.2/edu.northwestern.radiology.AIM";
 	public static String serverUrl = "http://localhost:8899/exist/";
 	public static String username = "epaduser";
 	public static String password = "3p4dus3r";

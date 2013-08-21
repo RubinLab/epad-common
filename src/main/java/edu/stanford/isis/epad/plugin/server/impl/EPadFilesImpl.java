@@ -156,8 +156,7 @@ public class EPadFilesImpl implements EPadFiles
 		// save in a temp file.
 		//
 
-		// look in the ../resources/annotations/
-		File dir = new File("../resources/annotations");
+		File dir = new File(ResourceUtils.getEPADWebServerAnnotationsDir());
 		if (!dir.exists()) {
 			logger.info("WARNING: Couldn't find annotations dir: " + dir.getAbsolutePath());
 			return null;
