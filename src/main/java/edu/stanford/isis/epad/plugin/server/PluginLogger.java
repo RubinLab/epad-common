@@ -8,6 +8,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import edu.stanford.isis.epad.common.ResourceUtils;
+
 /**
  * @author amsnyder
  */
@@ -24,19 +26,16 @@ public class PluginLogger
 		if (logger != null) {
 			return logger;
 		}
-
 		logger = Logger.getLogger("EPadPluginLogger");
 
 		FileHandler fileHandler;
 		try {
 			String timeStamp = createTimestamp();
-			fileHandler = new FileHandler("./log/epad-plugin-" + timeStamp + ".log", true); // TODO From config file
+			fileHandler = new FileHandler(ResourceUtils.getEPADWebServerLogDir() + "epad-plugin-" + timeStamp + ".log", true);
 			SimpleFormatter formatter = new SimpleFormatter();
 			fileHandler.setFormatter(formatter);
-
 			logger.addHandler(fileHandler);
 			logger.setLevel(Level.ALL);
-
 		} catch (IOException ioe) {
 			System.err.println("PluginLogger had: " + ioe.getMessage());
 		} catch (SecurityException se) {

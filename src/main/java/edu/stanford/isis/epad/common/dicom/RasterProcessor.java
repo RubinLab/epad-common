@@ -568,7 +568,7 @@ public class RasterProcessor
 		if (objectValue.containsValue(Tag.PixelRepresentation)) {
 			pixelRepresentation = objectValue.getInt(Tag.PixelRepresentation);
 		} else {
-			System.out.println("Default used for PixelRepresentation");
+			logger.info("Default used for PixelRepresentation");
 			pixelRepresentation = 0;
 		}
 		if (objectValue.containsValue(Tag.PhotometricInterpretation)) {
@@ -581,30 +581,30 @@ public class RasterProcessor
 			if (nested.containsValue(Tag.RescaleIntercept)) {
 				rescaleIntercept = nested.getFloat(Tag.RescaleIntercept);
 			} else {
-				System.out.println("Default value of 0.0 used for RescaleIntercept");
+				logger.info("Default value of 0.0 used for RescaleIntercept");
 				rescaleIntercept = 0.0f;
 			}
 			if (nested.containsValue(Tag.RescaleSlope)) {
 				rescaleSlope = nested.getFloat(Tag.RescaleSlope);
 			} else {
-				System.out.println("Default value of 1.0 used for RescaleSlope");
+				logger.info("Default value of 1.0 used for RescaleSlope");
 				rescaleSlope = 1.0f;
 			}
 			if (nested.containsValue(Tag.RescaleType)) {
 				rescaleType = nested.getString(Tag.RescaleType);
 			}
-			System.out.println("Object has Modality LUT Sequence");
+			logger.info("Object has Modality LUT Sequence");
 		} else {
 			if (objectValue.containsValue(Tag.RescaleIntercept)) {
 				rescaleIntercept = objectValue.getFloat(Tag.RescaleIntercept);
 			} else {
-				System.out.println("Default value of 0.0 used for RescaleIntercept");
+				logger.info("Default value of 0.0 used for RescaleIntercept");
 				rescaleIntercept = 0.0f;
 			}
 			if (objectValue.containsValue(Tag.RescaleSlope)) {
 				rescaleSlope = objectValue.getFloat(Tag.RescaleSlope);
 			} else {
-				System.out.println("Default value of 1.0 used for RescaleSlope");
+				logger.info("Default value of 1.0 used for RescaleSlope");
 				rescaleSlope = 1.0f;
 			}
 			if (objectValue.containsValue(Tag.RescaleType)) {
@@ -626,13 +626,13 @@ public class RasterProcessor
 			windowWidth = objectValue.getFloats(Tag.WindowWidth);
 		} else {
 			windowWidth[0] = -100.0f;
-			System.out.println("DMust calculate WindowCenter");
+			logger.info("DMust calculate WindowCenter");
 		}
 		if (objectValue.containsValue(Tag.WindowCenter)) {
 			windowCenter = objectValue.getFloats(Tag.WindowCenter);
 		} else {
 			windowCenter[0] = -100.0f;
-			System.out.println("Must calculate WindowCenter");
+			logger.info("Must calculate WindowCenter");
 		}
 		if (objectValue.containsValue(Tag.WindowCenterWidthExplanation)) {
 			windowCenterWidthExplanation = objectValue.getStrings(Tag.WindowCenterWidthExplanation);
@@ -694,14 +694,14 @@ public class RasterProcessor
 		unusedHighBits = bitsAllocated - 1 - highBit;
 		unusedLowBits = highBit - bitsStored + 1;
 		dataMask = (1 << bitsStored) - 1;
-		System.out.println("Bits allocated=" + Integer.toString(bitsAllocated) + ", stored=" + Integer.toString(bitsStored)
+		logger.info("Bits allocated=" + Integer.toString(bitsAllocated) + ", stored=" + Integer.toString(bitsStored)
 				+ ", high=" + Integer.toString(highBit));
 		if (pixelRepresentation == 0) {
-			System.out.println("Unsigned values");
+			logger.info("Unsigned values");
 		} else {
-			System.out.println("Signed values");
+			logger.info("Signed values");
 		}
-		System.out.println("Data mask is " + Integer.toString(dataMask, 16));
+		logger.info("Data mask is " + Integer.toString(dataMask, 16));
 
 	}
 
@@ -729,7 +729,9 @@ public class RasterProcessor
 			/* unsigned DataPixel values */
 			return working & dataMask;
 		} else {
-			if (working > (1 << (bitsStored - 1) - 1)) {
+			// Previously: if (working > (1 << (bitsStored - 1) - 1)) {
+			if (working > (1 << (bitsStored - 1)) - 1) {
+				logger.info(".");
 				working = (working & dataMask) - (1 << (bitsStored));
 			}
 			working = working + adjustment;
@@ -784,57 +786,58 @@ public class RasterProcessor
 	 */
 	public BufferedImage buildPng(Raster raster)
 	{
-		int[] dummy1 = new int[1];
-		int[] gray = new int[1];
-		int[] bgr = new int[3];
-		BufferedImage working = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-		WritableRaster writable = working.getRaster();
-		Distribution p1 = null;
-		Distribution p2 = null;
-		Distribution p3 = null;
+		int[] grayInputArray = new int[1];
+		int[] grayArray = new int[1];
+		int[] bgrArray = new int[3];
+		BufferedImage pngImage = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+		WritableRaster writablePNGRaster = pngImage.getRaster();
+		Distribution rawValuesDistribution = null;
+		Distribution highOrderBitsDistribution = null;
+		Distribution lowOrderBitsDistribution = null;
+
 		if (debugLevel > 0) {
 			if (pixelRepresentation == 0) {
-				System.out.println("Running buildPng with unsigned PixelData");
+				logger.info("Running buildPNF with unsigned PixelData");
 			} else {
-				System.out.println("Running buildPng with signed PixelData");
+				logger.info("Running buildPNG with signed PixelData");
 			}
-			p1 = new Distribution(-40000.0f, 40000.0f);
-			p1.setDesc("buildPng - Raw values");
-			p2 = new Distribution(0.0f, 256.0f);
-			p2.setDesc("buildPng - high order bits");
-			p3 = new Distribution(0.0f, 256.0f);
-			p3.setDesc("buildPng - low order bits");
+			rawValuesDistribution = new Distribution(-40000.0f, 40000.0f);
+			rawValuesDistribution.setDesc("buildPng - Raw values");
+			highOrderBitsDistribution = new Distribution(0.0f, 256.0f);
+			highOrderBitsDistribution.setDesc("buildPng - high order bits");
+			lowOrderBitsDistribution = new Distribution(0.0f, 256.0f);
+			lowOrderBitsDistribution.setDesc("buildPng - low order bits");
 		}
 		for (int x = 0; x < raster.getWidth(); x++) {
 			for (int y = 0; y < raster.getHeight(); y++) {
-				gray = raster.getPixel(x, y, dummy1);
-				int pixelValue = dataValue(gray[0]);
+				grayArray = raster.getPixel(x, y, grayInputArray);
+				int pixelValue = dataValue(grayArray[0]);
 				if (debugLevel > 0) {
-					p1.add(pixelValue);
-					p2.add(high(pixelValue));
-					p3.add(low(pixelValue));
+					rawValuesDistribution.add(pixelValue);
+					highOrderBitsDistribution.add(high(pixelValue));
+					lowOrderBitsDistribution.add(low(pixelValue));
 				}
-				bgr[0] = high(pixelValue);
-				bgr[1] = low(pixelValue);
+				bgrArray[0] = high(pixelValue);
+				bgrArray[1] = low(pixelValue);
 				if (y == 0 && x == 0) {
-					bgr[2] = high(getAdjustment());
+					bgrArray[2] = high(getAdjustment());
 				} else if (y == 0 && x == 1) {
-					bgr[2] = low(getAdjustment());
+					bgrArray[2] = low(getAdjustment());
 				} else {
-					bgr[2] = 0;
+					bgrArray[2] = 0;
 				}
-				writable.setPixel(x, y, bgr);
+				writablePNGRaster.setPixel(x, y, bgrArray);
 			}
 		}
 		if (debugLevel > 0) {
-			System.out.println("Distribution of gray values");
-			p1.print();
-			System.out.println("Distribution of high order bits");
-			p2.print();
-			System.out.println("Distribution of low order bits");
-			p3.print();
+			logger.info("Distribution of gray values");
+			rawValuesDistribution.print();
+			logger.info("Distribution of high order bits");
+			highOrderBitsDistribution.print();
+			logger.info("Distribution of low order bits");
+			lowOrderBitsDistribution.print();
 		}
-		return working;
+		return pngImage;
 	}
 
 	/**
@@ -848,51 +851,51 @@ public class RasterProcessor
 	 */
 	public BufferedImage buildRawS(Raster raster)
 	{
-		int[] dummy1 = new int[1];
-		int[] gray = new int[1];
-		int[] bgr = new int[3];
+		int[] grayInputArray = new int[1];
+		int[] grayArray = new int[1];
+		int[] bgrArray = new int[3];
 		BufferedImage working = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 		WritableRaster writable = working.getRaster();
-		Distribution p1 = null;
-		Distribution p2 = null;
-		Distribution p3 = null;
-		if (debugLevel > 0) {
+		Distribution rawValuesDistribution = null;
+		Distribution highOrderBitsDistribution = null;
+		Distribution lowOrderBitsDistribution = null;
 
+		if (debugLevel > 0) {
 			if (pixelRepresentation == 0) {
-				System.out.println("Running buildRawS with unsigned PixelData");
-				p1 = new Distribution(0, 10000.0f);
+				logger.info("Running buildRawS with unsigned PixelData");
+				rawValuesDistribution = new Distribution(0, 10000.0f);
 			} else {
-				System.out.println("Running buildRawS with signed PixelData");
-				p1 = new Distribution(32768.0f - 20000.0f, 32768.0f + 20000.0f);
+				logger.info("Running buildRawS with signed PixelData");
+				rawValuesDistribution = new Distribution(32768.0f - 20000.0f, 32768.0f + 20000.0f);
 			}
-			p1.setDesc("buildRawS - Distribution of PixelData values");
-			p2 = new Distribution(0.0f, 256.0f);
-			p2.setDesc("buildRawS - Distribution of high order bits");
-			p3 = new Distribution(0.0f, 256.0f);
-			p3.setDesc("buildRawS - Distribution of low order bits");
+			rawValuesDistribution.setDesc("buildRawS - Distribution of PixelData values");
+			highOrderBitsDistribution = new Distribution(0.0f, 256.0f);
+			highOrderBitsDistribution.setDesc("buildRawS - Distribution of high order bits");
+			lowOrderBitsDistribution = new Distribution(0.0f, 256.0f);
+			lowOrderBitsDistribution.setDesc("buildRawS - Distribution of low order bits");
 		}
 		for (int x = 0; x < raster.getWidth(); x++) {
 			for (int y = 0; y < raster.getHeight(); y++) {
-				gray = raster.getPixel(x, y, dummy1);
-				int pixelValue = dataValue(gray[0]);
+				grayArray = raster.getPixel(x, y, grayInputArray);
+				int pixelValue = dataValue(grayArray[0]);
 				if (debugLevel > 0) {
-					p1.add(pixelValue);
-					p2.add(high(pixelValue));
-					p3.add(low(pixelValue));
+					rawValuesDistribution.add(pixelValue);
+					highOrderBitsDistribution.add(high(pixelValue));
+					lowOrderBitsDistribution.add(low(pixelValue));
 				}
-				bgr[0] = high(pixelValue);
-				bgr[1] = low(pixelValue);
-				bgr[2] = 0;
-				writable.setPixel(x, y, bgr);
+				bgrArray[0] = high(pixelValue);
+				bgrArray[1] = low(pixelValue);
+				bgrArray[2] = 0;
+				writable.setPixel(x, y, bgrArray);
 			}
 		}
 		if (debugLevel > 0) {
-			System.out.println("Distribution of gray values");
-			p1.print();
-			System.out.println("Distribution of high order bits");
-			p2.print();
+			logger.info("Distribution of gray values");
+			rawValuesDistribution.print();
+			logger.info("Distribution of high order bits");
+			highOrderBitsDistribution.print();
 			System.out.println("Distribution of low order bits");
-			p3.print();
+			lowOrderBitsDistribution.print();
 		}
 		return working;
 	}
@@ -908,48 +911,50 @@ public class RasterProcessor
 	 */
 	public BufferedImage buildScaled(Raster raster)
 	{
-		int[] dummy1 = new int[1];
-		int[] gray = new int[1];
-		int[] bgr = new int[3];
-		BufferedImage working = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-		WritableRaster writable = working.getRaster();
-		Distribution p1 = null;
-		Distribution p2 = null;
-		Distribution p3 = null;
+		int[] grayInputArray = new int[1];
+		int[] grayArray = new int[1];
+		int[] bgrArray = new int[3];
+		BufferedImage pngImage = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+		WritableRaster pngRaster = pngImage.getRaster();
+		Distribution rawValuesDistribution = null;
+		Distribution highOrderBitsDistribution = null;
+		Distribution lowOrderBitsDistribution = null;
+
 		if (debugLevel > 0) {
-			p1 = new Distribution(-40000.0f, 40000.0f);
-			p1.setDesc("buildScaled - Distribution of rescaled gray values");
-			p2 = new Distribution(0.0f, 256.0f);
-			p2.setDesc("buildScaled - Distribution of high order bits");
-			p3 = new Distribution(0.0f, 256.0f);
-			p3.setDesc("buildScaled - Distribution of low order bits");
+			rawValuesDistribution = new Distribution(-40000.0f, 40000.0f);
+			rawValuesDistribution.setDesc("buildScaled - Distribution of rescaled gray values");
+			highOrderBitsDistribution = new Distribution(0.0f, 256.0f);
+			highOrderBitsDistribution.setDesc("buildScaled - Distribution of high order bits");
+			lowOrderBitsDistribution = new Distribution(0.0f, 256.0f);
+			lowOrderBitsDistribution.setDesc("buildScaled - Distribution of low order bits");
 		}
 		for (int x = 0; x < raster.getWidth(); x++) {
 			for (int y = 0; y < raster.getHeight(); y++) {
-				gray = raster.getPixel(x, y, dummy1);
-				int pixelValue = dataValue(gray[0]);
-				float value = rescaleSlope * pixelValue + rescaleIntercept;
-				pixelValue = (int)value;
+				grayArray = raster.getPixel(x, y, grayInputArray);
+				int pixelValue = dataValue(grayArray[0]);
+				float scaledValue = rescaleSlope * pixelValue + rescaleIntercept;
+				pixelValue = (int)scaledValue;
+
 				if (debugLevel > 0) {
-					p1.add(pixelValue);
-					p2.add(high(pixelValue));
-					p3.add(low(pixelValue));
+					rawValuesDistribution.add(pixelValue);
+					highOrderBitsDistribution.add(high(pixelValue));
+					lowOrderBitsDistribution.add(low(pixelValue));
 				}
-				bgr[0] = high(pixelValue);
-				bgr[1] = low(pixelValue);
-				bgr[2] = 0;
-				writable.setPixel(x, y, bgr);
+				bgrArray[0] = high(pixelValue);
+				bgrArray[1] = low(pixelValue);
+				bgrArray[2] = 0;
+				pngRaster.setPixel(x, y, bgrArray);
 			}
 		}
 		if (debugLevel > 0) {
-			System.out.println("Distribution of rescaled gray values");
-			p1.print();
-			System.out.println("Distribution of rescaled high order bits");
-			p2.print();
-			System.out.println("Distribution of rescaled low order bits");
-			p3.print();
+			logger.info("Distribution of rescaled gray values");
+			rawValuesDistribution.print();
+			logger.info("Distribution of rescaled high order bits");
+			highOrderBitsDistribution.print();
+			logger.info("Distribution of rescaled low order bits");
+			lowOrderBitsDistribution.print();
 		}
-		return working;
+		return pngImage;
 	}
 
 	/**
@@ -981,8 +986,8 @@ public class RasterProcessor
 			}
 			windowWidth[0] = (maximumGrayLevel - minimumGrayLevel) * rescaleSlope;
 			windowCenter[0] = (maximumGrayLevel + minimumGrayLevel) * rescaleSlope / 2.0f + rescaleIntercept;
-			System.out.println("WindowWidth is " + Float.toString(windowWidth[0]));
-			System.out.println("WindowCenter is " + Float.toString(windowCenter[0]));
+			logger.info("WindowWidth is " + Float.toString(windowWidth[0]));
+			logger.info("WindowCenter is " + Float.toString(windowCenter[0]));
 		}
 		BufferedImage working = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
 		WritableRaster writable = working.getRaster();

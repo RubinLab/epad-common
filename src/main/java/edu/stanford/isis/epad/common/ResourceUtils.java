@@ -103,6 +103,11 @@ public class ResourceUtils
 		return getEPADWebServerBaseDir() + "etc/";
 	}
 
+	public static String getEPADWebServerLoginDir()
+	{
+		return getEPADWebServerEtcDir() + "login/";
+	}
+
 	public static String getEPADWebServerUploadDir()
 	{
 		return getEPADWebServerResourcesDir() + "upload/";
