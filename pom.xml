@@ -21,7 +21,7 @@
      <version>${aim3api.version}</version>
    </dependency>
 
-   <!-- This is in the parent project repository because we could not find a public Maven repository containing it. -->
+   <!-- This is in the project repository (in ./lib) because we could not find a public Maven repository containing it. -->
    <dependency>
      <groupId>com.pixelmed</groupId>
      <artifactId>pixelmed</artifactId>

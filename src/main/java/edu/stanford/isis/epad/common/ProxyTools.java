@@ -30,6 +30,8 @@ public class ProxyTools
 	public static final String eventResourceURI = ProxyConfig.getInstance().getParam("eventResourceURI");
 	public static final String seriesOrderURI = ProxyConfig.getInstance().getParam("seriesOrderURI");
 
+	private static final ProxyLogger logger = ProxyLogger.getInstance();
+
 	private static String convertDicomNameToImageUID(String currFileName)
 	{
 		int lastDotIndex = currFileName.lastIndexOf('.');
@@ -119,12 +121,14 @@ public class ProxyTools
 			String dcmServerTitlePort = aeTitle + "@localhost:" + dicomServerPort;
 			dcmServerTitlePort = dcmServerTitlePort.trim();
 
-			System.out.println("Sending 1 files - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
+			logger.info("Sending 1 files - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
 
 			String[] command = { "./dcmsnd", dcmServerTitlePort, inputPathFile };
 
 			ProcessBuilder pb = new ProcessBuilder(command);
-			pb.directory(new File("../etc/scripts/tpl/bin"));
+			String dicomBinDirectoryPath = ResourceUtils.getEPADWebServerDICOMBinDir();
+			logger.info("DICOM binary directory: " + dicomBinDirectoryPath);
+			pb.directory(new File(dicomBinDirectoryPath));
 
 			Process process = pb.start();
 			process.getOutputStream();// get the output stream.
@@ -145,28 +149,24 @@ public class ProxyTools
 				// long totalTime = System.currentTimeMillis() - startTime;
 				// log.info("Tags exit value is: " + exitValue+" and took: "+totalTime+" ms");
 			} catch (InterruptedException e) {
-				System.out.println("Didn't send dicom files in: " + inputPathFile);
+				logger.info("Didn't send DICOM files in: " + inputPathFile);
 			}
-
 			String cmdLineOutput = sb.toString();
-			System.out.println(cmdLineOutput);
+			logger.info(cmdLineOutput);
 
 			if (cmdLineOutput.toLowerCase().contains("error")) {
 				throw new IllegalStateException("Failed for: " + cmdLineOutput);
 			}
-
 		} catch (Exception e) {
-
 			if (e instanceof IllegalStateException && throwException) {
 				throw e;
 			}
-
-			System.out.println("DicomHeadersTask failed to create dicom tags file.");
+			logger.warning("DicomHeadersTask failed to create DICOM tags file: " + e.getMessage());
 			if (throwException) {
-				throw new IllegalStateException("DicomHeadersTask failed to create dicom tags file.", e);
+				throw new IllegalStateException("DicomHeadersTask failed to create DICcom tags file.", e);
 			}
 		} catch (OutOfMemoryError oome) {
-			System.out.println("DicomHeadersTask OutOfMemoryError: ");
+			logger.warning("DicomHeadersTask OutOfMemoryError: ");
 			if (throwException) {
 				throw new IllegalStateException("DicomHeadersTask OutOfMemoryError: ", oome);
 			}
@@ -187,7 +187,7 @@ public class ProxyTools
 				writer = null;
 			}
 		} catch (Exception e) {
-			System.out.println("Failed to close writer");
+			logger.info("Failed to close writer");
 		}
 	}
 
@@ -199,7 +199,7 @@ public class ProxyTools
 				reader = null;
 			}
 		} catch (Exception e) {
-			System.out.println("Failed to close reader");
+			logger.info("Failed to close reader");
 		}
 	}
 
@@ -211,7 +211,7 @@ public class ProxyTools
 				stream = null;
 			}
 		} catch (Exception e) {
-			System.out.println("Failed to close stream");
+			logger.info("Failed to close stream");
 		}
 	}
 
@@ -223,7 +223,7 @@ public class ProxyTools
 
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(url);
-		System.out.println("getPositionOfImageInSeries = " + url);
+		logger.info("getPositionOfImageInSeries = " + url);
 
 		// Execute the GET method
 		int statusCode = client.executeMethod(method);
@@ -276,9 +276,9 @@ public class ProxyTools
 			}
 			resultat = true; // Copie réussie
 		} catch (java.io.FileNotFoundException f) {
-			System.out.println("FileTools.copyFile() = FileNotFoundException");
+			logger.info("FileTools.copyFile() = FileNotFoundException");
 		} catch (java.io.IOException e) {
-			System.out.println("FileTools.copyFile() = IOException");
+			logger.info("FileTools.copyFile() = IOException");
 		} finally {
 			// Quoi qu'il arrive, on ferme les flux
 			try {

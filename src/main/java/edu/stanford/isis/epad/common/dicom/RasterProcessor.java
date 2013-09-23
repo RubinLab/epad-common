@@ -5,16 +5,17 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 
-import org.apache.log4j.Logger;
 import org.dcm4che2.data.DicomObject;
 import org.dcm4che2.data.Tag;
+
+import edu.stanford.isis.epad.common.ProxyLogger;
 
 public class RasterProcessor
 {
 	/**
 	 * Logger object.
 	 */
-	Logger logger = Logger.getLogger(this.getClass());
+	private static ProxyLogger logger = ProxyLogger.getInstance();
 	/**
 	 * Controls amount of diagnostic output.
 	 */
@@ -690,7 +691,6 @@ public class RasterProcessor
 	 */
 	protected void common()
 	{
-
 		unusedHighBits = bitsAllocated - 1 - highBit;
 		unusedLowBits = highBit - bitsStored + 1;
 		dataMask = (1 << bitsStored) - 1;
@@ -702,7 +702,6 @@ public class RasterProcessor
 			logger.info("Signed values");
 		}
 		logger.info("Data mask is " + Integer.toString(dataMask, 16));
-
 	}
 
 	/**
@@ -716,27 +715,17 @@ public class RasterProcessor
 	 * @param value content of PixelData
 	 * @return grayscale
 	 */
-	/*
-	 * protected int dataValue(int value) { int working = value; if (pixelRepresentation == 0) { // unsigned DataPixel
-	 * values return working & dataMask; } else { if (working > (1<<(bitsStored-1) - 1)) { working = (working & dataMask)
-	 * - (1<<(bitsStored )); } working = working + adjustment; if (working < 0) { return 0; } else { return working; } } }
-	 */
-
 	protected int dataValue(int value)
 	{
 		int working = value;
-		if (pixelRepresentation == 0) {
-			/* unsigned DataPixel values */
+		if (pixelRepresentation == 0) { // Unsigned DataPixel values
 			return working & dataMask;
-		} else {
-			// Previously: if (working > (1 << (bitsStored - 1) - 1)) {
+		} else { // Signed DataPixel values
 			if (working > (1 << (bitsStored - 1)) - 1) {
-				logger.info(".");
 				working = (working & dataMask) - (1 << (bitsStored));
 			}
 			working = working + adjustment;
 			if (working < 0) {
-				/* previously read return 0 */
 				return (1 << (bitsStored)) - 1;
 			} else {
 				return working;
@@ -762,7 +751,7 @@ public class RasterProcessor
 			/* unsigned DataPixel values */
 			return working & ((1 << bitsStored) - 1);
 		} else {
-			if (working > (1 << (bitsStored - 1) - 1)) {
+			if (working > (1 << (bitsStored - 1)) - 1) {
 				return (working & dataMask) - (1 << bitsStored);
 			} else {
 				return (working & dataMask);
@@ -786,18 +775,18 @@ public class RasterProcessor
 	 */
 	public BufferedImage buildPng(Raster raster)
 	{
-		int[] grayInputArray = new int[1];
-		int[] grayArray = new int[1];
-		int[] bgrArray = new int[3];
 		BufferedImage pngImage = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 		WritableRaster writablePNGRaster = pngImage.getRaster();
 		Distribution rawValuesDistribution = null;
 		Distribution highOrderBitsDistribution = null;
 		Distribution lowOrderBitsDistribution = null;
+		int[] grayInputArray = new int[1];
+		int[] grayArray = new int[1];
+		int[] bgrArray = new int[3];
 
 		if (debugLevel > 0) {
 			if (pixelRepresentation == 0) {
-				logger.info("Running buildPNF with unsigned PixelData");
+				logger.info("Running buildPNG with unsigned PixelData");
 			} else {
 				logger.info("Running buildPNG with signed PixelData");
 			}
@@ -829,6 +818,15 @@ public class RasterProcessor
 				writablePNGRaster.setPixel(x, y, bgrArray);
 			}
 		}
+		/*
+		 * logger.info("TestingXXXX"); int[] bgrInputArray = new int[3]; for (int x = 0; x < raster.getWidth(); x++) { for
+		 * (int y = 0; y < raster.getHeight(); y++) { grayArray = raster.getPixel(x, y, grayInputArray); int rawPixelValue =
+		 * grayArray[0]; int pixelValue = dataValue(rawPixelValue);
+		 * 
+		 * bgrArray = writablePNGRaster.getPixel(x, y, bgrInputArray); if (bgrArray[0] != high(pixelValue))
+		 * logger.info("Broken"); if (bgrArray[1] != low(pixelValue)) logger.info("Broken2"); if (x > 1 && bgrArray[2] != 0)
+		 * logger.info("Also broken"); } }
+		 */
 		if (debugLevel > 0) {
 			logger.info("Distribution of gray values");
 			rawValuesDistribution.print();

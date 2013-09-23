@@ -65,7 +65,7 @@ public class ProxyConfig
 			properties = new Properties();
 			File configFile = getConfigFile();
 			if (!configFile.exists())
-				throw new IllegalStateException("Could not find file: " + configFile.getAbsolutePath());
+				throw new IllegalStateException("Could not find configuration file: " + configFile.getAbsolutePath());
 
 			FileInputStream fis = new FileInputStream(configFile);
 			try {
@@ -75,15 +75,14 @@ public class ProxyConfig
 			}
 			readProxyLoggerDebugState();
 		} catch (Exception e) {
-			System.out.println("Error reading config file: " + e.getMessage());
-			log.sever("Error reading config file", e);
+			log.sever("Error reading configuration file", e);
 		}
 	}
 
 	private File getConfigFile()
 	{
 		File configFile = new File(ResourceUtils.getEPADWebServerConfigFilePath());
-		log.info("Proxy config file: " + configFile.getAbsolutePath());
+		log.info("Configuration file: " + configFile.getAbsolutePath());
 
 		return configFile;
 	}

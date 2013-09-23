@@ -76,12 +76,12 @@ public class ResourceUtils
 	}
 
 	/**
-	 * Get the base directory for the ePAD web server as a File.
+	 * Get the base directory for the ePAD web server.
 	 * <p>
 	 * For the moment, we use ~/DicomProxy as the base directory for compatibility with pre-Restlet calls. Ultimately we
 	 * will change location to something more general.
 	 * 
-	 * @return File - base directory for DicomProxy.
+	 * @return File Base directory for ePAD web server.
 	 */
 	public static String getEPADWebServerBaseDir()
 	{
@@ -101,6 +101,31 @@ public class ResourceUtils
 	public static String getEPADWebServerEtcDir()
 	{
 		return getEPADWebServerBaseDir() + "etc/";
+	}
+
+	private static String getEPADWebServerDICOMScriptsDir()
+	{
+		return getEPADWebServerEtcDir() + "scripts/";
+	}
+
+	public static String getEPADWebServerDICOMBinDir()
+	{
+		return getEPADWebServerDICOMScriptsDir() + "tpl/bin/";
+	}
+
+	public static String getEPADWebServerIconsDir()
+	{
+		return getEPADWebServerEtcDir() + "icons/";
+	}
+
+	public static String getEPADWebServerMyScriptsDir()
+	{
+		return getEPADWebServerEtcDir() + "scripts/myscripts/bin/";
+	}
+
+	public static String getEPADWebServerMySQLScriptDir()
+	{
+		return getEPADWebServerEtcDir() + "db/mysql/";
 	}
 
 	public static String getEPADWebServerLoginDir()

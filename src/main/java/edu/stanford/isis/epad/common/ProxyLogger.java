@@ -90,6 +90,11 @@ public class ProxyLogger
 		log.log(Level.WARNING, message, t);
 	}
 
+	public void warning(String message)
+	{
+		log.log(Level.WARNING, message);
+	}
+
 	/**
 	 * Log a sever error with a message and a stack trace
 	 * 
