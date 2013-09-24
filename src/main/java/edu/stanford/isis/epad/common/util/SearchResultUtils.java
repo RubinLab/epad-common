@@ -5,7 +5,9 @@
  * Software License Agreement available at:
  *   http://epad.stanford.edu/license/
  */
-package edu.stanford.isis.epad.common;
+package edu.stanford.isis.epad.common.util;
+
+import edu.stanford.isis.epad.common.ProxyConfig;
 
 
 /**

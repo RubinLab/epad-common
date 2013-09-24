@@ -5,7 +5,7 @@
  * Software License Agreement available at:
  *   http://epad.stanford.edu/license/
  */
-package edu.stanford.isis.epad.common;
+package edu.stanford.isis.epad.common.util;
 
 import java.io.File;
 import java.io.FilenameFilter;

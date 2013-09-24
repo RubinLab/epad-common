@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.common;
+package edu.stanford.isis.epad.common.util;
 
 import java.awt.Color;
 import java.awt.Font;

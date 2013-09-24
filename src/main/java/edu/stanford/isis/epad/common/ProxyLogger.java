@@ -11,8 +11,11 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.stanford.isis.epad.common.util.LogFormatter;
+import edu.stanford.isis.epad.common.util.ResourceUtils;
+
 /**
- * Use this class as the logger for the DicomProxy project, which logs the data in the ./log/dicom-proxy.log file.
+ * Use this class as the logger for the ePAD web server, which logs the data in the ./log/dicom-proxy.log file.
  * 
  * @author amsnyder
  */
@@ -36,7 +39,7 @@ public class ProxyLogger
 			fh.setFormatter(new LogFormatter());
 			log.addHandler(fh);
 		} catch (Exception e) {
-			System.out.println("Failed to setup logging!" + e.getMessage());
+			System.err.println("Failed to setup logging!" + e.getMessage());
 		}
 	}
 

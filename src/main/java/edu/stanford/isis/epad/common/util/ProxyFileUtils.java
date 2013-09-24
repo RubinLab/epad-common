@@ -5,7 +5,7 @@
  * Software License Agreement available at:
  *   http://epad.stanford.edu/license/
  */
-package edu.stanford.isis.epad.common;
+package edu.stanford.isis.epad.common.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -31,6 +31,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
+
+import edu.stanford.isis.epad.common.ProxyLogger;
 
 /**
  * Utility for writing generic files with text data.

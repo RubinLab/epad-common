@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import edu.stanford.isis.epad.common.util.ResourceUtils;
+
 /**
  * Read the "etc/proxy-config.properties" file on start-up and provides method to look up values.
  * <ul>
@@ -49,8 +51,8 @@ import java.util.Set;
  */
 public class ProxyConfig
 {
-	private static ProxyLogger log = ProxyLogger.getInstance();
-	private static ProxyConfig ourInstance = new ProxyConfig();
+	private static final ProxyLogger log = ProxyLogger.getInstance();
+	private static final ProxyConfig ourInstance = new ProxyConfig();
 
 	private Properties properties;
 

@@ -9,7 +9,7 @@ package edu.stanford.isis.epad.common.dicom;
 
 import java.io.File;
 
-import edu.stanford.isis.epad.common.ResourceUtils;
+import edu.stanford.isis.epad.common.util.ResourceUtils;
 
 /**
  * Utility to formatUidToDir UID in directories.

@@ -5,7 +5,7 @@
  * Software License Agreement available at:
  *   http://epad.stanford.edu/license/
  */
-package edu.stanford.isis.epad.common;
+package edu.stanford.isis.epad.common.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -15,6 +15,7 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import edu.stanford.isis.epad.common.ProxyLogger;
 import edu.stanford.isis.epad.common.dicom.DicomFormatUtil;
 import edu.stanford.isis.epad.common.dicom.DicomSeriesUID;
 import edu.stanford.isis.epad.common.dicom.DicomStudyUID;

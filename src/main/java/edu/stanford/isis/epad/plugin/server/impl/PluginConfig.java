@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.stanford.isis.epad.common.ProxyLogger;
-import edu.stanford.isis.epad.common.ResourceUtils;
+import edu.stanford.isis.epad.common.util.ResourceUtils;
 
 /**
  * Reads the file plugin-config.txt one line at a time. Each line is the class name for the plugin handler.

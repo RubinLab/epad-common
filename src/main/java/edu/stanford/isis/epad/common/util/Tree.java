@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.common;
+package edu.stanford.isis.epad.common.util;
 
 import java.util.ArrayList;
 import java.util.List;

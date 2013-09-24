@@ -14,11 +14,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import edu.stanford.isis.epad.common.FileKey;
 import edu.stanford.isis.epad.common.ProxyLogger;
-import edu.stanford.isis.epad.common.ResourceUtils;
 import edu.stanford.isis.epad.common.dicom.DicomFormatUtil;
 import edu.stanford.isis.epad.common.dicom.UIdType;
+import edu.stanford.isis.epad.common.util.FileKey;
+import edu.stanford.isis.epad.common.util.ResourceUtils;
 import edu.stanford.isis.epad.plugin.server.EPadFiles;
 
 /**
