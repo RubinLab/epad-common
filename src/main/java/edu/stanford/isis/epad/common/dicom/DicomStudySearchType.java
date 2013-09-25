@@ -8,27 +8,23 @@
 package edu.stanford.isis.epad.common.dicom;
 
 /**
- *
+ * 
  * @author amsnyder
  */
-public enum DicomStudySearchType
-{
+public enum DicomStudySearchType {
+	PATIENT_NAME("patientName"), PATIENT_ID("patientId"), ASSESION_NUM("accessionNum"), EXAM_TYPE("examType"), STUDY_DATE(
+			"studyDate"), WORK_LIST_NAME("workListName");
 
-    PATIENT_NAME("patientName"),
-    PATIENT_ID("patientId"),
-    ASSESION_NUM("accessionNum"),
-    EXAM_TYPE("examType"),
-    STUDY_DATE("studyDate"),
-    WORK_LIST_NAME("workListName");
+	private String name;
 
-    private String name;
+	DicomStudySearchType(String type)
+	{
+		this.name = type;
+	}
 
-    DicomStudySearchType(String type){
-        this.name =type;
-    }
-
-    public String toString(){
-        return name;
-    }
-
+	@Override
+	public String toString()
+	{
+		return name;
+	}
 }

@@ -724,7 +724,7 @@ public class RasterProcessor
 			if (working > (1 << (bitsStored - 1)) - 1) {
 				working = (working & dataMask) - (1 << (bitsStored));
 			}
-			working = working + adjustment;
+			working = working + adjustment; // For signed, 1 << (bitsStored - 1);
 			if (working < 0) {
 				return (1 << (bitsStored)) - 1;
 			} else {
