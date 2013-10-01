@@ -21,6 +21,16 @@ public class JsonHelper
 		return value.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"").replaceAll("\'", "\\\\\'");
 	}
 
+	public static String createJSONErrorResponse(String errorMessage)
+	{
+		return "{ \"error\": \"" + errorMessage + " \"}";
+	}
+
+	public static String createJSONErrorResponse(String errorMessage, Throwable t)
+	{
+		return "{ \"error\": \"" + errorMessage + ": " + t.getMessage() + " \"}";
+	}
+
 	/**
 	 * Test driver.
 	 * 
