@@ -3,7 +3,10 @@ package edu.stanford.isis.epad.common.xnat;
 /**
  * A description of an XNAT project.
  * <p>
- * <code>/xnat/data/projects</code> returns a JSON-specified list of projects for the current user, e.g.,
+ * <code>curl -b JSESSIONID=[session_key] -X GET "http:[host:port]/projects/"</code>
+ * <p>
+ * Redirects to the XNAT call <code>/xnat/data/projects</code>, which returns a JSON-specified list of projects for the
+ * current user, e.g.,
  * <p>
  * <code>
  * {
