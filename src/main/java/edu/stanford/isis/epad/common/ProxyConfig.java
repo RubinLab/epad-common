@@ -118,6 +118,41 @@ public class ProxyConfig
 	}
 
 	/**
+	 * 
+	 * @param parameterName
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public String getStringConfigurationParameter(String parameterName)
+	{
+		String parameterValue = getParam(parameterName);
+
+		if (parameterValue == null) {
+			String errorMessage = "no value for parameter " + parameterName + " in configuration file";
+			log.warning(errorMessage);
+			throw new IllegalArgumentException(errorMessage);
+		}
+		return parameterValue;
+	}
+
+	/**
+	 * 
+	 * @param parameterName
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public int getIntegerConfigurationParameter(String parameterName)
+	{
+		String parameterValue = getStringConfigurationParameter(parameterName);
+		try {
+			return Integer.parseInt(parameterValue);
+		} catch (NumberFormatException nfe) {
+			throw new IllegalArgumentException("The parameter in : " + parameterName + " needs to be an integer. It was: "
+					+ parameterValue);
+		}
+	}
+
+	/**
 	 * Get all the key,values as a Map of Strings.
 	 * 
 	 * @return Map of String keys to String values
