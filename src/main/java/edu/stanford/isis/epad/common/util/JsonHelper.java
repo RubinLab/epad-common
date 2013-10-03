@@ -23,12 +23,12 @@ public class JsonHelper
 
 	public static String createJSONErrorResponse(String errorMessage)
 	{
-		return "{ \"error\": \"" + errorMessage + " \"}";
+		return "{ \"error\": \"" + errorMessage + "\" }";
 	}
 
 	public static String createJSONErrorResponse(String errorMessage, Throwable t)
 	{
-		return "{ \"error\": \"" + errorMessage + ": " + t.getMessage() + " \"}";
+		return "{ \"error\": \"" + errorMessage + ": " + t.getMessage() + "\" }";
 	}
 
 	/**
