@@ -13,7 +13,7 @@ package edu.stanford.isis.epad.common.xnat;
  * "ResultSet":
  *  { "Result":
  *    [ 
- *      {"project":"BOBP","insert_user":"bob","ID":"EPAD_S00002","insert_date":"2013-09-05 10:01:03.035","label":"SID1","URI":"/data/subjects/EPAD_S00002"},
+ *      {"project":"PRJ1","insert_user":"bob","ID":"EPAD_S00002","insert_date":"...","label":"SID1","URI":"/data/subjects/EPAD_S00002", "src": ""},
  *    ], 
  *    "totalRecords": "1"
  *  }
@@ -24,10 +24,10 @@ package edu.stanford.isis.epad.common.xnat;
  */
 public class XNATSubjectDescription
 {
-	public final String project, insert_user, id, insert_date, label, uri;
+	public final String project, insert_user, id, insert_date, label, uri, src;
 
 	public XNATSubjectDescription(String project, String insert_user, String id, String insert_date, String label,
-			String uri)
+			String uri, String src)
 	{
 		this.project = project;
 		this.insert_user = insert_user;
@@ -35,5 +35,6 @@ public class XNATSubjectDescription
 		this.insert_date = insert_date;
 		this.label = label;
 		this.uri = uri;
+		this.src = src;
 	}
 }
