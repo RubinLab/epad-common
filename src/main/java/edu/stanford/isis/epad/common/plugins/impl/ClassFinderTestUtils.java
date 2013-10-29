@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.plugin.server.impl;
+package edu.stanford.isis.epad.common.plugins.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +13,8 @@ import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import edu.stanford.isis.epad.common.ProxyLogger;
-import edu.stanford.isis.epad.plugin.server.PluginHandler;
+import edu.stanford.isis.epad.common.plugins.PluginHandler;
+import edu.stanford.isis.epad.common.util.EPADLogger;
 
 /**
  * Place to keep the class loader test code.
@@ -23,7 +23,7 @@ import edu.stanford.isis.epad.plugin.server.PluginHandler;
  */
 public class ClassFinderTestUtils
 {
-    private static final ProxyLogger logger = ProxyLogger.getInstance();
+    private static final EPADLogger logger = EPADLogger.getInstance();
 
     /**
      *

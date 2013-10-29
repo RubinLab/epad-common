@@ -8,14 +8,14 @@ import java.awt.image.WritableRaster;
 import org.dcm4che2.data.DicomObject;
 import org.dcm4che2.data.Tag;
 
-import edu.stanford.isis.epad.common.ProxyLogger;
+import edu.stanford.isis.epad.common.util.EPADLogger;
 
 public class RasterProcessor
 {
 	/**
 	 * Logger object.
 	 */
-	private static ProxyLogger logger = ProxyLogger.getInstance();
+	private static EPADLogger logger = EPADLogger.getInstance();
 	/**
 	 * Controls amount of diagnostic output.
 	 */

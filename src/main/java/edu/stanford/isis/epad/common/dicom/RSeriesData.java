@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.dcm4che2.data.Tag;
 
-import edu.stanford.isis.epad.common.ProxyConfig;
+import edu.stanford.isis.epad.common.util.EPADConfig;
 
 /**
  * DicomSeries
@@ -84,7 +84,7 @@ public class RSeriesData implements DicomSeriesData {
      */
     public static String getHeaderColumn(){
     	
-    	ProxyConfig config = ProxyConfig.getInstance();
+    	EPADConfig config = EPADConfig.getInstance();
     	String separator = config.getParam("fieldSeparator");
     	
         StringBuilder sb = new StringBuilder();
@@ -112,7 +112,7 @@ public class RSeriesData implements DicomSeriesData {
      */
     public String getDataColumn(){
     	
-    	ProxyConfig config = ProxyConfig.getInstance();
+    	EPADConfig config = EPADConfig.getInstance();
     	String separator = config.getParam("fieldSeparator");
     	
         StringBuilder sb = new StringBuilder();

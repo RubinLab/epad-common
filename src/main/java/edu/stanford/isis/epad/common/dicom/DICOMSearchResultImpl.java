@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.dcm4che2.data.Tag;
 
-import edu.stanford.isis.epad.common.ProxyLogger;
+import edu.stanford.isis.epad.common.util.EPADLogger;
 import edu.stanford.isis.epad.common.util.Node;
 import edu.stanford.isis.epad.common.util.Tree;
 
@@ -31,7 +31,7 @@ import edu.stanford.isis.epad.common.util.Tree;
 public class DICOMSearchResultImpl implements DicomSearchResult
 {
 
-	ProxyLogger logger = ProxyLogger.getInstance();
+	EPADLogger logger = EPADLogger.getInstance();
 	/**
 	 * List of tree structures with one tree structure for each study.
 	 */

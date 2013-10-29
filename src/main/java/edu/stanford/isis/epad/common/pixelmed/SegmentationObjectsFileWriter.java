@@ -55,7 +55,6 @@ import com.pixelmed.utils.CopyStream;
 
 public class SegmentationObjectsFileWriter
 {
-
 	public static final String Manufacturer = "Stanford University";
 	public static final String ManufacturerModelName = "ePAD";
 	public static final String DeviceSerialNumber = "SN123456";
@@ -83,7 +82,6 @@ public class SegmentationObjectsFileWriter
 	 * @param slice_thickness
 	 * @throws DicomException
 	 */
-
 	public SegmentationObjectsFileWriter(AttributeList original_attrs, short[] patient_orientation,
 			double[] pixel_spacing, double slice_thickness) throws DicomException
 	{

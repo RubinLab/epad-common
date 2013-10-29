@@ -7,7 +7,6 @@
  */
 package edu.stanford.isis.epad.common.util;
 
-import edu.stanford.isis.epad.common.ProxyConfig;
 
 
 /**
@@ -20,7 +19,7 @@ public class SearchResultUtils {
 	String separator = null;
 	
     public SearchResultUtils(){
-        ProxyConfig config = ProxyConfig.getInstance();
+        EPADConfig config = EPADConfig.getInstance();
         separator = config.getParam("fieldSeparator");
     }
 

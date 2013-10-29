@@ -35,9 +35,9 @@ public class LockFileUtils
 	{
 		isDirectory(dir);
 		if (!containsLock(dir, lockType)) {
-			String contents = ProxyDateFormatter.currentTimeInFormat(ProxyDateFormatter.YEAR_MONTH_DATE_HMS);
+			String contents = EPADDateFormatter.currentTimeInFormat(EPADDateFormatter.YEAR_MONTH_DATE_HMS);
 			File lockFile = new File(dir.getAbsoluteFile() + "/" + lockType.name() + ".lock");
-			return ProxyFileUtils.overwrite(lockFile, contents);
+			return EPADFileUtils.overwrite(lockFile, contents);
 		}
 		return true;
 	}

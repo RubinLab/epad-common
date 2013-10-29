@@ -3,89 +3,89 @@ package edu.stanford.isis.epad.common.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 
-import edu.stanford.isis.epad.common.ProxyConfig;
-import edu.stanford.isis.epad.common.ProxyLogger;
-
-public class ProxyTools
+public class EPADTools
 {
-	public static String serverProxy = ProxyConfig.getInstance().getParam("serverProxy");
-	public static String baseAnnotationDir = ProxyConfig.getInstance().getParam("baseAnnotationDir");
-	public static String dbpath = ProxyConfig.getInstance().getParam("dbpath");
-	public static String templatePath = ProxyConfig.getInstance().getParam("baseTemplatesDir");
-	public static String wadoProxy = ProxyConfig.getInstance().getParam("wadoProxy");
-	public static final String dicomServerPort = ProxyConfig.getInstance().getParam("DicomServerPort");
-	public static final String aeTitle = ProxyConfig.getInstance().getParam("DicomServerAETitle");
-	public static final String username = ProxyConfig.getInstance().getParam("username");
-	public static final String password = ProxyConfig.getInstance().getParam("password");
-	public static final String collection = ProxyConfig.getInstance().getParam("defaultcontainer");
-	public static final String aim3Namespace = ProxyConfig.getInstance().getParam("namespace");
-	public static final String existURI = ProxyConfig.getInstance().getParam("serverUrlUpload");
-	public static final String eventResourceURI = ProxyConfig.getInstance().getParam("eventResourceURI");
-	public static final String seriesOrderURI = ProxyConfig.getInstance().getParam("seriesOrderURI");
+	public static String serverProxy = EPADConfig.getInstance().getParam("serverProxy");
+	public static String baseAnnotationDir = EPADConfig.getInstance().getParam("baseAnnotationDir");
+	public static String dbpath = EPADConfig.getInstance().getParam("dbpath");
+	public static String templatePath = EPADConfig.getInstance().getParam("baseTemplatesDir");
+	public static String wadoProxy = EPADConfig.getInstance().getParam("wadoProxy");
+	public static final String dicomServerPort = EPADConfig.getInstance().getParam("DicomServerPort");
+	public static final String aeTitle = EPADConfig.getInstance().getParam("DicomServerAETitle");
+	public static final String username = EPADConfig.getInstance().getParam("username");
+	public static final String password = EPADConfig.getInstance().getParam("password");
+	public static final String collection = EPADConfig.getInstance().getParam("defaultcontainer");
+	public static final String aim3Namespace = EPADConfig.getInstance().getParam("namespace");
+	public static final String existURI = EPADConfig.getInstance().getParam("serverUrlUpload");
+	public static final String eventResourceURI = EPADConfig.getInstance().getParam("eventResourceURI");
+	public static final String seriesOrderURI = EPADConfig.getInstance().getParam("seriesOrderURI");
 
-	private static final ProxyLogger logger = ProxyLogger.getInstance();
+	private static final EPADLogger logger = EPADLogger.getInstance();
+	private static final EPADConfig config = EPADConfig.getInstance();
 
-	private static String convertDicomNameToImageUID(String currFileName)
+	public static int feedFileWithDICOMFromWADO(File file, Map<String, String> dicomImageFileDescription)
+			throws IOException
 	{
-		int lastDotIndex = currFileName.lastIndexOf('.');
+		String studyIDKey = dicomImageFileDescription.get("study_iuid");
+		String seriesIDKey = dicomImageFileDescription.get("series_iuid");
+		String imageIDKey = dicomImageFileDescription.get("sop_iuid");
 
-		String uidPart = currFileName;
-		if (lastDotIndex > 0) {
-			uidPart = currFileName.substring(0, lastDotIndex);
-		}
-		uidPart = uidPart.replaceAll("_", ".");
-		return uidPart;
+		return feedFileWithDICOMFromWADO(file, studyIDKey, seriesIDKey, imageIDKey);
 	}
 
-	public static void feedFileWithDicomFromWado(File temp, String studyUID, String seriesUID, String imageId)
-			throws Exception
+	public static int feedFileWithDICOMFromWADO(File temp, String studyIdKey, String seriesIdKey, String imageIdKey)
+			throws IOException
 	{
-		ProxyConfig config = ProxyConfig.getInstance();
 		String host = config.getParam("NameServer");
 		int port = config.getIntParam("DicomServerWadoPort");
 		String base = config.getParam("WadoUrlExtension");
+
 		WadoUrlBuilder wadoUrlBuilder = new WadoUrlBuilder(host, port, base, WadoUrlBuilder.ContentType.FILE);
 
-		// GET WADO call result.
-		wadoUrlBuilder.setStudyUID(studyUID);
-		wadoUrlBuilder.setSeriesUID(seriesUID);
-		wadoUrlBuilder.setObjectUID(imageId);
+		wadoUrlBuilder.setStudyUID(studyIdKey);
+		wadoUrlBuilder.setSeriesUID(seriesIdKey);
+		wadoUrlBuilder.setObjectUID(imageIdKey);
 
 		String wadoUrl = wadoUrlBuilder.build();
 
-		// --Get the Dicom file from the server
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(wadoUrl);
-
-		// Execute the GET method
 		int statusCode = client.executeMethod(method);
 
-		if (statusCode != -1) {
-			// Get the result as stream
-			InputStream res = method.getResponseBodyAsStream();
-			// write the inputStream to a FileOutputStream
-			OutputStream out = new FileOutputStream(temp);
-
-			int read = 0;
-			byte[] bytes = new byte[4096];
-
-			while ((read = res.read(bytes)) != -1) {
-				out.write(bytes, 0, read);
+		if (statusCode == HttpServletResponse.SC_OK) {
+			InputStream wadoResponseStream = null;
+			OutputStream outputStream = null;
+			try {
+				wadoResponseStream = method.getResponseBodyAsStream();
+				outputStream = new FileOutputStream(temp);
+				int read = 0;
+				byte[] bytes = new byte[4096];
+				while ((read = wadoResponseStream.read(bytes)) != -1) {
+					outputStream.write(bytes, 0, read);
+				}
+			} finally {
+				if (wadoResponseStream != null)
+					wadoResponseStream.close();
+				if (outputStream != null) {
+					outputStream.flush();
+					outputStream.close();
+				}
 			}
-			res.close();
-			out.flush();
-			out.close();
 		}
+		return statusCode;
 	}
 
 	public static ArrayList<String> getDicomSeries(String seriesUID) throws Exception
@@ -180,44 +180,6 @@ public class ProxyTools
 		}
 	}
 
-	@SuppressWarnings("unused")
-	private static void close(Writer writer)
-	{
-		try {
-			if (writer != null) {
-				writer.flush();
-				writer.close();
-				writer = null;
-			}
-		} catch (Exception e) {
-			logger.info("Failed to close writer");
-		}
-	}
-
-	private static void close(Reader reader)
-	{
-		try {
-			if (reader != null) {
-				reader.close();
-				reader = null;
-			}
-		} catch (Exception e) {
-			logger.info("Failed to close reader");
-		}
-	}
-
-	private static void close(InputStream stream)
-	{
-		try {
-			if (stream != null) {
-				stream.close();
-				stream = null;
-			}
-		} catch (Exception e) {
-			logger.info("Failed to close stream");
-		}
-	}
-
 	public static int getPositionOfImageInSeries(String seriesUID, String imageIUD) throws Exception
 	{
 		@SuppressWarnings("unused")
@@ -295,4 +257,41 @@ public class ProxyTools
 		}
 		return (resultat);
 	}
+
+	private static String convertDicomNameToImageUID(String currFileName)
+	{
+		int lastDotIndex = currFileName.lastIndexOf('.');
+
+		String uidPart = currFileName;
+		if (lastDotIndex > 0) {
+			uidPart = currFileName.substring(0, lastDotIndex);
+		}
+		uidPart = uidPart.replaceAll("_", ".");
+		return uidPart;
+	}
+
+	private static void close(Reader reader)
+	{
+		try {
+			if (reader != null) {
+				reader.close();
+				reader = null;
+			}
+		} catch (Exception e) {
+			logger.info("Failed to close reader");
+		}
+	}
+
+	private static void close(InputStream stream)
+	{
+		try {
+			if (stream != null) {
+				stream.close();
+				stream = null;
+			}
+		} catch (Exception e) {
+			logger.info("Failed to close stream");
+		}
+	}
+
 }

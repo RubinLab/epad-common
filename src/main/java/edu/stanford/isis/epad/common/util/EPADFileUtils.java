@@ -32,16 +32,14 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 
-import edu.stanford.isis.epad.common.ProxyLogger;
-
 /**
  * Utility for writing generic files with text data.
  */
-public class ProxyFileUtils
+public class EPADFileUtils
 {
-	private static final ProxyLogger log = ProxyLogger.getInstance();
+	private static final EPADLogger log = EPADLogger.getInstance();
 
-	ProxyFileUtils()
+	EPADFileUtils()
 	{
 	}
 
@@ -590,7 +588,7 @@ public class ProxyFileUtils
 		// If the directory doesn't exist create it.
 		File parentDir = to.getParentFile();
 		if (!parentDir.exists()) {
-			ProxyFileUtils.makeDirs(parentDir);
+			EPADFileUtils.makeDirs(parentDir);
 		}
 
 		if (!to.exists()) {

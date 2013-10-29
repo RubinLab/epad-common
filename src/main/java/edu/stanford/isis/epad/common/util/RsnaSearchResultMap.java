@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import edu.stanford.isis.epad.common.ProxyLogger;
 import edu.stanford.isis.epad.common.dicom.DicomTagFileUtils;
 
 /**
@@ -30,7 +29,7 @@ public class RsnaSearchResultMap
 	private static RsnaSearchResultMap ourInstance = new RsnaSearchResultMap();
 	private final Map<String, String> resultMap = new ConcurrentHashMap<String, String>();
 	private String defaultResult = null;
-	private final ProxyLogger log;
+	private final EPADLogger log;
 
 	public static RsnaSearchResultMap getInstance()
 	{
@@ -39,7 +38,7 @@ public class RsnaSearchResultMap
 
 	private RsnaSearchResultMap()
 	{
-		log = ProxyLogger.getInstance();
+		log = EPADLogger.getInstance();
 		readResultsFiles();
 	}
 
@@ -245,7 +244,7 @@ public class RsnaSearchResultMap
 			if (!rsnaEverythingFile.exists()) {
 				log.info("WARNING: rsnaEverythingFile not found. Will not add the following line: " + resultLine);
 			}
-			String rsnaEverythingContents = ProxyFileUtils.read(rsnaEverythingFile);
+			String rsnaEverythingContents = EPADFileUtils.read(rsnaEverythingFile);
 
 			if (!rsnaEverythingContents.contains(resultLine)) {
 				// append the current file to the end.
@@ -255,7 +254,7 @@ public class RsnaSearchResultMap
 				}
 				newContents = newContents + resultLine;
 
-				ProxyFileUtils.overwrite(rsnaEverythingFile, newContents);
+				EPADFileUtils.overwrite(rsnaEverythingFile, newContents);
 				log.info("Updated rsnaEverything.results file with: \n" + newContents);
 				return true;
 			}

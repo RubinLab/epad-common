@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.plugin.server;
+package edu.stanford.isis.epad.common.plugins;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -55,5 +55,4 @@ public class PluginLogger
 	{
 		throw new CloneNotSupportedException();
 	}
-
 }

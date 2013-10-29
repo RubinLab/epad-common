@@ -15,7 +15,6 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
-import edu.stanford.isis.epad.common.ProxyLogger;
 import edu.stanford.isis.epad.common.dicom.DicomFormatUtil;
 import edu.stanford.isis.epad.common.dicom.DicomSeriesUID;
 import edu.stanford.isis.epad.common.dicom.DicomStudyUID;
@@ -26,7 +25,7 @@ import edu.stanford.isis.epad.common.dicom.DicomStudyUID;
  */
 public class ResourceUtils
 {
-	private static final ProxyLogger log = ProxyLogger.getInstance();
+	private static final EPADLogger log = EPADLogger.getInstance();
 
 	private ResourceUtils()
 	{

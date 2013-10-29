@@ -47,25 +47,28 @@ package edu.stanford.isis.epad.common.pixelmed;
  */
 
 /**
- * <p>Add code meaning to the string definition.</p>
- *
- * @author	Wei Lu  (lvwei@stanford.edu; luwei@tju.edu.cn)
+ * <p>
+ * Add code meaning to the string definition.
+ * </p>
+ * 
+ * @author Wei Lu (lvwei@stanford.edu; luwei@tju.edu.cn)
  * @date 2012-12
  */
-public class SegmentationPropertyCategories {
-	  /** (T-D000A, SRT, "Anatomical Structure") */
-	  public static final String AnatomicalStructure = "T-D000A\\SRT\\AnatomicalStructure";
+public class SegmentationPropertyCategories
+{
+	/** (T-D000A, SRT, "Anatomical Structure") */
+	public static final String AnatomicalStructure = "T-D000A\\SRT\\AnatomicalStructure";
 
-	  /** (R-42019, SRT, "Function") */
-	  public static final String Function = "R-42019\\SRT\\Function";
+	/** (R-42019, SRT, "Function") */
+	public static final String Function = "R-42019\\SRT\\Function";
 
-	  /** (M-01000, SRT, "Morphologically Altered Structure") */
-	  public static final String MorphologicallyAlteredStructure = "M-01000\\SRT\\MorphologicallyAlteredStructure";
+	/** (M-01000, SRT, "Morphologically Altered Structure") */
+	public static final String MorphologicallyAlteredStructure = "M-01000\\SRT\\MorphologicallyAlteredStructure";
 
-	  /** (A-00004, SRT, "Physical object") */
-	  public static final String PhysicalObject = "A-00004\\SRT\\PhysicalObject";
+	/** (A-00004, SRT, "Physical object") */
+	public static final String PhysicalObject = "A-00004\\SRT\\PhysicalObject";
 
-	  /** (T-D0050, SRT, "Tissue") */
-	  public static final String Tissue = "T-D0050\\SRT\\Tissue";
+	/** (T-D0050, SRT, "Tissue") */
+	public static final String Tissue = "T-D0050\\SRT\\Tissue";
 
 }

@@ -5,12 +5,12 @@
  * Software License Agreement available at:
  *   http://epad.stanford.edu/license/
  */
-package edu.stanford.isis.epad.plugin.server.impl;
+package edu.stanford.isis.epad.common.plugins.impl;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.user.client.ui.LayoutPanel;
 
-import edu.stanford.isis.epad.plugin.server.EPadPlugin;
+import edu.stanford.isis.epad.common.plugins.EPadPlugin;
 
 /**
  * WARNING: This interface will be rapidly changing during development. Contact amsnyder@stanford.edu if you plan to

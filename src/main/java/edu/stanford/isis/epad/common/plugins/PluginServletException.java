@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.plugin.server;
+package edu.stanford.isis.epad.common.plugins;
 
 /**
  * Plugins use the Exception to include human readable text messages that need to appear in a dialog box when reporting
@@ -8,10 +8,9 @@ package edu.stanford.isis.epad.plugin.server;
  */
 public class PluginServletException extends Exception
 {
-
 	private static final long serialVersionUID = -6586646313136630786L;
 
-	String humanReadableMessage;
+	private final String humanReadableMessage;
 
 	public PluginServletException()
 	{

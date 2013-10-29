@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.plugin.server.impl;
+package edu.stanford.isis.epad.common.plugins;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.stanford.isis.epad.common.ProxyLogger;
+import edu.stanford.isis.epad.common.util.EPADLogger;
 import edu.stanford.isis.epad.common.util.ResourceUtils;
 
 /**
@@ -16,7 +16,7 @@ import edu.stanford.isis.epad.common.util.ResourceUtils;
  */
 public class PluginConfig
 {
-	private static final ProxyLogger log = ProxyLogger.getInstance();
+	private static final EPADLogger log = EPADLogger.getInstance();
 	private static PluginConfig ourInstance = new PluginConfig();
 	private final List<String> pluginHandlerList = new ArrayList<String>();
 	private final List<String> pluginTemplateList = new ArrayList<String>();

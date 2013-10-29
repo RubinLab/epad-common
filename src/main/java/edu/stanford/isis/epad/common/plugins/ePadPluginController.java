@@ -1,10 +1,8 @@
-package edu.stanford.isis.epad.plugin.server;
+package edu.stanford.isis.epad.common.plugins;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
-
-import edu.stanford.isis.epad.common.EPadProxyConfig;
 
 /**
  * Request all server-side interfaces from here
@@ -22,8 +20,6 @@ public class ePadPluginController
 	Logger logger = PluginLogger.getLogger();
 
 	EPadFiles ePadFiles = null;
-
-	EPadProxyConfig ePadProxyConfig = null;
 
 	/***
 	 * Get ePadFiles and ePadProxyConfig via reflection.
@@ -48,19 +44,10 @@ public class ePadPluginController
 		return ePadFiles;
 	}
 
-	public EPadProxyConfig getEPadProxyConfig()
-	{
-		return ePadProxyConfig;
-	}
-
 	public String getInterfaceVersion()
 	{
 		return EPadPlugin.PLUGIN_INTERFACE_VERSION;
 	}
-
-	/*******************
-     *
-     *******************/
 
 	@SuppressWarnings("unused")
 	private void logExceptionWithDetails(String name, Exception e)

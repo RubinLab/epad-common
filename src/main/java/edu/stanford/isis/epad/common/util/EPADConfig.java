@@ -5,7 +5,7 @@
  * Software License Agreement available at:
  *   http://epad.stanford.edu/license/
  */
-package edu.stanford.isis.epad.common;
+package edu.stanford.isis.epad.common.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import edu.stanford.isis.epad.common.util.ResourceUtils;
 
 /**
  * Read the "etc/proxy-config.properties" file on start-up and provides method to look up values.
@@ -49,19 +47,19 @@ import edu.stanford.isis.epad.common.util.ResourceUtils;
  * 
  * @author amsnyder
  */
-public class ProxyConfig
+public class EPADConfig
 {
-	private static final ProxyLogger log = ProxyLogger.getInstance();
-	private static final ProxyConfig ourInstance = new ProxyConfig();
+	private static final EPADLogger log = EPADLogger.getInstance();
+	private static final EPADConfig ourInstance = new EPADConfig();
 
 	private Properties properties;
 
-	public static ProxyConfig getInstance()
+	public static EPADConfig getInstance()
 	{
 		return ourInstance;
 	}
 
-	private ProxyConfig()
+	private EPADConfig()
 	{
 		try {
 			properties = new Properties();

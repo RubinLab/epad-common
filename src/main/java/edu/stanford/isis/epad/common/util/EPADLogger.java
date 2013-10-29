@@ -5,32 +5,29 @@
  * Software License Agreement available at:
  *   http://epad.stanford.edu/license/
  */
-package edu.stanford.isis.epad.common;
+package edu.stanford.isis.epad.common.util;
 
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import edu.stanford.isis.epad.common.util.LogFormatter;
-import edu.stanford.isis.epad.common.util.ResourceUtils;
 
 /**
  * Use this class as the logger for the ePAD web server, which logs the data in the ./log/dicom-proxy.log file.
  * 
  * @author amsnyder
  */
-public class ProxyLogger
+public class EPADLogger
 {
-	private final static ProxyLogger ourInstance = new ProxyLogger();
+	private final static EPADLogger ourInstance = new EPADLogger();
 	private final Logger log;
 	private boolean useDebug = false;
 
-	public static ProxyLogger getInstance()
+	public static EPADLogger getInstance()
 	{
 		return ourInstance;
 	}
 
-	private ProxyLogger()
+	private EPADLogger()
 	{
 		log = Logger.getAnonymousLogger();
 

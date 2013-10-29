@@ -29,7 +29,6 @@ import com.pixelmed.dicom.TagFromName;
 
 public class ConvertTIFFMasksToSegmentationObjects
 {
-
 	private AttributeList list = new AttributeList();
 	private byte[] pixels = null;
 	private short image_width = 0, image_height = 0, image_frames = 0;

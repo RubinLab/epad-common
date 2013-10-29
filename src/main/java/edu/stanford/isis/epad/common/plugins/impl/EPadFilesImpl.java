@@ -5,7 +5,7 @@
  * Software License Agreement available at:
  *   http://epad.stanford.edu/license/
  */
-package edu.stanford.isis.epad.plugin.server.impl;
+package edu.stanford.isis.epad.common.plugins.impl;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -14,12 +14,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import edu.stanford.isis.epad.common.ProxyLogger;
 import edu.stanford.isis.epad.common.dicom.DicomFormatUtil;
 import edu.stanford.isis.epad.common.dicom.UIdType;
+import edu.stanford.isis.epad.common.plugins.EPadFiles;
+import edu.stanford.isis.epad.common.util.EPADLogger;
 import edu.stanford.isis.epad.common.util.FileKey;
 import edu.stanford.isis.epad.common.util.ResourceUtils;
-import edu.stanford.isis.epad.plugin.server.EPadFiles;
 
 /**
  * Implements ePAD Files plugin API.
@@ -28,7 +28,7 @@ import edu.stanford.isis.epad.plugin.server.EPadFiles;
  */
 public class EPadFilesImpl implements EPadFiles
 {
-	private final ProxyLogger logger = ProxyLogger.getInstance();
+	private final EPADLogger logger = EPADLogger.getInstance();
 
 	@Override
 	public boolean hasStudy(String studyUID)

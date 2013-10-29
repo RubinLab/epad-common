@@ -5,22 +5,21 @@
  * Software License Agreement available at:
  *   http://epad.stanford.edu/license/
  */
-package edu.stanford.isis.epad.plugin.server.impl;
+package edu.stanford.isis.epad.common.plugins;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import edu.stanford.isis.epad.common.ProxyLogger;
-import edu.stanford.isis.epad.plugin.server.PluginServletHandler;
+import edu.stanford.isis.epad.common.plugins.impl.ClassFinderTestUtils;
+import edu.stanford.isis.epad.common.util.EPADLogger;
 
 /**
  * Keep all the registered handlers around.
  */
 public class PluginHandlerMap
 {
-
-	private static ProxyLogger logger = ProxyLogger.getInstance();
+	private static EPADLogger logger = EPADLogger.getInstance();
 	private static PluginHandlerMap ourInstance = new PluginHandlerMap();
 
 	private final Map<String, PluginServletHandler> pluginServletMap = new HashMap<String, PluginServletHandler>();

@@ -7,7 +7,7 @@
  */
 package edu.stanford.isis.epad.common.dicom;
 
-import edu.stanford.isis.epad.common.ProxyLogger;
+import edu.stanford.isis.epad.common.util.EPADLogger;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -27,7 +27,7 @@ public class DicomTagFileUtils {
 
     private DicomTagFileUtils(){}
 
-    private static final ProxyLogger logger = ProxyLogger.getInstance();
+    private static final EPADLogger logger = EPADLogger.getInstance();
 
     /* Need to expect the tags can have two versions. Either a UNICODE tag, or not. */
     public static final String PATIENT_NAME = "Patient\u2019s Name";

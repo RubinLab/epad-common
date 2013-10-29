@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.plugin.server;
+package edu.stanford.isis.epad.common.plugins;
 
 import edu.stanford.hakan.aim3api.base.GeometricShape;
 import edu.stanford.hakan.aim3api.base.GeometricShapeCollection;
