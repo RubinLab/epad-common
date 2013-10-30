@@ -129,6 +129,7 @@ public class DicomReader
 		dis.setHandler(stop);
 		DicomObject object = dis.readDicomObject();
 		RasterProcessor rasterProcessor = new RasterProcessor(object);
+		// RasterProcessorDP rasterProcessor = new RasterProcessorDP(object);
 		dis.close();
 		fis = new FileImageInputStream(dicomFile);
 		DicomImageReader codec = (DicomImageReader)new DicomImageReaderSpi().createReaderInstance();
@@ -137,6 +138,7 @@ public class DicomReader
 		Raster raster = codec.readRaster(frameValue, param);
 		BufferedImage packedImage = rasterProcessor.buildPng(raster);
 		dis.close();
+		fis.close();
 		return packedImage;
 	}
 
