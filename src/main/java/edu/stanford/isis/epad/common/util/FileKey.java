@@ -12,57 +12,64 @@ import java.io.IOException;
 
 /**
  * The key for a file is based on the "Absolute Path" as a String.
- *
+ * 
  * @author amsnyder
  */
-public class FileKey {
+public class FileKey
+{
+	private final String canonicalPath;
+	private final File file;
 
-    final String canonicalPath;
-    final File file;
+	public FileKey(File f)
+	{
+		this.file = f;
+		canonicalPath = getCanonicalPath(f);
+	}
 
-    public FileKey(File f){
-        this.file = f;
-        canonicalPath = getCanonicalPath(f);
-    }
+	/**
+	 * The canonical path is preferred, but use the absolute as a backup.
+	 * 
+	 * @param f
+	 * @return
+	 */
+	public static String getCanonicalPath(File f)
+	{
+		try {
+			return f.getCanonicalPath();
+		} catch (IOException ioe) {
+			return f.getAbsolutePath();
+		}
+	}
 
-    /**
-     * The canonical path is preferred, but use the absolute as a backup.
-     * @param f
-     * @return
-     */
-    public static String getCanonicalPath(File f){
-        try{
-            return f.getCanonicalPath();
-        }catch(IOException ioe){
-            return f.getAbsolutePath();
-        }
-    }
+	public File getFile()
+	{
+		return file;
+	}
 
-    public File getFile(){
-        return file;
-    }
+	@Override
+	public int hashCode()
+	{
+		return 7 * canonicalPath.hashCode() + 5;
+	}
 
-    @Override
-    public int hashCode(){
-        return 7* canonicalPath.hashCode()+5;
-    }
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o == null) {
+			return false;
+		}
 
-    @Override
-    public boolean equals(Object o){
-        if(o==null){
-            return false;
-        }
+		if (!(o instanceof FileKey)) {
+			return false;
+		}
+		FileKey that = (FileKey)o;
 
-        if( !(o instanceof FileKey)){
-            return false;
-        }
-        FileKey that = (FileKey) o;
+		return (canonicalPath.equalsIgnoreCase(that.canonicalPath));
+	}
 
-        return (canonicalPath.equalsIgnoreCase(that.canonicalPath));
-    }
-
-    @Override
-    public String toString(){
-        return canonicalPath;
-    }
+	@Override
+	public String toString()
+	{
+		return canonicalPath;
+	}
 }
