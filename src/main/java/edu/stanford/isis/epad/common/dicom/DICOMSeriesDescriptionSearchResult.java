@@ -1,17 +1,18 @@
 package edu.stanford.isis.epad.common.dicom;
 
 /**
- * Represents the result from an ePAD DICOM series order query.
+ * Represents the result from an ePAD DICOM series description query.
  * 
  * @author martin
  */
-public class DICOMSeriesOrderSearchResult
+public class DICOMSeriesDescriptionSearchResult
 {
 	public String fileName;
 	public int instanceNumber;
 	public String sliceLocation, contentTime;
 
-	public DICOMSeriesOrderSearchResult(String fileName, int instanceNumber, String sliceLocation, String contentTime)
+	public DICOMSeriesDescriptionSearchResult(String fileName, int instanceNumber, String sliceLocation,
+			String contentTime)
 	{
 		this.fileName = fileName;
 		this.instanceNumber = instanceNumber;

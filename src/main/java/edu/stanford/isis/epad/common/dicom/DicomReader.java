@@ -35,27 +35,17 @@ import org.dcm4che2.io.StopTagInputHandler;
  */
 public class DicomReader
 {
-	/**
-	 * File containing Dicom data.
-	 */
-	protected File dicomFile = null;
+	protected final File dicomFile;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param value file containing Dicom data
-	 */
-	public DicomReader(File value)
+	public DicomReader(File dicomFile)
 	{
-		dicomFile = value;
+		this.dicomFile = dicomFile;
 	}
 
 	/**
-	 * Obtain a DicomObject object using the Dicom file.
-	 * 
+	 * Obtain a DicomObject object using the DICOM file.
 	 * <p>
 	 * This object does not contain pixel data.
-	 * <p>
 	 * 
 	 * @return DicomObject object.
 	 * @throws IOException
@@ -129,7 +119,6 @@ public class DicomReader
 		dis.setHandler(stop);
 		DicomObject object = dis.readDicomObject();
 		RasterProcessor rasterProcessor = new RasterProcessor(object);
-		// RasterProcessorDP rasterProcessor = new RasterProcessorDP(object);
 		dis.close();
 		fis = new FileImageInputStream(dicomFile);
 		DicomImageReader codec = (DicomImageReader)new DicomImageReaderSpi().createReaderInstance();

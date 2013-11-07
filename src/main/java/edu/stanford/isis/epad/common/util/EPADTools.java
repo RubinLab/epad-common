@@ -124,7 +124,7 @@ public class EPADTools
 			String dcmServerTitlePort = aeTitle + "@localhost:" + dicomServerPort;
 			dcmServerTitlePort = dcmServerTitlePort.trim();
 
-			logger.info("Sending 1 files - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
+			logger.info("Sending 1 file - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
 
 			String[] command = { "./dcmsnd", dcmServerTitlePort, inputPathFile };
 
