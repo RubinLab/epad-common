@@ -282,8 +282,23 @@ public class EPADFileUtils
 		if (files != null) {
 			return Arrays.asList(files);
 		} else {
-			// return an empty list of no files.
-			return new ArrayList<File>();
+			return new ArrayList<File>(); // return an empty list of no files.
+		}
+	}
+
+	public static List<File> getAllFilesWithoutExtension(File dir, final String extension)
+	{
+		File[] files = dir.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File file)
+			{
+				return !file.getName().endsWith(extension);
+			}
+		});
+		if (files != null) {
+			return Arrays.asList(files);
+		} else {
+			return new ArrayList<File>(); // return an empty list of no files.
 		}
 	}
 
@@ -662,9 +677,8 @@ public class EPADFileUtils
 				if (!currFile.delete()) {
 					throw new IllegalStateException("Could not delete file=" + currFile.getAbsolutePath());
 				}
-			}// for
+			}
 
-			// delete the root directory.
 			if (!dirToDelete.delete()) {
 				throw new IllegalStateException("Could not delete: " + dirToDelete.getAbsolutePath());
 			}
@@ -677,6 +691,45 @@ public class EPADFileUtils
 			// log.warning("Had: "+e.getMessage()+" for "+dirToDelete.getAbsolutePath(),e);
 			return false;
 		}
-	}// deleteDirAndContents
+	}
 
+	public static boolean deleteFilesInDirWithoutExtension(File dir, String extension)
+	{
+		try {
+			List<File> files = getAllFilesWithoutExtension(dir, extension);
+
+			for (File file : files) {
+				if (!file.delete()) {
+					throw new IllegalStateException("Could not delete file=" + file.getAbsolutePath());
+				}
+			}
+			return true;
+		} catch (IllegalStateException ise) {
+			log.warning(ise.getMessage());
+			return false;
+		} catch (Exception e) {
+			log.warning("Had: " + e.getMessage() + " for " + dir.getAbsolutePath(), e);
+			return false;
+		}
+	}
+
+	public static boolean deleteFilesInDirWithExtension(File dir, String extension)
+	{
+		try {
+			List<File> files = getAllFilesWithExtension(dir, extension);
+
+			for (File file : files) {
+				if (!file.delete()) {
+					throw new IllegalStateException("Could not delete file=" + file.getAbsolutePath());
+				}
+			}
+			return true;
+		} catch (IllegalStateException ise) {
+			log.warning(ise.getMessage());
+			return false;
+		} catch (Exception e) {
+			log.warning("Had: " + e.getMessage() + " for " + dir.getAbsolutePath(), e);
+			return false;
+		}
+	}
 }
