@@ -87,7 +87,7 @@ public class EPADLogger
 	 */
 	public void warning(String message, Throwable t)
 	{
-		log.log(Level.WARNING, message, t);
+		log.log(Level.WARNING, message + ":" + t.getMessage(), t); // TODO See why getMessage is necessary
 	}
 
 	public void warning(String message)

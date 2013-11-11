@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -279,11 +280,20 @@ public class EPADFileUtils
 				return file.getName().endsWith(extension);
 			}
 		});
+
 		if (files != null) {
 			return Arrays.asList(files);
 		} else {
 			return new ArrayList<File>(); // return an empty list of no files.
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Collection<File> getAllFilesWithExtension(File dir, String extension, boolean recursive)
+	{
+		String[] extensions = new String[] { extension };
+
+		return FileUtils.listFiles(dir, extensions, recursive);
 	}
 
 	public static List<File> getAllFilesWithoutExtension(File dir, final String extension)
@@ -636,7 +646,6 @@ public class EPADFileUtils
 
 	public static boolean createDirsAndFile(File file)
 	{
-
 		boolean success = makeDirs(file.getParentFile());
 		if (!success) {
 			return false;
@@ -671,14 +680,12 @@ public class EPADFileUtils
 					throw new IllegalStateException("Filed to delete dir=" + dirToDelete.getAbsolutePath());
 				}
 			}
-			// delete all content files.
 			File[] files = dirToDelete.listFiles();
 			for (File currFile : files) {
 				if (!currFile.delete()) {
 					throw new IllegalStateException("Could not delete file=" + currFile.getAbsolutePath());
 				}
 			}
-
 			if (!dirToDelete.delete()) {
 				throw new IllegalStateException("Could not delete: " + dirToDelete.getAbsolutePath());
 			}
@@ -716,11 +723,11 @@ public class EPADFileUtils
 	public static boolean deleteFilesInDirWithExtension(File dir, String extension)
 	{
 		try {
-			List<File> files = getAllFilesWithExtension(dir, extension);
+			Collection<File> files = getAllFilesWithExtension(dir, extension, true);
 
 			for (File file : files) {
 				if (!file.delete()) {
-					throw new IllegalStateException("Could not delete file=" + file.getAbsolutePath());
+					throw new IllegalStateException("Could not delete file " + file.getAbsolutePath());
 				}
 			}
 			return true;
