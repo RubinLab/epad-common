@@ -78,7 +78,7 @@ public class FirstDicomQueryTest implements Runnable
 		} catch (Exception e) {
 			System.err.println(LOG.toString());
 		} finally {
-			System.out.println(LOG.toString());
+			System.err.println(LOG.toString());
 		}
 	}
 
@@ -100,7 +100,7 @@ public class FirstDicomQueryTest implements Runnable
 		} catch (Exception e) {
 			System.err.println(LOG.toString());
 		} finally {
-			System.out.println(LOG.toString());
+			System.err.println(LOG.toString());
 		}
 
 	}
@@ -854,7 +854,6 @@ public class FirstDicomQueryTest implements Runnable
 			// Just to get the DCM4CHEE version.
 
 			Package p = FirstDicomQueryTest.class.getPackage();
-			System.out.println("dcmqr v" + p.getImplementationVersion());
 			// Syst//em.exit(0);
 			throw new IllegalArgumentException("dcmqr v" + p.getImplementationVersion());
 		}
@@ -1382,7 +1381,6 @@ public class FirstDicomQueryTest implements Runnable
 	{
 		if (conn.isListening()) {
 			conn.bind(executor);
-			System.out.println("Start Server listening on port " + conn.getPort());
 		}
 	}
 

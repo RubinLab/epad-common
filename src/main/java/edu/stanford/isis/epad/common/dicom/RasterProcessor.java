@@ -1,7 +1,6 @@
 package edu.stanford.isis.epad.common.dicom;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 
@@ -184,14 +183,13 @@ public class RasterProcessor
 		 */
 		public void print()
 		{
-			System.out.println();
-			System.out.println("Processing distribution " + getDesc());
-			System.out.println("There are " + Integer.toString(count) + " items");
-			System.out.println("Range is " + Float.toString(lowValue) + " to " + Float.toString(highValue));
-			System.out.println("Minimum value is " + Float.toString(minimum));
-			System.out.println("Maximum value is " + Float.toString(maximum));
+			logger.info("Processing distribution " + getDesc());
+			logger.info("There are " + Integer.toString(count) + " items");
+			logger.info("Range is " + Float.toString(lowValue) + " to " + Float.toString(highValue));
+			logger.info("Minimum value is " + Float.toString(minimum));
+			logger.info("Maximum value is " + Float.toString(maximum));
 			for (int i = 0; i < dist.length; i++) {
-				System.out.println(String.format("%3d  %8.2f  %8d", i, lowValue + increment * i, dist[i]));
+				logger.info(String.format("%3d  %8.2f  %8d", i, lowValue + increment * i, dist[i]));
 			}
 		}
 	}
@@ -309,33 +307,21 @@ public class RasterProcessor
 	 */
 	public void print(Raster raster)
 	{
-		DataBuffer buffer = raster.getDataBuffer();
-		int dataType = buffer.getDataType();
-		int dataSize = DataBuffer.getDataTypeSize(dataType);
-		if (pixelRepresentation == 0) {
-			System.out.println("PixelData contains unsigned values");
-		} else {
-			System.out.println("PixelData contains signed values");
-		}
-		System.out.println("Bits Allocated=" + Integer.toString(bitsAllocated) + ", Stored=" + Integer.toString(bitsStored)
-				+ ", High=" + Integer.toString(highBit));
-		System.out.println("Unused bits: high=" + Integer.toString(unusedHighBits) + ", low="
-				+ Integer.toString(unusedLowBits));
-		if (dataType == DataBuffer.TYPE_BYTE) {
-			System.out.println("BYTE " + Integer.toString(dataSize));
-		} else if (dataType == DataBuffer.TYPE_SHORT) {
-			System.out.println("SHORT " + Integer.toString(dataSize));
-		} else if (dataType == DataBuffer.TYPE_USHORT) {
-			System.out.println("USHORT " + Integer.toString(dataSize));
-		} else if (dataType == DataBuffer.TYPE_INT) {
-			System.out.println("INT " + Integer.toString(dataSize));
-		} else if (dataType == DataBuffer.TYPE_FLOAT) {
-			System.out.println("FLOAT " + Integer.toString(dataSize));
-		} else if (dataType == DataBuffer.TYPE_DOUBLE) {
-			System.out.println("DOUBLE " + Integer.toString(dataSize));
-		} else if (dataType == DataBuffer.TYPE_UNDEFINED) {
-			System.out.println("UNDEFINED");
-		}
+		/*
+		 * DataBuffer buffer = raster.getDataBuffer();
+		 * 
+		 * int dataType = buffer.getDataType();
+		 * 
+		 * int dataSize = DataBuffer.getDataTypeSize(dataType);
+		 * 
+		 * if (dataType == DataBuffer.TYPE_BYTE) { logger.info("BYTE " + Integer.toString(dataSize)); } else if (dataType ==
+		 * DataBuffer.TYPE_SHORT) { logger.info("SHORT " + Integer.toString(dataSize)); } else if (dataType ==
+		 * DataBuffer.TYPE_USHORT) { logger.info("USHORT " + Integer.toString(dataSize)); } else if (dataType ==
+		 * DataBuffer.TYPE_INT) { logger.info("INT " + Integer.toString(dataSize)); } else if (dataType ==
+		 * DataBuffer.TYPE_FLOAT) { logger.info("FLOAT " + Integer.toString(dataSize)); } else if (dataType ==
+		 * DataBuffer.TYPE_DOUBLE) { logger.info("DOUBLE " + Integer.toString(dataSize)); } else if (dataType ==
+		 * DataBuffer.TYPE_UNDEFINED) { logger.info("UNDEFINED"); }
+		 */
 		int min = 100000;
 		int max = -100000;
 		int min2 = 10000;
@@ -360,10 +346,6 @@ public class RasterProcessor
 				}
 			}
 		}
-		System.out.println("Minimum value unsigned = " + Integer.toString(min));
-		System.out.println("Maximum value unsigned = " + Integer.toString(max));
-		System.out.println("Minimum value signed   = " + Integer.toString(min2));
-		System.out.println("Maximum value signed   = " + Integer.toString(max2));
 		Distribution raw = new Distribution(min, max, 50);
 		Distribution signed = new Distribution(min2, max2, 50);
 		raw.setDesc("Raster values");
@@ -694,14 +676,14 @@ public class RasterProcessor
 		unusedHighBits = bitsAllocated - 1 - highBit;
 		unusedLowBits = highBit - bitsStored + 1;
 		dataMask = (1 << bitsStored) - 1;
-		logger.info("Bits allocated=" + Integer.toString(bitsAllocated) + ", stored=" + Integer.toString(bitsStored)
-				+ ", high=" + Integer.toString(highBit));
-		if (pixelRepresentation == 0) {
-			logger.info("Unsigned values");
-		} else {
-			logger.info("Signed values");
-		}
-		logger.info("Data mask is " + Integer.toString(dataMask, 16));
+		// logger.info("Bits allocated=" + Integer.toString(bitsAllocated) + ", stored=" + Integer.toString(bitsStored)
+		// + ", high=" + Integer.toString(highBit));
+		// if (pixelRepresentation == 0) {
+		// logger.info("Unsigned values");
+		// } else {
+		// logger.info("Signed values");
+		// }
+		// logger.info("Data mask is " + Integer.toString(dataMask, 16));
 	}
 
 	/**
@@ -785,11 +767,11 @@ public class RasterProcessor
 		int[] bgrArray = new int[3];
 
 		if (debugLevel > 0) {
-			if (pixelRepresentation == 0) {
-				logger.info("Running buildPNG with unsigned PixelData");
-			} else {
-				logger.info("Running buildPNG with signed PixelData");
-			}
+			// if (pixelRepresentation == 0) {
+			// logger.info("Running buildPNG with unsigned PixelData");
+			// } else {
+			// logger.info("Running buildPNG with signed PixelData");
+			// }
 			rawValuesDistribution = new Distribution(-40000.0f, 40000.0f);
 			rawValuesDistribution.setDesc("buildPng - Raw values");
 			highOrderBitsDistribution = new Distribution(0.0f, 256.0f);
@@ -892,7 +874,7 @@ public class RasterProcessor
 			rawValuesDistribution.print();
 			logger.info("Distribution of high order bits");
 			highOrderBitsDistribution.print();
-			System.out.println("Distribution of low order bits");
+			logger.info("Distribution of low order bits");
 			lowOrderBitsDistribution.print();
 		}
 		return working;
@@ -1017,15 +999,14 @@ public class RasterProcessor
 	public static void test(int value)
 	{
 		RasterProcessor instance = new RasterProcessor();
-		System.out.println();
-		System.out.print(String.format("%1$6d  ", value));
-		System.out.print(String.format("%1$02x  %2$02x  %3$7d", instance.high(value), instance.low(value),
+		logger.info(String.format("%1$6d  ", value));
+		logger.info(String.format("%1$02x  %2$02x  %3$7d", instance.high(value), instance.low(value),
 				instance.combine(instance.high(value), instance.low(value))));
 	}
 
 	protected void test2(int value)
 	{
-		System.out.println(String.format("%1$04x  %1$8d  %2$8d", value & dataMask, dataValue(value)));
+		logger.info(String.format("%1$04x  %1$8d  %2$8d", value & dataMask, dataValue(value)));
 	}
 
 	/**
@@ -1055,11 +1036,11 @@ public class RasterProcessor
 		distribute.add(2.1f);
 		distribute.add(2.2f);
 		distribute.print();
-		System.out.println("Tests for bit shifting");
+		logger.info("Tests for bit shifting");
 		long mask1 = (1l << 32) - (1l << 16);
-		System.out.println(Long.toString(mask1, 16) + "  (1<<32) - (1<<16)");
-		System.out.println(Long.toString(1l << 16, 16) + "  1<<16");
-		System.out.println(Long.toString(1l << 15, 16) + "  1<<15");
+		logger.info(Long.toString(mask1, 16) + "  (1<<32) - (1<<16)");
+		logger.info(Long.toString(1l << 16, 16) + "  1<<16");
+		logger.info(Long.toString(1l << 15, 16) + "  1<<15");
 		RasterProcessor instance = null;
 		instance = new RasterProcessor();
 		instance.setDebugLevel(10);

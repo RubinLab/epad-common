@@ -182,8 +182,6 @@ public class ConvertTIFFMasksToSegmentationObjects
 			e.printStackTrace(System.err);
 			System.exit(0);
 		}
-
-		System.out.println("DICOM segmentation objects file " + output_file + " is generated.");
 	}
 
 }

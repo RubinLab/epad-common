@@ -147,16 +147,13 @@ public class DicomReader
 			outputStream = new FileOutputStream(outputFile);
 			ImageIO.write(instance.getPackedImage(), "png", outputStream);
 			outputStream.close();
-			System.out.println("Generating second image");
 			outputFile = new File("image.jpeg");
 			outputStream = new FileOutputStream(outputFile);
 			ImageIO.write(instance.getImage(), "jpeg", outputStream);
 			outputStream.close();
 		} catch (FileNotFoundException e) {
-			System.out.println(e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		} catch (IOException e) {
-			System.out.println(e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

@@ -102,15 +102,15 @@ public class DicomQuery
 		DicomSearchResult retVal = DicomQuery.searchForStudies(DicomStudySearchType.PATIENT_ID,
 				"83393488148532965622665512597663741359");
 
-		System.out.println("#studies found: " + retVal.getStudies().size());
+		log.info("#studies found: " + retVal.getStudies().size());
 		// int debug=1;
 
 		for (DicomStudyData curr : retVal.getStudies()) {
-			System.out.println("studyId=" + curr.getStudyId());
-			System.out.println("patientName=" + curr.getPatientName());
-			System.out.println("patientId=" + curr.getPatientId());
-			System.out.println("examType=" + curr.getExamType());
-			System.out.println("studyDate=" + curr.getStudyDate());
+			log.info("studyId=" + curr.getStudyId());
+			log.info("patientName=" + curr.getPatientName());
+			log.info("patientId=" + curr.getPatientId());
+			log.info("examType=" + curr.getExamType());
+			log.info("studyDate=" + curr.getStudyDate());
 		}
 
 		// debug=2;
@@ -224,7 +224,7 @@ public class DicomQuery
 				} else {
 					DicomTag tag = parseDcm4cheeTagFromLine(currLine);
 					String value = parseDcm4cheeResultFromLine(currLine);
-					System.out.println("Series Tag: " + tag + " = " + value); // ToDo: remove when debug finished.
+					log.info("Series Tag: " + tag + " = " + value); // ToDo: remove when debug finished.
 					tags.put(tag, value);
 				}
 			} else {
@@ -358,8 +358,8 @@ public class DicomQuery
 				} else {
 					DicomTag tag = parseDcm4cheeTagFromLine(currLine);
 					String value = parseDcm4cheeResultFromLine(currLine);
-					System.out.println("parseSearchResults - Image Tag: " + tag + " = " + value); // ToDo: remove when debug
-																																												// finished.
+					log.info("parseSearchResults - Image Tag: " + tag + " = " + value); // ToDo: remove when debug
+																																							// finished.
 					tags.put(tag, value);
 				}
 			} else {
@@ -1309,7 +1309,7 @@ public class DicomQuery
 			// Just to get the DCM4CHEE version.
 
 			Package p = DicomQuery.class.getPackage();
-			System.out.println("dcmqr v" + p.getImplementationVersion());
+			log.info("dcmqr v" + p.getImplementationVersion());
 			// Syst//em.exit(0);
 			throw new IllegalArgumentException("dcmqr v" + p.getImplementationVersion());
 		}
@@ -1837,7 +1837,7 @@ public class DicomQuery
 	{
 		if (conn.isListening()) {
 			conn.bind(executor);
-			System.out.println("Start Server listening on port " + conn.getPort());
+			log.info("Start Server listening on port " + conn.getPort());
 		}
 	}
 

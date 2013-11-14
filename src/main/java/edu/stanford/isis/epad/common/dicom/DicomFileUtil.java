@@ -80,19 +80,19 @@ public class DicomFileUtil
 		// hard coded dicom file here.
 		File dicomFile = new File("/Users/alansnyder/work/2012-06/IM-0001-0001.dcm");
 
-		System.out.println("TEST #1");
+		log.info("TEST #1");
 		if (DicomFileUtil.hasMagicWordInHeader(dicomFile)) {
-			System.out.println("TEST PASS!!");
+			log.info("TEST PASS!!");
 		} else {
-			System.out.println("TEST FAIL!!");
+			log.info("TEST FAIL!!");
 		}
 
 		printFileExists(dicomFile);
-		System.out.println("#1 DONE");
+		log.info("#1 DONE");
 
 		// no extension.
 		File dicomFile2 = new File("/Users/alansnyder/work/2012-06/DICOM-FILE-NO-EXT");
-		System.out.println("TEST #2 - add extension.");
+		log.info("TEST #2 - add extension.");
 
 		printFileExists(dicomFile2);
 		File df2 = DicomFileUtil.addDcmExtensionToFile(dicomFile2);
@@ -103,11 +103,11 @@ public class DicomFileUtil
 	private static void printFileExists(File f)
 	{
 		if (f.exists()) {
-			System.out.println("Found: " + f.getName());
+			log.info("Found: " + f.getName());
 		} else {
-			System.out.println("Not Found: " + f.getAbsolutePath());
+			log.info("Not Found: " + f.getAbsolutePath());
 			if (f.isDirectory()) {
-				System.out.println("Java thinks " + f.getName() + " is a directory.");
+				log.info("Java thinks " + f.getName() + " is a directory.");
 			}
 		}
 	}

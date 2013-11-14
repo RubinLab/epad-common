@@ -140,7 +140,7 @@ public class DICOMSearchResultImpl implements DicomSearchResult
 		searchResultMap.put(studyUID, tree);
 		studyList.add(studyUID);
 
-		System.out.println("Add Study Results: studyUID=" + studyUID);
+		logger.info("Add Study Results: studyUID=" + studyUID);
 	}
 
 	/**

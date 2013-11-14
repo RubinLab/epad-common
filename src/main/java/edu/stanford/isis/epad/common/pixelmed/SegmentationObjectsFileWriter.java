@@ -1188,7 +1188,6 @@ public class SegmentationObjectsFileWriter
 		}
 
 		try {
-			System.out.println("Input DICOM file is " + input_file + ".");
 			DicomInputStream i_stream = new DicomInputStream(new FileInputStream(input_file));
 			AttributeList list = new AttributeList();
 			list.read(i_stream);
@@ -1236,8 +1235,6 @@ public class SegmentationObjectsFileWriter
 			e.printStackTrace(System.err);
 			System.exit(0);
 		}
-
-		System.out.println("DICOM file " + output_file + " is generated.");
 	}
 
 }
