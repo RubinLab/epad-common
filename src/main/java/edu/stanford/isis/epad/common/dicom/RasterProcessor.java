@@ -551,7 +551,7 @@ public class RasterProcessor
 		if (objectValue.containsValue(Tag.PixelRepresentation)) {
 			pixelRepresentation = objectValue.getInt(Tag.PixelRepresentation);
 		} else {
-			logger.info("Default used for PixelRepresentation");
+			// logger.info("Default used for PixelRepresentation");
 			pixelRepresentation = 0;
 		}
 		if (objectValue.containsValue(Tag.PhotometricInterpretation)) {
@@ -564,13 +564,13 @@ public class RasterProcessor
 			if (nested.containsValue(Tag.RescaleIntercept)) {
 				rescaleIntercept = nested.getFloat(Tag.RescaleIntercept);
 			} else {
-				logger.info("Default value of 0.0 used for RescaleIntercept");
+				// logger.info("Default value of 0.0 used for RescaleIntercept");
 				rescaleIntercept = 0.0f;
 			}
 			if (nested.containsValue(Tag.RescaleSlope)) {
 				rescaleSlope = nested.getFloat(Tag.RescaleSlope);
 			} else {
-				logger.info("Default value of 1.0 used for RescaleSlope");
+				// logger.info("Default value of 1.0 used for RescaleSlope");
 				rescaleSlope = 1.0f;
 			}
 			if (nested.containsValue(Tag.RescaleType)) {
@@ -581,13 +581,13 @@ public class RasterProcessor
 			if (objectValue.containsValue(Tag.RescaleIntercept)) {
 				rescaleIntercept = objectValue.getFloat(Tag.RescaleIntercept);
 			} else {
-				logger.info("Default value of 0.0 used for RescaleIntercept");
+				// logger.info("Default value of 0.0 used for RescaleIntercept");
 				rescaleIntercept = 0.0f;
 			}
 			if (objectValue.containsValue(Tag.RescaleSlope)) {
 				rescaleSlope = objectValue.getFloat(Tag.RescaleSlope);
 			} else {
-				logger.info("Default value of 1.0 used for RescaleSlope");
+				// logger.info("Default value of 1.0 used for RescaleSlope");
 				rescaleSlope = 1.0f;
 			}
 			if (objectValue.containsValue(Tag.RescaleType)) {
@@ -609,13 +609,13 @@ public class RasterProcessor
 			windowWidth = objectValue.getFloats(Tag.WindowWidth);
 		} else {
 			windowWidth[0] = -100.0f;
-			logger.info("DMust calculate WindowCenter");
+			// logger.info("Must calculate WindowCenter");
 		}
 		if (objectValue.containsValue(Tag.WindowCenter)) {
 			windowCenter = objectValue.getFloats(Tag.WindowCenter);
 		} else {
 			windowCenter[0] = -100.0f;
-			logger.info("Must calculate WindowCenter");
+			// logger.info("Must calculate WindowCenter");
 		}
 		if (objectValue.containsValue(Tag.WindowCenterWidthExplanation)) {
 			windowCenterWidthExplanation = objectValue.getStrings(Tag.WindowCenterWidthExplanation);
@@ -966,8 +966,8 @@ public class RasterProcessor
 			}
 			windowWidth[0] = (maximumGrayLevel - minimumGrayLevel) * rescaleSlope;
 			windowCenter[0] = (maximumGrayLevel + minimumGrayLevel) * rescaleSlope / 2.0f + rescaleIntercept;
-			logger.info("WindowWidth is " + Float.toString(windowWidth[0]));
-			logger.info("WindowCenter is " + Float.toString(windowCenter[0]));
+			// logger.info("WindowWidth is " + Float.toString(windowWidth[0]));
+			// logger.info("WindowCenter is " + Float.toString(windowCenter[0]));
 		}
 		BufferedImage working = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
 		WritableRaster writable = working.getRaster();
