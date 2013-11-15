@@ -12,45 +12,44 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Creates an MD5Hash
- *
+ * 
  * @author amsnyder
  */
-public class DicomHashUtil {
+public class DicomHashUtil
+{
+	MessageDigest md;
 
-    MessageDigest md;
+	public DicomHashUtil()
+	{
+		try {
+			md = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException nsae) {
 
-    public DicomHashUtil(){
-        try{
-            md = MessageDigest.getInstance("MD5");
-        }catch (NoSuchAlgorithmException nsae){
+		}
+	}
 
-        }
+	/**
+	 * Return an MD5 Hash of an arbitrary string.
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public static String hash(String input) // throws Exception
+	{
+		return input.replace('.', '_');
+	}
 
-    }
-
-    /**
-     * Return an MD5 Hash of an arbitrary string.
-     * @param input
-     * @return
-     */
-    public static String hash(String input) //throws Exception
-    {
-        return input.replace('.','_');
-    }
-
-
-    /**
-     * Make a string into an MD5 hash.
-     * @param input
-     * @return String MD5 hash
-     * @throws Exception
-     */
-    public String md5Hash(String input)
-        throws Exception
-    {
-        byte[] in = input.getBytes("UTF-8");
-        md.digest(in);
-        return new String(md.digest());
-    }
-
+	/**
+	 * Make a string into an MD5 hash.
+	 * 
+	 * @param input
+	 * @return String MD5 hash
+	 * @throws Exception
+	 */
+	public String md5Hash(String input) throws Exception
+	{
+		byte[] in = input.getBytes("UTF-8");
+		md.digest(in);
+		return new String(md.digest());
+	}
 }

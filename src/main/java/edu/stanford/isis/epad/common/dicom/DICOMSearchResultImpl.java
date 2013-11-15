@@ -28,7 +28,7 @@ import edu.stanford.isis.epad.common.util.Tree;
  * 
  * @author amsnyder
  */
-public class DICOMSearchResultImpl implements DicomSearchResult
+public class DicomSearchResultImpl implements DicomSearchResult
 {
 
 	EPADLogger logger = EPADLogger.getInstance();
@@ -51,7 +51,7 @@ public class DICOMSearchResultImpl implements DicomSearchResult
 
 	final DicomSearchMap searchMap;
 
-	public DICOMSearchResultImpl(DicomStudySearchType type, String param)
+	public DicomSearchResultImpl(DicomStudySearchType type, String param)
 	{
 		searchResultMap = new ConcurrentHashMap<DicomStudyUID, Tree<DicomData>>();
 		studyList = new ArrayList<DicomStudyUID>();
@@ -84,7 +84,7 @@ public class DICOMSearchResultImpl implements DicomSearchResult
 		Tree<DicomData> tree = searchResultMap.get(studyUID);
 
 		if (tree == null) {
-			logger.info("WARNING: No Series found for StudyID=" + studyID + "! Returning empty list.");
+			logger.info("WARNING: No Series found for study " + studyID + "! Returning empty list.");
 			return retVal;
 		}
 

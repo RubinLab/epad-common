@@ -11,12 +11,14 @@ import java.util.Comparator;
 
 /**
  * Sort DicomImages in a series.
- *
+ * 
  * @author amsnyder
  */
-public class DicomImageSorter implements Comparator<DicomImageData> {
-    @Override
-    public int compare(DicomImageData dicomImageData, DicomImageData dicomImageData1) {
-        return dicomImageData.getStackOrder() - dicomImageData1.getStackOrder();
-    }
+public class DicomImageSorter implements Comparator<DicomImageData>
+{
+	@Override
+	public int compare(DicomImageData dicomImageData, DicomImageData dicomImageData1)
+	{
+		return dicomImageData.getStackOrder() - dicomImageData1.getStackOrder();
+	}
 }

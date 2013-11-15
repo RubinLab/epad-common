@@ -5,13 +5,13 @@ package edu.stanford.isis.epad.common.dicom;
  * 
  * @author martin
  */
-public class DICOMSeriesDescriptionSearchResult
+public class DicomSeriesDescriptionSearchResult
 {
 	public String fileName;
 	public int instanceNumber;
 	public String sliceLocation, contentTime;
 
-	public DICOMSeriesDescriptionSearchResult(String fileName, int instanceNumber, String sliceLocation,
+	public DicomSeriesDescriptionSearchResult(String fileName, int instanceNumber, String sliceLocation,
 			String contentTime)
 	{
 		this.fileName = fileName;

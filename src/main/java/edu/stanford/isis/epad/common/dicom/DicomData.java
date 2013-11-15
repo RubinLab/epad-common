@@ -9,23 +9,23 @@ package edu.stanford.isis.epad.common.dicom;
 
 /**
  * Interfaces common to Studies, Series and Images(Instances)
- *
+ * 
  * @author amsnyder
  */
-public interface DicomData {
+public interface DicomData
+{
+	DicomQueryLevel getType();
 
-    DicomQueryLevel getType();
+	String getPatientId();
 
-    String getPatientId();
-    String getPatientName();
+	String getPatientName();
 
-    String getStudyDate();
+	String getStudyDate();
 
-
-    /**
-     * Modality or ExamType
-     * @return
-     */
-    String getExamType();
-
+	/**
+	 * Modality or ExamType
+	 * 
+	 * @return
+	 */
+	String getExamType();
 }

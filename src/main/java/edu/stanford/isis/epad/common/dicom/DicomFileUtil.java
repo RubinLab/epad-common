@@ -70,14 +70,8 @@ public class DicomFileUtil
 		return newName;
 	}
 
-	/**
-	 * Just for testing.
-	 * 
-	 * @param args
-	 */
 	public static void main(String[] args)
 	{
-		// hard coded dicom file here.
 		File dicomFile = new File("/Users/alansnyder/work/2012-06/IM-0001-0001.dcm");
 
 		log.info("TEST #1");

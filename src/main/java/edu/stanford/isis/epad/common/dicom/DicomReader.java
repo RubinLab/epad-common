@@ -23,6 +23,8 @@ import org.dcm4che2.imageioimpl.plugins.dcm.DicomImageReaderSpi;
 import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
 
+import edu.stanford.isis.epad.common.util.EPADLogger;
+
 /**
  * Read a Dicom instance and generate a variety of other formats that can be used to create files.
  * 
@@ -36,6 +38,8 @@ import org.dcm4che2.io.StopTagInputHandler;
 public class DicomReader
 {
 	protected final File dicomFile;
+
+	private static final EPADLogger log = EPADLogger.getInstance();
 
 	public DicomReader(File dicomFile)
 	{
@@ -129,6 +133,37 @@ public class DicomReader
 		dis.close();
 		fis.close();
 		return packedImage;
+	}
+
+	// See http://forums.dcm4che.org/jiveforums/message.jspa?messageID=21407 for various ways of resding a DICOM file.
+	public String getPatientName() throws IOException
+	{
+		DicomInputStream dis = null;
+		dis = new DicomInputStream(dicomFile);
+		DicomObject dicomObject = dis.readDicomObject();
+		String patientName = dicomObject.getString(Tag.PatientName);
+		dis.close();
+		return patientName;
+	}
+
+	public String getPatientID() throws IOException
+	{
+		DicomInputStream dis = null;
+		dis = new DicomInputStream(dicomFile);
+		DicomObject dicomObject = dis.readDicomObject();
+		String patientID = dicomObject.getString(Tag.PatientID);
+		dis.close();
+		return patientID;
+	}
+
+	public String getStudyIUID() throws IOException
+	{
+		DicomInputStream dis = null;
+		dis = new DicomInputStream(dicomFile);
+		DicomObject dicomObject = dis.readDicomObject();
+		String studyIUID = dicomObject.getString(Tag.StudyInstanceUID);
+		dis.close();
+		return studyIUID;
 	}
 
 	/**

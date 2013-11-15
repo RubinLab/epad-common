@@ -9,19 +9,20 @@ package edu.stanford.isis.epad.common.dicom;
 
 /**
  * An interface to get (Instance) image data.
- *
+ * 
  * @author amsnyder
  */
-public interface DicomImageData extends DicomData{
+public interface DicomImageData extends DicomData
+{
+	/**
+	 * In a series get the order of this image.
+	 * 
+	 * @return
+	 */
+	int getStackOrder();
 
-    /**
-     * In a series get the order of this image.
-     * @return
-     */
-    int getStackOrder();
+	String getRawDataURL();
 
-    String getRawDataURL();
-
-    DicomImageUID getSopInstanceId();
+	DicomImageUID getSopInstanceId();
 
 }

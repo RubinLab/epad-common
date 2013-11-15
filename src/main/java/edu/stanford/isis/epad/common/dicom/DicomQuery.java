@@ -132,7 +132,7 @@ public class DicomQuery
 		return parseStudySearchResult(searchType, searchParam);
 	}
 
-	private static void debugSearchResultCache(DICOMSearchResultCache cache)
+	private static void debugSearchResultCache(DicomSearchResultCache cache)
 	{
 		EPADLogger logger = EPADLogger.getInstance();
 		logger.info("DEBUG SearchResultCache: " + cache.toString());
@@ -147,9 +147,9 @@ public class DicomQuery
 	 */
 	public static DicomSearchResult searchForSeries(String studyUID, String remoteAddr)
 	{
-		DICOMSearchResultCache searchResultCache = DICOMSearchResultCache.getInstance();
+		DicomSearchResultCache searchResultCache = DicomSearchResultCache.getInstance();
 
-		DICOMSearchResultImpl result = searchResultCache.getMostRecent(remoteAddr);
+		DicomSearchResultImpl result = searchResultCache.getMostRecent(remoteAddr);
 		if (result == null) {
 			debugSearchResultCache(searchResultCache);
 			throw new IllegalStateException("Failed to find the root search for: studyUID=" + studyUID + " remoteAddr="
@@ -200,7 +200,7 @@ public class DicomQuery
 	 * @param rootResult
 	 * @return
 	 */
-	private static DicomSearchResult parseSeriesSearchResult(String studyUID, DICOMSearchResultImpl rootResult)
+	private static DicomSearchResult parseSeriesSearchResult(String studyUID, DicomSearchResultImpl rootResult)
 	{
 		boolean isReadingTags = false;
 
@@ -271,7 +271,7 @@ public class DicomQuery
 
 		boolean isReadingTags = false;
 
-		DICOMSearchResultImpl retVal = new DICOMSearchResultImpl(searchType, searchParam);
+		DicomSearchResultImpl retVal = new DicomSearchResultImpl(searchType, searchParam);
 
 		// NOTE:: We are using a static log here, which will not work for multiple
 		// simultaneous calls. This needs to be fixed.
@@ -302,7 +302,7 @@ public class DicomQuery
 			}
 		}
 
-		DICOMSearchResultCache cache = DICOMSearchResultCache.getInstance();
+		DicomSearchResultCache cache = DicomSearchResultCache.getInstance();
 		cache.cache(retVal, searchType, searchParam);
 
 		return retVal;
@@ -336,7 +336,6 @@ public class DicomQuery
 	 */
 	private static List<DicomImageData> parseImageSearchResult()
 	{
-
 		boolean isReadingTags = false;
 		List<RImageData> retVal = new ArrayList<RImageData>();
 
@@ -384,7 +383,6 @@ public class DicomQuery
 	 */
 	private static DicomTag parseDcm4cheeTagFromLine(String line)
 	{
-
 		String backetFormat = line.substring(line.indexOf("("), line.indexOf(")"));
 		return DicomTag.forBracketFormat(backetFormat);
 	}
@@ -397,9 +395,7 @@ public class DicomQuery
 	 */
 	private static String parseDcm4cheeResultFromLine(String line)
 	{
-
 		return line.substring(line.indexOf("[") + 1, line.indexOf("]"));
-
 	}
 
 	/**
