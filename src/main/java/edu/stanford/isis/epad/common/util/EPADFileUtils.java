@@ -543,8 +543,6 @@ public class EPADFileUtils
 	public static void extractFolder(String zipFile) throws IOException
 	{
 		try {
-
-			log.info("Unzipping: " + zipFile);
 			int BUFFER = 2048;
 			File file = new File(zipFile);
 
