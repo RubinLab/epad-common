@@ -27,7 +27,7 @@ public class EPADTools
 	public static final String aeTitle = EPADConfig.getInstance().getParam("DicomServerAETitle");
 	public static final String username = EPADConfig.getInstance().getParam("username");
 	public static final String password = EPADConfig.getInstance().getParam("password");
-	public static final String collection = EPADConfig.getInstance().getParam("defaultcontainer");
+	public static final String collection = EPADConfig.getInstance().getParam("collection"); // "defaultcontainer";
 	public static final String aim3Namespace = EPADConfig.getInstance().getParam("namespace");
 	public static final String existURI = EPADConfig.getInstance().getParam("serverUrlUpload");
 	public static final String eventResourceURI = EPADConfig.getInstance().getParam("eventResourceURI");
