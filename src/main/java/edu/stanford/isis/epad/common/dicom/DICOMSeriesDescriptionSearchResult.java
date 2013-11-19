@@ -1,22 +1,50 @@
 package edu.stanford.isis.epad.common.dicom;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Represents the result from an ePAD DICOM series description query.
+ * Result returned from an ePAD series description query.
  * 
  * @author martin
  */
 public class DicomSeriesDescriptionSearchResult
 {
-	public String fileName;
-	public int instanceNumber;
-	public String sliceLocation, contentTime;
+	public final List<DicomImageDescriptionSearchResult> ResultSet; // TODO Move to lower case but sync with front end
+																																	// call first
 
-	public DicomSeriesDescriptionSearchResult(String fileName, int instanceNumber, String sliceLocation,
-			String contentTime)
+	public DicomSeriesDescriptionSearchResult(List<DicomImageDescriptionSearchResult> resultSet)
 	{
-		this.fileName = fileName;
-		this.instanceNumber = instanceNumber;
-		this.sliceLocation = sliceLocation;
-		this.contentTime = contentTime;
+		this.ResultSet = Collections.unmodifiableList(resultSet);
+	}
+
+	public int getNumberOfImagesInSeries()
+	{
+		return this.ResultSet.size();
+	}
+
+	public List<String> getImageUIDs()
+	{
+		List<String> result = new ArrayList<String>();
+		for (DicomImageDescriptionSearchResult imageDescription : ResultSet) {
+			result.add(imageDescription.getImageUID());
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param imageUID
+	 * @return Index on success; -1 on failure
+	 */
+	public int getImageIndex(String imageUID)
+	{
+		for (DicomImageDescriptionSearchResult imageDescription : ResultSet) {
+			if (imageDescription.getImageUID().equals(imageUID)) {
+				return imageDescription.instanceNumber;
+			}
+		}
+		return -1;
 	}
 }

@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -88,32 +87,6 @@ public class EPADTools
 		return statusCode;
 	}
 
-	public static ArrayList<String> getDicomSeries(String seriesUID) throws Exception
-	{
-		ArrayList<String> result = null;
-		String url = seriesOrderURI + "?series_iuid=" + seriesUID;
-
-		HttpClient client = new HttpClient();
-		GetMethod method = new GetMethod(url);
-		int statusCode = client.executeMethod(method);
-		if (statusCode != -1) {
-			// Get the result as stream
-			BufferedReader reader = new BufferedReader(new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8"));
-			result = new ArrayList<String>();
-			String line;
-			while ((line = reader.readLine()) != null) {
-				String[] cols = line.split(",");
-				if (cols != null && cols.length > 1) {
-					String imgIUD = cols[0];
-					if (imgIUD.endsWith(".dcm")) {
-						result.add(convertDicomNameToImageUID(imgIUD));
-					}
-				}
-			}
-		}
-		return result;
-	}
-
 	public static void dcmsnd(String inputPathFile, boolean throwException) throws Exception
 	{
 		InputStream is = null;
@@ -178,46 +151,6 @@ public class EPADTools
 			close(isr);
 			close(is);
 		}
-	}
-
-	public static int getPositionOfImageInSeries(String seriesUID, String imageIUD) throws Exception
-	{
-		@SuppressWarnings("unused")
-		ArrayList<String> result = null;
-		String url = seriesOrderURI + "?series_iuid=" + seriesUID;
-
-		HttpClient client = new HttpClient();
-		GetMethod method = new GetMethod(url);
-		logger.info("getPositionOfImageInSeries = " + url);
-
-		// Execute the GET method
-		int statusCode = client.executeMethod(method);
-		int pos = -1;
-		int nbImagesInSeries = 0;
-		int indexPos = 1;
-
-		if (statusCode != -1) { // Get the result as stream
-			BufferedReader reader = new BufferedReader(new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8"));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				String[] cols = line.split(",");
-				if (cols != null && cols.length > 1) {
-					String imgIUD = cols[0];
-					if (imgIUD.endsWith(".dcm")) {
-						nbImagesInSeries++;
-						String currentUID = convertDicomNameToImageUID(imgIUD);
-						if (imageIUD.equals(currentUID)) {
-							pos = Integer.parseInt(cols[1]);
-							indexPos = nbImagesInSeries;
-						}
-					}
-				}
-			}
-		}
-		if (pos > nbImagesInSeries) {
-			pos = indexPos;
-		}
-		return pos;
 	}
 
 	public static boolean copyFile(File source, File destination)

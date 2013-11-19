@@ -7,38 +7,13 @@
  */
 package edu.stanford.isis.epad.common.plugins.impl;
 
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.user.client.ui.LayoutPanel;
-
 import edu.stanford.isis.epad.common.plugins.EPadPlugin;
 
-/**
- * WARNING: This interface will be rapidly changing during development. Contact amsnyder@stanford.edu if you plan to
- * implement it, to understand likely changes in the future. The EPadFiles interface is more stable.
- * 
- * This interface is used to register a plugin/add-on with the DicomProxy. At this moment it hasn't been decided if it
- * is a jar file or a war file.
- * 
- */
 public class EPadPluginImpl implements EPadPlugin
 {
-
 	@Override
 	public String getPluginImplVersion()
 	{
-		return "2012/08/10 13:00 (beta)";
+		return "2013/11/10 13:00";
 	}
-
-	@Override
-	public LayoutPanel getGwtUILayoutPanel()
-	{
-		return null; // To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	@Override
-	public DivElement getGwtUIDivElement()
-	{
-		return null; // To change body of implemented methods use File | Settings | File Templates.
-	}
-
 }
