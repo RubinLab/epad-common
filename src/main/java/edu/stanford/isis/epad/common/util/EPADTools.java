@@ -96,19 +96,14 @@ public class EPADTools
 		try {
 			String dcmServerTitlePort = aeTitle + "@localhost:" + dicomServerPort;
 			dcmServerTitlePort = dcmServerTitlePort.trim();
-
-			logger.info("Sending 1 file - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
-
+			logger.info("Sending file - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
 			String[] command = { "./dcmsnd", dcmServerTitlePort, inputPathFile };
-
 			ProcessBuilder pb = new ProcessBuilder(command);
 			String dicomBinDirectoryPath = ResourceUtils.getEPADWebServerDICOMBinDir();
 			logger.info("DICOM binary directory: " + dicomBinDirectoryPath);
 			pb.directory(new File(dicomBinDirectoryPath));
-
 			Process process = pb.start();
 			process.getOutputStream();// get the output stream.
-			// Read out dir output
 			is = process.getInputStream();
 			isr = new InputStreamReader(is);
 
@@ -117,18 +112,16 @@ public class EPADTools
 			StringBuilder sb = new StringBuilder();
 			while ((line = br.readLine()) != null) {
 				sb.append(line).append("\n");
+				logger.info("./dcmsend output: " + line);
 			}
 
-			try { // Wait to get exit value
-				@SuppressWarnings("unused")
-				int exitValue = process.waitFor(); // keep.
-				// long totalTime = System.currentTimeMillis() - startTime;
-				// log.info("Tags exit value is: " + exitValue+" and took: "+totalTime+" ms");
+			try {
+				int exitValue = process.waitFor();
+				logger.info("dcmsend exit value is: " + exitValue);
 			} catch (InterruptedException e) {
-				logger.info("Didn't send DICOM files in: " + inputPathFile);
+				logger.warning("Error sending DICOM files in: " + inputPathFile, e);
 			}
 			String cmdLineOutput = sb.toString();
-			logger.info(cmdLineOutput);
 
 			if (cmdLineOutput.toLowerCase().contains("error")) {
 				throw new IllegalStateException("Failed for: " + cmdLineOutput);
@@ -189,18 +182,6 @@ public class EPADTools
 			}
 		}
 		return (resultat);
-	}
-
-	private static String convertDicomNameToImageUID(String currFileName)
-	{
-		int lastDotIndex = currFileName.lastIndexOf('.');
-
-		String uidPart = currFileName;
-		if (lastDotIndex > 0) {
-			uidPart = currFileName.substring(0, lastDotIndex);
-		}
-		uidPart = uidPart.replaceAll("_", ".");
-		return uidPart;
 	}
 
 	private static void close(Reader reader)
