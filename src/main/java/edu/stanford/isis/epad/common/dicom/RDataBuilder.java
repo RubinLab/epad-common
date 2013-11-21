@@ -10,7 +10,7 @@ package edu.stanford.isis.epad.common.dicom;
 import java.util.Map;
 
 import edu.stanford.isis.epad.common.util.EPADLogger;
-import edu.stanford.isis.epad.common.util.ResourceUtils;
+import edu.stanford.isis.epad.common.util.EPADResources;
 
 /**
  * 
@@ -37,7 +37,7 @@ public class RDataBuilder
 		RSeriesData retVal = new RSeriesData(map);
 
 		EPADLogger.getInstance().info("Making thumbnail for study=" + studyUID + ", series=" + seriesUID);
-		retVal.setThumbnailURL(ResourceUtils.makeThumbnailFilePath(studyUID, seriesUID));
+		retVal.setThumbnailURL(EPADResources.makeThumbnailFilePath(studyUID, seriesUID));
 		return retVal;
 	}
 

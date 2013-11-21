@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import edu.stanford.isis.epad.common.util.ResourceUtils;
+import edu.stanford.isis.epad.common.util.EPADResources;
 
 /**
  * @author amsnyder
@@ -31,7 +31,7 @@ public class PluginLogger
 		FileHandler fileHandler;
 		try {
 			String timeStamp = createTimestamp();
-			fileHandler = new FileHandler(ResourceUtils.getEPADWebServerLogDir() + "epad-plugin-" + timeStamp + ".log", true);
+			fileHandler = new FileHandler(EPADResources.getEPADWebServerLogDir() + "epad-plugin-" + timeStamp + ".log", true);
 			SimpleFormatter formatter = new SimpleFormatter();
 			fileHandler.setFormatter(formatter);
 			logger.addHandler(fileHandler);

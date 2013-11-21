@@ -42,7 +42,7 @@ public class EPADLogger
 
 	private String getLogFilePath()
 	{
-		String logFilePath = ResourceUtils.getEPADWebServerLogFilePath();
+		String logFilePath = EPADResources.getEPADWebServerLogFilePath();
 		log.info("ePAD web service log file: " + logFilePath);
 
 		return logFilePath;

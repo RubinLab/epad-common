@@ -23,11 +23,11 @@ import edu.stanford.isis.epad.common.dicom.DicomStudyUID;
  * 
  * @author amsnyder
  */
-public class ResourceUtils
+public class EPADResources
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
 
-	private ResourceUtils()
+	private EPADResources()
 	{
 	}
 

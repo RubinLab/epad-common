@@ -42,10 +42,10 @@ public class EPADTools
 		String seriesIDKey = dicomImageFileDescription.get("series_iuid");
 		String imageIDKey = dicomImageFileDescription.get("sop_iuid");
 
-		return feedFileWithDICOMFromWADO(file, studyIDKey, seriesIDKey, imageIDKey);
+		return downloadDICOMFileFromWADO(file, studyIDKey, seriesIDKey, imageIDKey);
 	}
 
-	public static int feedFileWithDICOMFromWADO(File temp, String studyIdKey, String seriesIdKey, String imageIdKey)
+	public static int downloadDICOMFileFromWADO(File temp, String studyID, String seriesID, String imageID)
 			throws IOException
 	{
 		String host = config.getParam("NameServer");
@@ -54,9 +54,9 @@ public class EPADTools
 
 		WadoUrlBuilder wadoUrlBuilder = new WadoUrlBuilder(host, port, base, WadoUrlBuilder.ContentType.FILE);
 
-		wadoUrlBuilder.setStudyUID(studyIdKey);
-		wadoUrlBuilder.setSeriesUID(seriesIdKey);
-		wadoUrlBuilder.setObjectUID(imageIdKey);
+		wadoUrlBuilder.setStudyUID(studyID);
+		wadoUrlBuilder.setSeriesUID(seriesID);
+		wadoUrlBuilder.setObjectUID(imageID);
 
 		String wadoUrl = wadoUrlBuilder.build();
 
@@ -99,7 +99,7 @@ public class EPADTools
 			logger.info("Sending file - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
 			String[] command = { "./dcmsnd", dcmServerTitlePort, inputPathFile };
 			ProcessBuilder pb = new ProcessBuilder(command);
-			String dicomBinDirectoryPath = ResourceUtils.getEPADWebServerDICOMBinDir();
+			String dicomBinDirectoryPath = EPADResources.getEPADWebServerDICOMBinDir();
 			logger.info("DICOM binary directory: " + dicomBinDirectoryPath);
 			pb.directory(new File(dicomBinDirectoryPath));
 			Process process = pb.start();

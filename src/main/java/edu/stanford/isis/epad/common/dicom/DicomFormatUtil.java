@@ -9,7 +9,7 @@ package edu.stanford.isis.epad.common.dicom;
 
 import java.io.File;
 
-import edu.stanford.isis.epad.common.util.ResourceUtils;
+import edu.stanford.isis.epad.common.util.EPADResources;
 
 /**
  * Utility to formatUidToDir UID in directories.
@@ -41,7 +41,7 @@ public class DicomFormatUtil
 	public static String createDicomDirPath(String studyUID)
 	{
 		String studyDir = formatUidToDir(studyUID);
-		return ResourceUtils.getEPADWebServerDicomDir() + studyDir;
+		return EPADResources.getEPADWebServerDicomDir() + studyDir;
 	}
 
 	public static String createDicomDirPath(String studyUID, String seriesUID)
@@ -56,7 +56,7 @@ public class DicomFormatUtil
 
 	public static boolean hasSeriesDir(String studyUID, String seriesUID)
 	{
-		String checkPath = ResourceUtils.getEPADWebServerDicomDir() + formatUidToDir(studyUID) + "/"
+		String checkPath = EPADResources.getEPADWebServerDicomDir() + formatUidToDir(studyUID) + "/"
 				+ formatUidToDir(seriesUID);
 		File checkFile = new File(checkPath);
 
@@ -78,7 +78,7 @@ public class DicomFormatUtil
 			extension = "." + extension;
 		}
 
-		String checkFilePath = ResourceUtils.getEPADWebServerDicomDir() + formatUidToDir(studyUID) + "/"
+		String checkFilePath = EPADResources.getEPADWebServerDicomDir() + formatUidToDir(studyUID) + "/"
 				+ formatUidToDir(seriesUID) + "/" + formatUidToDir(sopInstanceUID) + extension;
 		File checkFile = new File(checkFilePath);
 

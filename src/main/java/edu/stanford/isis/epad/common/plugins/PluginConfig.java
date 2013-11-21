@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.stanford.isis.epad.common.util.EPADLogger;
-import edu.stanford.isis.epad.common.util.ResourceUtils;
+import edu.stanford.isis.epad.common.util.EPADResources;
 
 /**
  * Reads the file plugin-config.txt one line at a time. Each line is the class name for the plugin handler.
@@ -74,7 +74,7 @@ public class PluginConfig
 
 	private File getConfigFile()
 	{
-		File configFile = new File(ResourceUtils.getEPADWebServerPluginConfigFilePath());
+		File configFile = new File(EPADResources.getEPADWebServerPluginConfigFilePath());
 
 		log.info("EPadPlugin config file: " + configFile.getAbsolutePath());
 		return configFile;

@@ -81,7 +81,7 @@ public class EPADConfig
 
 	private File getConfigFile()
 	{
-		File configFile = new File(ResourceUtils.getEPADWebServerConfigFilePath());
+		File configFile = new File(EPADResources.getEPADWebServerConfigFilePath());
 		log.info("Configuration file: " + configFile.getAbsolutePath());
 
 		return configFile;

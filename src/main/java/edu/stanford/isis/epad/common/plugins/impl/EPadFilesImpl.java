@@ -19,7 +19,7 @@ import edu.stanford.isis.epad.common.dicom.UIdType;
 import edu.stanford.isis.epad.common.plugins.EPadFiles;
 import edu.stanford.isis.epad.common.util.EPADLogger;
 import edu.stanford.isis.epad.common.util.FileKey;
-import edu.stanford.isis.epad.common.util.ResourceUtils;
+import edu.stanford.isis.epad.common.util.EPADResources;
 
 /**
  * Implements ePAD Files plugin API.
@@ -156,7 +156,7 @@ public class EPadFilesImpl implements EPadFiles
 		// save in a temp file.
 		//
 
-		File dir = new File(ResourceUtils.getEPADWebServerAnnotationsDir());
+		File dir = new File(EPADResources.getEPADWebServerAnnotationsDir());
 		if (!dir.exists()) {
 			logger.info("WARNING: Couldn't find annotations dir: " + dir.getAbsolutePath());
 			return null;
@@ -200,7 +200,7 @@ public class EPadFilesImpl implements EPadFiles
 	 */
 	private File getBaseDicomDir()
 	{
-		return new File(ResourceUtils.getEPADWebServerDicomDir());
+		return new File(EPADResources.getEPADWebServerDicomDir());
 	}
 
 	/**
