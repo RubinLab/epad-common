@@ -165,9 +165,9 @@ public class ClassFinderTestUtils
 				logger.info("FirstHandler was not found");
 			}
 		} catch (Exception e) {
-			logger.sever("classForName had: ", e);
+			logger.severe("classForName had: ", e);
 		} catch (IncompatibleClassChangeError err) {
-			logger.sever(err.getMessage(), err);
+			logger.severe(err.getMessage(), err);
 		}
 	}
 

@@ -132,7 +132,7 @@ public class DicomReader
 	}
 
 	// See http://forums.dcm4che.org/jiveforums/message.jspa?messageID=21407 for various ways of reading a DICOM file.
-	public String getPatientName() throws IOException
+	public static String getPatientName(File dicomFile) throws IOException
 	{
 		DicomInputStream dis = new DicomInputStream(dicomFile);
 		DicomObject dicomObject = dis.readDicomObject();
@@ -141,7 +141,7 @@ public class DicomReader
 		return patientName;
 	}
 
-	public String getPatientID() throws IOException
+	public static String getPatientID(File dicomFile) throws IOException
 	{
 		DicomInputStream dis = new DicomInputStream(dicomFile);
 		DicomObject dicomObject = dis.readDicomObject();
@@ -150,13 +150,22 @@ public class DicomReader
 		return patientID;
 	}
 
-	public String getStudyIUID() throws IOException
+	public static String getStudyIUID(File dicomFile) throws IOException
 	{
 		DicomInputStream dis = new DicomInputStream(dicomFile);
 		DicomObject dicomObject = dis.readDicomObject();
 		String studyIUID = dicomObject.getString(Tag.StudyInstanceUID);
 		dis.close();
 		return studyIUID;
+	}
+
+	public static String getReferencedSOPInstanceUID(File dicomFile) throws IOException
+	{
+		DicomInputStream dis = new DicomInputStream(dicomFile);
+		DicomObject dicomObject = dis.readDicomObject();
+		String referencedSOPInstanceUID = dicomObject.getString(Tag.ReferencedSOPInstanceUID);
+		dis.close();
+		return referencedSOPInstanceUID;
 	}
 
 	/**

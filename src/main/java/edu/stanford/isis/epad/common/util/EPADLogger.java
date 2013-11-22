@@ -101,11 +101,10 @@ public class EPADLogger
 	 * @param message String to write to the log
 	 * @param t Throwable exception with Stack Trace.
 	 */
-	public void sever(String message, Throwable t)
+	public void severe(String message, Throwable t)
 	{
+		log.info("message " + t.getMessage());
+
 		log.log(Level.SEVERE, message, t);
-		if (t != null) {
-			t.printStackTrace();
-		}
 	}
 }

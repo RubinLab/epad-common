@@ -75,7 +75,7 @@ public class EPADConfig
 			}
 			readProxyLoggerDebugState();
 		} catch (Exception e) {
-			log.sever("Error reading configuration file", e);
+			log.severe("Error reading configuration file", e);
 		}
 	}
 

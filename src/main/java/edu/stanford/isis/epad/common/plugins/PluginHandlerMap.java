@@ -107,7 +107,7 @@ public class PluginHandlerMap
 		} catch (Exception e) {
 			logger.warning(e.getMessage(), e);
 		} catch (Error err) {
-			logger.sever(err.getMessage(), err);
+			logger.severe(err.getMessage(), err);
 		}
 		return null;
 	}
@@ -147,9 +147,9 @@ public class PluginHandlerMap
 			}
 
 		} catch (Exception e) {
-			logger.sever("classLoaderForName had: ", e);
+			logger.severe("classLoaderForName had: ", e);
 		} catch (IncompatibleClassChangeError err) {
-			logger.sever(err.getMessage(), err);
+			logger.severe(err.getMessage(), err);
 		}
 	}
 

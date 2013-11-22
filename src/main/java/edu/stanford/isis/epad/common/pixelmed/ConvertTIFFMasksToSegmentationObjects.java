@@ -51,13 +51,10 @@ public class ConvertTIFFMasksToSegmentationObjects
 			get_attributes_from_dicom_files(dicom_files);
 			get_pixels_from_mask_files(mask_files);
 		} catch (Exception e) {
-			System.err.println(e);
-			e.printStackTrace(System.err);
-			throw (new DicomException("Error in reading dicom files!"));
+			throw (new DicomException("Error reading dicom files!"));
 		}
 
 		SegmentationObjectsFileWriter obj = new SegmentationObjectsFileWriter(list, orientation, spacing, thickness);
-
 		CodedConcept category = new CodedConcept("260787004" /* conceptUniqueIdentifier */,
 				"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
 				null /* codingSchemeVersion */, "A-00004" /* codeValue */, "Physical Object" /* codeMeaning */,
@@ -71,7 +68,6 @@ public class ConvertTIFFMasksToSegmentationObjects
 		obj.AddAllFrames(pixels, image_frames, image_width, image_height, "binary", (short)0, positions);
 
 		obj.SaveDicomFile(output_file);
-
 	}
 
 	/**
@@ -165,7 +161,6 @@ public class ConvertTIFFMasksToSegmentationObjects
 	 */
 	public static void main(String[] args)
 	{
-		// TODO Auto-generated method stub
 		String path_to_mask_files = "./DicomFiles/Images/TIFF/";
 		String path_to_dicom_files = "./DicomFiles/Images/PET/";
 		String output_file = "./TEMP/tiff.sobin";
@@ -183,5 +178,4 @@ public class ConvertTIFFMasksToSegmentationObjects
 			System.exit(0);
 		}
 	}
-
 }
