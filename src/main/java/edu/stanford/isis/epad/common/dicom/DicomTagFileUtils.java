@@ -66,6 +66,7 @@ public class DicomTagFileUtils
 	public static final String INSTITUTION = "Institution Name";
 	public static final String STATION_NAME = "Station Name";
 	public static final String DEPARTMENT = "";
+	public static final String REFERENCED_SOP_INSTANCE_UID = "Referenced SOP Instance UID";
 
 	// tags that are unique to each image.
 	public static final String SLICE_LOCATION = "Slice Location";
@@ -88,10 +89,13 @@ public class DicomTagFileUtils
 		}
 	}
 
-	public static void generateDicomTagFile(File dicomFile)
+	public static File generateDicomTagFile(File dicomFile)
 	{
-		if (!EPADFileUtils.isFileType(dicomFile, ".dcm")) {
+		File tagFile = null;
+
+		if (!EPADFileUtils.isFileType(dicomFile, ".dcm") && !EPADFileUtils.isFileType(dicomFile, ".dso")) {
 			logger.info(dicomFile + " is NOT a DICOM file.");
+			return null;
 		} else {
 			BufferedReader br = null;
 			FileWriter tagFileWriter = null;
@@ -99,7 +103,6 @@ public class DicomTagFileUtils
 			logger.info("Generating DICOM tag file for file " + dicomFile.getAbsolutePath());
 
 			try {
-				String tagPath = createTagFilePath(dicomFile);
 				String[] command = { "./dcm2txt", "-w", "120", dicomFile.getAbsolutePath() };
 				ProcessBuilder processBuilder = new ProcessBuilder(command);
 				String dicomBinDirectory = EPADResources.getEPADWebServerDICOMBinDir();
@@ -125,7 +128,8 @@ public class DicomTagFileUtils
 				}
 
 				if (processStatusCode == 0) {
-					File tagFile = new File(tagPath);
+					String tagFilePath = createTagFilePath(dicomFile);
+					tagFile = new File(tagFilePath);
 					tagFileWriter = new FileWriter(tagFile);
 					tagFileWriter.write(sb.toString());
 					tagFileWriter.flush();
@@ -149,6 +153,7 @@ public class DicomTagFileUtils
 				}
 			}
 		}
+		return tagFile;
 	}
 
 	/**
@@ -160,12 +165,12 @@ public class DicomTagFileUtils
 	private static String createTagFilePath(File dcmFile)
 	{
 		String dcmFilePath = dcmFile.getAbsolutePath();
-		if (dcmFilePath.endsWith("dcm")) {
+		if (dcmFilePath.endsWith("dcm"))
 			return dcmFilePath.replaceAll("\\.dcm", "\\.tag");
-		}
-		if (dcmFilePath.endsWith("DCM")) {
+
+		if (dcmFilePath.endsWith("DCM"))
 			return dcmFilePath.replaceAll("\\.DCM", "\\.tag");
-		}
+
 		return dcmFilePath + ".tag";
 	}
 

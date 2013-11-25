@@ -159,15 +159,6 @@ public class DicomReader
 		return studyIUID;
 	}
 
-	public static String getReferencedSOPInstanceUID(File dicomFile) throws IOException
-	{
-		DicomInputStream dis = new DicomInputStream(dicomFile);
-		DicomObject dicomObject = dis.readDicomObject();
-		String referencedSOPInstanceUID = dicomObject.getString(Tag.ReferencedSOPInstanceUID);
-		dis.close();
-		return referencedSOPInstanceUID;
-	}
-
 	/**
 	 * Test driver.
 	 * 

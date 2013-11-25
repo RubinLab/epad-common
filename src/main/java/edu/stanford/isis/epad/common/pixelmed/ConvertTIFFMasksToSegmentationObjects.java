@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -44,8 +45,8 @@ public class ConvertTIFFMasksToSegmentationObjects
 	 * @throws DicomException
 	 * @throws IOException
 	 */
-	public ConvertTIFFMasksToSegmentationObjects(ArrayList<String> mask_files, ArrayList<String> dicom_files,
-			String output_file) throws DicomException, IOException
+	public ConvertTIFFMasksToSegmentationObjects(List<String> mask_files, List<String> dicom_files, String output_file)
+			throws DicomException, IOException
 	{
 		try {
 			get_attributes_from_dicom_files(dicom_files);
@@ -93,8 +94,8 @@ public class ConvertTIFFMasksToSegmentationObjects
 		return file_list;
 	}
 
-	private void get_attributes_from_dicom_files(ArrayList<String> dicom_files) throws FileNotFoundException,
-			IOException, DicomException
+	private void get_attributes_from_dicom_files(List<String> dicom_files) throws FileNotFoundException, IOException,
+			DicomException
 	{
 		AttributeList list = new AttributeList();
 		String input_file = null;
@@ -136,7 +137,7 @@ public class ConvertTIFFMasksToSegmentationObjects
 
 	}
 
-	private void get_pixels_from_mask_files(ArrayList<String> mask_files) throws FileNotFoundException, IOException,
+	private void get_pixels_from_mask_files(List<String> mask_files) throws FileNotFoundException, IOException,
 			DicomException
 	{
 		BufferedImage image = null;
