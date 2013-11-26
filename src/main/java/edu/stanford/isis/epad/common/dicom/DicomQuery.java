@@ -89,7 +89,7 @@ import edu.stanford.isis.epad.common.util.EPADLogger;
  * {@link #getImagesForSeries(DicomSeriesUID)} - can't find what calls this</li>
  * </ul>
  * <p>
- * {@link DICOMSearchResult} represents the data returned by a search operation.
+ * {@link DicomSearchResult} represents the data returned by a search operation.
  * </p>
  */
 public class DicomQuery
@@ -99,7 +99,7 @@ public class DicomQuery
 
 	public static void main(String[] args)
 	{
-		DICOMSearchResult retVal = DicomQuery.searchForStudies(DicomStudySearchType.PATIENT_ID,
+		DicomSearchResult retVal = DicomQuery.searchForStudies(DicomStudySearchType.PATIENT_ID,
 				"83393488148532965622665512597663741359");
 
 		log.info("#studies found: " + retVal.getStudies().size());
@@ -123,7 +123,7 @@ public class DicomQuery
 	 * @param searchParam
 	 * @return DicomSearchResult -
 	 */
-	public static DICOMSearchResult searchForStudies(DicomStudySearchType searchType, String searchParam)
+	public static DicomSearchResult searchForStudies(DicomStudySearchType searchType, String searchParam)
 	{
 
 		String[] dicomQueryArguments = buildStudySearchArgs(searchType, searchParam);
@@ -145,7 +145,7 @@ public class DicomQuery
 	 * @param remoteAddr
 	 * @return list of series
 	 */
-	public static DICOMSearchResult searchForSeries(String studyUID, String remoteAddr)
+	public static DicomSearchResult searchForSeries(String studyUID, String remoteAddr)
 	{
 		DICOMSearchResultCache searchResultCache = DICOMSearchResultCache.getInstance();
 
@@ -200,7 +200,7 @@ public class DicomQuery
 	 * @param rootResult
 	 * @return
 	 */
-	private static DICOMSearchResult parseSeriesSearchResult(String studyUID, DICOMSearchResultImpl rootResult)
+	private static DicomSearchResult parseSeriesSearchResult(String studyUID, DICOMSearchResultImpl rootResult)
 	{
 		boolean isReadingTags = false;
 
@@ -266,7 +266,7 @@ public class DicomQuery
 	 * DCM4CHEE@171.65.102.125:11112 Disconnected from the target VM, address: '127.0.0.1:50011', transport: 'socket' *
 	 * 
 	 */
-	private static DICOMSearchResult parseStudySearchResult(DicomStudySearchType searchType, String searchParam)
+	private static DicomSearchResult parseStudySearchResult(DicomStudySearchType searchType, String searchParam)
 	{
 
 		boolean isReadingTags = false;

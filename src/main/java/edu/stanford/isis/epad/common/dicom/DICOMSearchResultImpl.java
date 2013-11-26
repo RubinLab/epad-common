@@ -28,7 +28,7 @@ import edu.stanford.isis.epad.common.util.Tree;
  * 
  * @author amsnyder
  */
-public class DICOMSearchResultImpl implements DICOMSearchResult
+public class DICOMSearchResultImpl implements DicomSearchResult
 {
 
 	EPADLogger logger = EPADLogger.getInstance();
