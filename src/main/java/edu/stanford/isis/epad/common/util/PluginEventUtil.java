@@ -31,14 +31,17 @@ public class PluginEventUtil
 			PostMethod method = new PostMethod(urlEncoded);
 			method.setRequestHeader("Cookie", "JSESSIONID=" + sessionID);
 			int statusCode = client.executeMethod(method);
+
+			logger.info("EVENT: " + urlEncoded);
+
 			if (statusCode != HttpServletResponse.SC_OK)
-				logger.info("tedSeg: unexpected status code returned from event service " + statusCode);
+				logger.info("Unexpected status code returned from event service " + statusCode);
 		} catch (UnsupportedEncodingException e1) {
-			logger.warning("tedSeg: UnsupportedEncodingException", e1);
+			logger.warning("event: UnsupportedEncodingException", e1);
 		} catch (HttpException e) {
-			logger.warning("tedSeg: HttpException", e);
+			logger.warning("event: HttpException", e);
 		} catch (IOException e) {
-			logger.warning("tedSeg: IOException", e);
+			logger.warning("event: IOException", e);
 		}
 	}
 }
