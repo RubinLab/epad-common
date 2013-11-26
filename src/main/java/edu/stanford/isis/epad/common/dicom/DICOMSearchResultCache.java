@@ -15,21 +15,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @author amsnyder
  */
-public class DicomSearchResultCache
+public class DICOMSearchResultCache
 {
-	private static DicomSearchResultCache ourInstance = new DicomSearchResultCache();
+	private static DICOMSearchResultCache ourInstance = new DICOMSearchResultCache();
 
 	final Map<SearchKey, DICOMSearchResultImpl> cache = new ConcurrentHashMap<SearchKey, DICOMSearchResultImpl>();
 	final Map<SearchKey, Long> cacheTimestamp = new ConcurrentHashMap<SearchKey, Long>();
 
 	final Map<UserKey, DICOMSearchResultImpl> mostRecent = new ConcurrentHashMap<UserKey, DICOMSearchResultImpl>();
 
-	public static DicomSearchResultCache getInstance()
+	public static DICOMSearchResultCache getInstance()
 	{
 		return ourInstance;
 	}
 
-	private DicomSearchResultCache()
+	private DICOMSearchResultCache()
 	{
 	}
 

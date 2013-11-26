@@ -132,7 +132,7 @@ public class DicomQuery
 		return parseStudySearchResult(searchType, searchParam);
 	}
 
-	private static void debugSearchResultCache(DicomSearchResultCache cache)
+	private static void debugSearchResultCache(DICOMSearchResultCache cache)
 	{
 		EPADLogger logger = EPADLogger.getInstance();
 		logger.info("DEBUG SearchResultCache: " + cache.toString());
@@ -147,7 +147,7 @@ public class DicomQuery
 	 */
 	public static DICOMSearchResult searchForSeries(String studyUID, String remoteAddr)
 	{
-		DicomSearchResultCache searchResultCache = DicomSearchResultCache.getInstance();
+		DICOMSearchResultCache searchResultCache = DICOMSearchResultCache.getInstance();
 
 		DICOMSearchResultImpl result = searchResultCache.getMostRecent(remoteAddr);
 		if (result == null) {
@@ -302,7 +302,7 @@ public class DicomQuery
 			}
 		}
 
-		DicomSearchResultCache cache = DicomSearchResultCache.getInstance();
+		DICOMSearchResultCache cache = DICOMSearchResultCache.getInstance();
 		cache.cache(retVal, searchType, searchParam);
 
 		return retVal;
