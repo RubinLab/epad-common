@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author amsnyder
  */
-public interface DicomSearchResult {
+public interface DICOMSearchResult {
 
     List<DicomStudyData> getStudies();
 

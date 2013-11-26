@@ -5,7 +5,7 @@ package edu.stanford.isis.epad.common.dicom;
  * 
  * @author martin
  */
-public class DicomStudySearchResult
+public class DICOMStudySearchResult
 {
 	public final String studyUID, patientName, patientID, examType, dateAcquired;
 	public int studyStatus, seriesCount;
@@ -13,7 +13,7 @@ public class DicomStudySearchResult
 	public int imagesCount;
 	public String studyID, studyDescription, physicianName, birthdate, sex;
 
-	public DicomStudySearchResult(String studyUID, String patientName, String patientID, String examType,
+	public DICOMStudySearchResult(String studyUID, String patientName, String patientID, String examType,
 			String dateAcquired, int studyStatus, int seriesCount, String firstSeriesUID, String firstSeriesDateAcquired,
 			String studyAccessionNumber, int imagesCount, String studyID, String studyDescription, String physicianName,
 			String birthdate, String sex)

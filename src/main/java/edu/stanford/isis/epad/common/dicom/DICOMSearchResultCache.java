@@ -19,10 +19,10 @@ public class DicomSearchResultCache
 {
 	private static DicomSearchResultCache ourInstance = new DicomSearchResultCache();
 
-	final Map<SearchKey, DicomSearchResultImpl> cache = new ConcurrentHashMap<SearchKey, DicomSearchResultImpl>();
+	final Map<SearchKey, DICOMSearchResultImpl> cache = new ConcurrentHashMap<SearchKey, DICOMSearchResultImpl>();
 	final Map<SearchKey, Long> cacheTimestamp = new ConcurrentHashMap<SearchKey, Long>();
 
-	final Map<UserKey, DicomSearchResultImpl> mostRecent = new ConcurrentHashMap<UserKey, DicomSearchResultImpl>();
+	final Map<UserKey, DICOMSearchResultImpl> mostRecent = new ConcurrentHashMap<UserKey, DICOMSearchResultImpl>();
 
 	public static DicomSearchResultCache getInstance()
 	{
@@ -40,7 +40,7 @@ public class DicomSearchResultCache
 	 * @param searchType
 	 * @param searchParam
 	 */
-	public void cache(DicomSearchResultImpl searchResult, DicomStudySearchType searchType, String searchParam)
+	public void cache(DICOMSearchResultImpl searchResult, DicomStudySearchType searchType, String searchParam)
 	{
 		SearchKey key = new SearchKey(searchType, searchParam);
 		cache.put(key, searchResult);
@@ -53,7 +53,7 @@ public class DicomSearchResultCache
 	 * @param searchResult
 	 * @param remoteAddr
 	 */
-	public void setMostRecent(DicomSearchResultImpl searchResult, String remoteAddr)
+	public void setMostRecent(DICOMSearchResultImpl searchResult, String remoteAddr)
 	{
 		UserKey key = new UserKey(remoteAddr);
 		mostRecent.put(key, searchResult);
@@ -64,7 +64,7 @@ public class DicomSearchResultCache
 	 * @param remoteAddr
 	 * @return
 	 */
-	public DicomSearchResultImpl getMostRecent(String remoteAddr)
+	public DICOMSearchResultImpl getMostRecent(String remoteAddr)
 	{
 		UserKey key = new UserKey(remoteAddr);
 		return mostRecent.get(key);
@@ -77,7 +77,7 @@ public class DicomSearchResultCache
 	 * @param searchParam
 	 * @return
 	 */
-	public DicomSearchResultImpl find(DicomStudySearchType searchType, String searchParam)
+	public DICOMSearchResultImpl find(DicomStudySearchType searchType, String searchParam)
 	{
 		SearchKey key = new SearchKey(searchType, searchParam);
 		// check the time-to-live of this request.

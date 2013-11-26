@@ -1,10 +1,10 @@
 package edu.stanford.isis.epad.common.dicom;
 
-public class DicomElementResult
+public class DICOMElementResult
 {
 	public final String tagCode, tagName, value;
 
-	public DicomElementResult(String tagCode, String tagName, String value)
+	public DICOMElementResult(String tagCode, String tagName, String value)
 	{
 		this.tagCode = tagCode;
 		this.tagName = tagName;

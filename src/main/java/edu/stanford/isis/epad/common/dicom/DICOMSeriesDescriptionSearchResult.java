@@ -9,12 +9,12 @@ import java.util.List;
  * 
  * @author martin
  */
-public class DicomSeriesDescriptionSearchResult
+public class DICOMSeriesDescriptionSearchResult
 {
 	public final List<DicomImageDescriptionSearchResult> ResultSet; // TODO Move to lower case but sync with front end
 																																	// call first
 
-	public DicomSeriesDescriptionSearchResult(List<DicomImageDescriptionSearchResult> resultSet)
+	public DICOMSeriesDescriptionSearchResult(List<DicomImageDescriptionSearchResult> resultSet)
 	{
 		this.ResultSet = Collections.unmodifiableList(resultSet);
 	}

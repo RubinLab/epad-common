@@ -5,7 +5,7 @@ package edu.stanford.isis.epad.common.dicom;
  * 
  * @author martin
  * 
- * @see DicomSeriesDescriptionSearchResult
+ * @see DICOMSeriesDescriptionSearchResult
  */
 public class DicomImageDescriptionSearchResult
 {

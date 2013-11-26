@@ -18,7 +18,7 @@ public interface DicomQueryInterface
 	 * @param searchParam
 	 * @return DicomSearchResult
 	 */
-	DicomSearchResult searchForStudies(DicomStudySearchType searchType, String searchParam);
+	DICOMSearchResult searchForStudies(DicomStudySearchType searchType, String searchParam);
 
 	/**
 	 * Get DICOM tag information about a series.
@@ -27,7 +27,7 @@ public interface DicomQueryInterface
 	 * @param remoteAddr - IP address of client used for caching purposes
 	 * @return DicomSearchResult
 	 */
-	DicomSearchResult searchForSeries(String studyUID, String remoteAddr);
+	DICOMSearchResult searchForSeries(String studyUID, String remoteAddr);
 
 	/**
 	 * Get a list of all the Images associated with a series.

@@ -89,7 +89,7 @@ import edu.stanford.isis.epad.common.util.EPADLogger;
  * {@link #getImagesForSeries(DicomSeriesUID)} - can't find what calls this</li>
  * </ul>
  * <p>
- * {@link DicomSearchResult} represents the data returned by a search operation.
+ * {@link DICOMSearchResult} represents the data returned by a search operation.
  * </p>
  */
 public class DicomQuery
@@ -99,7 +99,7 @@ public class DicomQuery
 
 	public static void main(String[] args)
 	{
-		DicomSearchResult retVal = DicomQuery.searchForStudies(DicomStudySearchType.PATIENT_ID,
+		DICOMSearchResult retVal = DicomQuery.searchForStudies(DicomStudySearchType.PATIENT_ID,
 				"83393488148532965622665512597663741359");
 
 		log.info("#studies found: " + retVal.getStudies().size());
@@ -123,7 +123,7 @@ public class DicomQuery
 	 * @param searchParam
 	 * @return DicomSearchResult -
 	 */
-	public static DicomSearchResult searchForStudies(DicomStudySearchType searchType, String searchParam)
+	public static DICOMSearchResult searchForStudies(DicomStudySearchType searchType, String searchParam)
 	{
 
 		String[] dicomQueryArguments = buildStudySearchArgs(searchType, searchParam);
@@ -145,11 +145,11 @@ public class DicomQuery
 	 * @param remoteAddr
 	 * @return list of series
 	 */
-	public static DicomSearchResult searchForSeries(String studyUID, String remoteAddr)
+	public static DICOMSearchResult searchForSeries(String studyUID, String remoteAddr)
 	{
 		DicomSearchResultCache searchResultCache = DicomSearchResultCache.getInstance();
 
-		DicomSearchResultImpl result = searchResultCache.getMostRecent(remoteAddr);
+		DICOMSearchResultImpl result = searchResultCache.getMostRecent(remoteAddr);
 		if (result == null) {
 			debugSearchResultCache(searchResultCache);
 			throw new IllegalStateException("Failed to find the root search for: studyUID=" + studyUID + " remoteAddr="
@@ -200,7 +200,7 @@ public class DicomQuery
 	 * @param rootResult
 	 * @return
 	 */
-	private static DicomSearchResult parseSeriesSearchResult(String studyUID, DicomSearchResultImpl rootResult)
+	private static DICOMSearchResult parseSeriesSearchResult(String studyUID, DICOMSearchResultImpl rootResult)
 	{
 		boolean isReadingTags = false;
 
@@ -266,12 +266,12 @@ public class DicomQuery
 	 * DCM4CHEE@171.65.102.125:11112 Disconnected from the target VM, address: '127.0.0.1:50011', transport: 'socket' *
 	 * 
 	 */
-	private static DicomSearchResult parseStudySearchResult(DicomStudySearchType searchType, String searchParam)
+	private static DICOMSearchResult parseStudySearchResult(DicomStudySearchType searchType, String searchParam)
 	{
 
 		boolean isReadingTags = false;
 
-		DicomSearchResultImpl retVal = new DicomSearchResultImpl(searchType, searchParam);
+		DICOMSearchResultImpl retVal = new DICOMSearchResultImpl(searchType, searchParam);
 
 		// NOTE:: We are using a static log here, which will not work for multiple
 		// simultaneous calls. This needs to be fixed.

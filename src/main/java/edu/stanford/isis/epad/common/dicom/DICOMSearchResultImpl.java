@@ -28,7 +28,7 @@ import edu.stanford.isis.epad.common.util.Tree;
  * 
  * @author amsnyder
  */
-public class DicomSearchResultImpl implements DicomSearchResult
+public class DICOMSearchResultImpl implements DICOMSearchResult
 {
 
 	EPADLogger logger = EPADLogger.getInstance();
@@ -51,7 +51,7 @@ public class DicomSearchResultImpl implements DicomSearchResult
 
 	final DicomSearchMap searchMap;
 
-	public DicomSearchResultImpl(DicomStudySearchType type, String param)
+	public DICOMSearchResultImpl(DicomStudySearchType type, String param)
 	{
 		searchResultMap = new ConcurrentHashMap<DicomStudyUID, Tree<DicomData>>();
 		studyList = new ArrayList<DicomStudyUID>();
