@@ -70,6 +70,7 @@ public class EPADConfig
 			FileInputStream fis = new FileInputStream(configFile);
 			try {
 				properties.load(fis);
+				log.info("Using ePAD configuration file " + configFile.getAbsolutePath());
 			} finally {
 				fis.close();
 			}

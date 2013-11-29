@@ -203,6 +203,11 @@ public class EPADResources
 		return getEPADWebServerLogDir() + "dicom-proxy.log";
 	}
 
+	public static String getEPADWebServerJettyConfigFilePath()
+	{
+		return getEPADWebServerEtcDir() + "jetty-config.xml";
+	}
+
 	/**
 	 * Make the file path to a thumbnail given it's studyID and seriesID. The study and series Id all have the '.'
 	 * replaced with '_'.

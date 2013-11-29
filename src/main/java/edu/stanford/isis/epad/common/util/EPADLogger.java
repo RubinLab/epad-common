@@ -87,7 +87,8 @@ public class EPADLogger
 	 */
 	public void warning(String message, Throwable t)
 	{
-		log.log(Level.WARNING, message + ":" + t.getMessage(), t); // TODO See why getMessage is necessary
+		log.log(Level.WARNING, message + ":" + t.getClass().getCanonicalName() + ":" + t.getMessage(), t);
+		// TODO See why getMessage is necessary. Configuraiton issue
 	}
 
 	public void warning(String message)
