@@ -10,13 +10,12 @@ package edu.stanford.isis.epad.common.dicom;
 import org.dcm4che2.data.Tag;
 
 /**
- * Make the DCM4CHEE Tag class strongly typed for Maps.
+ * Make the DCM4CHEE Tag class strongly typed for maps
  * 
  * @author amsnyder
  */
 public class DicomTag
 {
-
 	private final int tag;
 
 	private DicomTag(int tag)

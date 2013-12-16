@@ -1,13 +1,5 @@
 package edu.stanford.isis.epad.common.pixelmed;
 
-/**
- /**
- * <p>A class for saving segmentation results.</p>
- *
- * @author	Wei Lu (luwei@tju.edu.cn)
- * @date 2012-12
- */
-
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,6 +45,12 @@ import com.pixelmed.dicom.UnsignedShortAttribute;
 import com.pixelmed.dicom.VersionAndConstants;
 import com.pixelmed.utils.CopyStream;
 
+/**
+ * A class for saving segmentation results.
+ * 
+ * @author Wei Lu (luwei@tju.edu.cn)
+ * @date 2012-12
+ */
 public class SegmentationObjectsFileWriter
 {
 	public static final String Manufacturer = "Stanford University";

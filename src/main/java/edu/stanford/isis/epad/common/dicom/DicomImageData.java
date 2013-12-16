@@ -8,7 +8,7 @@
 package edu.stanford.isis.epad.common.dicom;
 
 /**
- * An interface to get (Instance) image data.
+ * An interface represting a DICOM instance
  * 
  * @author amsnyder
  */
@@ -24,5 +24,4 @@ public interface DicomImageData extends DicomData
 	String getRawDataURL();
 
 	DicomImageUID getSopInstanceId();
-
 }

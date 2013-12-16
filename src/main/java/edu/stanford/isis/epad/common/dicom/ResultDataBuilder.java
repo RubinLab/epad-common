@@ -16,32 +16,31 @@ import edu.stanford.isis.epad.common.util.EPADResources;
  * 
  * @author amsnyder
  */
-public class RDataBuilder
+public class ResultDataBuilder
 {
-
-	private RDataBuilder()
+	private ResultDataBuilder()
 	{
 	}
 
-	public static RStudyData createStudyData(Map<DicomTag, String> map)
+	public static ResultStudyData createStudyData(Map<DicomTag, String> map)
 	{
 		// int[] required = {Tag.StudyInstanceUID, Tag.StudyDate, Tag.PatientID, Tag.PatientName, Tag.ModalitiesInStudy};
 
 		// checkForRequiredTags(required,map);
 
-		return new RStudyData(map);
+		return new ResultStudyData(map);
 	}
 
-	public static RSeriesData createSeriesData(Map<DicomTag, String> map, DicomStudyUID studyUID, DicomSeriesUID seriesUID)
+	public static ResultSeriesData createSeriesData(Map<DicomTag, String> map, DicomStudyUID studyUID, DicomSeriesUID seriesUID)
 	{
-		RSeriesData retVal = new RSeriesData(map);
+		ResultSeriesData retVal = new ResultSeriesData(map);
 
 		EPADLogger.getInstance().info("Making thumbnail for study=" + studyUID + ", series=" + seriesUID);
 		retVal.setThumbnailURL(EPADResources.makeThumbnailFilePath(studyUID, seriesUID));
 		return retVal;
 	}
 
-	public static RImageData createImageData(Map<DicomTag, String> map)
+	public static ResultImageData createImageData(Map<DicomTag, String> map)
 	{
 		throw new UnsupportedOperationException("Create image data not implemented.");
 	}

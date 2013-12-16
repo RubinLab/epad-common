@@ -10,7 +10,7 @@ package edu.stanford.isis.epad.common.dicom;
 import java.util.Comparator;
 
 /**
- * Sort DicomImages in a series.
+ * Sort DICOM images in a series based on their stack order
  * 
  * @author amsnyder
  */

@@ -32,5 +32,4 @@ public class DicomImageDescriptionSearchResult
 		uidPart = uidPart.replaceAll("_", ".");
 		return uidPart;
 	}
-
 }

@@ -11,14 +11,14 @@ import java.util.List;
 
 /**
  * The interface for a search result.
- *
+ * 
  * @author amsnyder
  */
-public interface DicomSearchResult {
+public interface DicomSearchResult
+{
+	List<DicomStudyData> getStudies();
 
-    List<DicomStudyData> getStudies();
+	List<DicomSeriesData> getSeriesForStudyId(String studyID);
 
-    List<DicomSeriesData> getSeriesForStudyId(String studyID);
-
-    List<DicomImageData> getSOPInstancesForSeriesId(String seriesID);
+	List<DicomImageData> getSOPInstancesForSeriesId(String seriesID);
 }

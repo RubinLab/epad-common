@@ -12,7 +12,7 @@ public class DicomParentCache
 {
 	private static DicomParentCache ourInstance = new DicomParentCache();
 
-	Map<String, DicomParent> parentMap = new ConcurrentHashMap<String, DicomParent>();
+	private final Map<String, DicomParent> parentMap = new ConcurrentHashMap<String, DicomParent>();
 
 	public static DicomParentCache getInstance()
 	{

@@ -7,24 +7,24 @@ import java.util.logging.Logger;
 /**
  * Request all server-side interfaces from here
  */
-public class ePadPluginController
+public class PluginController
 {
-	private static ePadPluginController ourInstance = new ePadPluginController();
+	private static PluginController ourInstance = new PluginController();
 
-	public static ePadPluginController getInstance()
+	public static PluginController getInstance()
 	{
 		return ourInstance;
 	}
 
 	// ToDo: Each plug-in should have its own logger and log file.
-	Logger logger = PluginLogger.getLogger();
+	private final Logger logger = PluginLogger.getLogger();
 
-	EPadFiles ePadFiles = null;
+	private EPadFiles ePadFiles = null;
 
 	/***
 	 * Get ePadFiles and ePadProxyConfig via reflection.
 	 */
-	private ePadPluginController()
+	private PluginController()
 	{
 
 	}

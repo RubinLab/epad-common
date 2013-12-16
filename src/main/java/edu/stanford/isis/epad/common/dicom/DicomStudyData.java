@@ -9,16 +9,17 @@ package edu.stanford.isis.epad.common.dicom;
 
 /**
  * Interfaces specific to studies.
- *
+ * 
  * @author amsnyder
  */
-public interface DicomStudyData extends DicomData, DicomRowData{
+public interface DicomStudyData extends DicomData, DicomRowData
+{
+	public DicomStudyUID getStudyId();
 
-    DicomStudyUID getStudyId();
-
-    /**
-     * Returns true if the series data has been queried.
-     * @return true
-     */
-    boolean hasSeriesData();
+	/**
+	 * Returns true if the series data has been queried.
+	 * 
+	 * @return true
+	 */
+	public boolean hasSeriesData();
 }

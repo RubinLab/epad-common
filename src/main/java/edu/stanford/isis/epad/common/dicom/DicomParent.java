@@ -1,27 +1,30 @@
 package edu.stanford.isis.epad.common.dicom;
 
-
 /**
- * Holds a Dicom UID and the type.
- *
+ * Holds a IDCOM UID and the type.
+ * 
  * @author amsnyder
  */
-public class DicomParent {
+public class DicomParent
+{
 
-    final String dicomUID;
-    final DicomParentType type;
+	final String dicomUID;
+	final DicomParentType type;
 
-    public DicomParent(String dicomUID, DicomParentType type){
-        this.dicomUID = dicomUID;
-        this.type = type;
-    }
+	public DicomParent(String dicomUID, DicomParentType type)
+	{
+		this.dicomUID = dicomUID;
+		this.type = type;
+	}
 
-    public String getDicomUID(){
-        return dicomUID;
-    }
+	public String getDicomUID()
+	{
+		return dicomUID;
+	}
 
-    public DicomParentType getType(){
-        return type;
-    }
+	public DicomParentType getType()
+	{
+		return type;
+	}
 
 }

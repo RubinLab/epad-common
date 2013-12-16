@@ -9,23 +9,24 @@ package edu.stanford.isis.epad.common.dicom;
 
 /**
  * Interfaces specific to series.
- *
+ * 
  * @author amsnyder
  */
-public interface DicomSeriesData extends DicomData, DicomRowData{
+public interface DicomSeriesData extends DicomData, DicomRowData
+{
+	/**
+	 * The URL to a 64x64 pixel thumbnail image.
+	 * 
+	 * @return
+	 */
+	public String getThumbnailURL();
 
-    /**
-     * The URL to a 64x64 pixel thumbnail image.
-     * @return
-     */
-    String getThumbnailURL();
+	public DicomSeriesUID getSeriesId();
 
-
-    DicomSeriesUID getSeriesId();
-
-    /**
-     * Returns true if the Image data has been queried;
-     * @return boolean true if it has queries the image data.
-     */
-    boolean hasImageData();
+	/**
+	 * Returns true if the Image data has been queried;
+	 * 
+	 * @return boolean true if it has queries the image data.
+	 */
+	public boolean hasImageData();
 }

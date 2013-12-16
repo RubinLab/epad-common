@@ -8,25 +8,31 @@
 package edu.stanford.isis.epad.common.dicom;
 
 /**
- *
+ * 
  * @author amsnyder
  */
-public class DicomStudyUID extends DicomUID {
-    public DicomStudyUID(String idString) {
-        super(idString);
-    }
+public class DicomStudyUID extends DicomUID
+{
+	public DicomStudyUID(String idString)
+	{
+		super(idString);
+	}
 
-    @Override
-    public boolean equals(Object o){
-        if(o==this) return true;
-        if(!(o instanceof DicomStudyUID)) return false;
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o == this)
+			return true;
+		if (!(o instanceof DicomStudyUID))
+			return false;
 
-        DicomStudyUID dsu = (DicomStudyUID) o;
-        return id.equals(dsu.id);
-    }
+		DicomStudyUID dsu = (DicomStudyUID)o;
+		return id.equals(dsu.id);
+	}
 
-    @Override
-    public int hashCode(){
-        return 31+id.hashCode();
-    }
+	@Override
+	public int hashCode()
+	{
+		return 31 + id.hashCode();
+	}
 }

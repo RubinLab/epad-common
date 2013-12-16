@@ -8,7 +8,7 @@
 package edu.stanford.isis.epad.common.dicom;
 
 /**
- * Data-structure for passing window level and
+ * Data-structure for passing window level information
  */
 public class DicomWindowSetting
 {

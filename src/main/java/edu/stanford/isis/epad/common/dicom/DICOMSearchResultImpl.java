@@ -30,26 +30,25 @@ import edu.stanford.isis.epad.common.util.Tree;
  */
 public class DICOMSearchResultImpl implements DicomSearchResult
 {
-
-	EPADLogger logger = EPADLogger.getInstance();
+	private final EPADLogger logger = EPADLogger.getInstance();
 	/**
 	 * List of tree structures with one tree structure for each study.
 	 */
-	final Map<DicomStudyUID, Tree<DicomData>> searchResultMap;
+	private final Map<DicomStudyUID, Tree<DicomData>> searchResultMap;
 	/**
 	 * List of study instance UID values for studies contained in search results.
 	 */
-	final List<DicomStudyUID> studyList;
+	private final List<DicomStudyUID> studyList;
 	/**
 	 * String indicating type of search that was used to locate the studies.
 	 */
-	final DicomStudySearchType searchType;
+	private final DicomStudySearchType searchType;
 	/**
 	 * Value used in search for studies.
 	 */
-	final String searchParam;
+	private final String searchParam;
 
-	final DicomSearchMap searchMap;
+	private final DicomSearchMap searchMap;
 
 	public DICOMSearchResultImpl(DicomStudySearchType type, String param)
 	{
@@ -133,7 +132,7 @@ public class DICOMSearchResultImpl implements DicomSearchResult
 		String studyInstanceId = data.get(DicomTag.forInt(Tag.StudyInstanceUID));
 		DicomStudyUID studyUID = new DicomStudyUID(studyInstanceId);
 
-		RStudyData studyData = RDataBuilder.createStudyData(data);
+		ResultStudyData studyData = ResultDataBuilder.createStudyData(data);
 
 		Tree<DicomData> tree = new Tree<DicomData>();
 		tree.setRootElement(new Node<DicomData>(studyData));
@@ -156,7 +155,7 @@ public class DICOMSearchResultImpl implements DicomSearchResult
 		String seriesInstanceId = data.get(DicomTag.forInt(Tag.SeriesInstanceUID));
 		DicomSeriesUID seriesUID = new DicomSeriesUID(seriesInstanceId);
 
-		RSeriesData seriesData = RDataBuilder.createSeriesData(data, dicomStudyUID, seriesUID);
+		ResultSeriesData seriesData = ResultDataBuilder.createSeriesData(data, dicomStudyUID, seriesUID);
 
 		Tree<DicomData> tree = searchResultMap.get(dicomStudyUID);
 		if (tree == null) {

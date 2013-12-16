@@ -16,79 +16,93 @@ import java.util.concurrent.ConcurrentHashMap;
  * Holds all the information known about the relationships between Studies, Series, and Images.
  * <p>
  * Since this relationship don't change this information is kept even when the cached data is deleted.
- *
+ * 
  * @author amsnyder
  */
-public class DicomSearchMap {
-    private static DicomSearchMap ourInstance = new DicomSearchMap();
+public class DicomSearchMap
+{
+	private static DicomSearchMap ourInstance = new DicomSearchMap();
 
-    final Map<DicomSeriesUID,DicomStudyUID> seriesMap = new ConcurrentHashMap<DicomSeriesUID,DicomStudyUID>();
+	final Map<DicomSeriesUID, DicomStudyUID> seriesMap = new ConcurrentHashMap<DicomSeriesUID, DicomStudyUID>();
 
-    final Map<DicomSeriesUID,List<DicomImageData>> imagesMap = new ConcurrentHashMap<DicomSeriesUID,List<DicomImageData>>();
+	final Map<DicomSeriesUID, List<DicomImageData>> imagesMap = new ConcurrentHashMap<DicomSeriesUID, List<DicomImageData>>();
 
-    public static DicomSearchMap getInstance() {
-        return ourInstance;
-    }
+	public static DicomSearchMap getInstance()
+	{
+		return ourInstance;
+	}
 
+	private DicomSearchMap()
+	{
+	}
 
-    private DicomSearchMap() {
-    }
+	/**
+	 * The the parent (studyId) for this seriesId.
+	 * 
+	 * @param seriesUID
+	 * @return DicomStudyUID
+	 */
+	public DicomStudyUID getStudyForSeries(DicomSeriesUID seriesUID)
+	{
+		return seriesMap.get(seriesUID);
+	}
 
-    /**
-     * The the parent (studyId) for this seriesId.
-     * @param seriesUID
-     * @return DicomStudyUID
-     */
-    public DicomStudyUID getStudyForSeries(DicomSeriesUID seriesUID){
-        return seriesMap.get(seriesUID);
-    }
+	/**
+	 * Add a Study to Series relationship mapping.
+	 * 
+	 * @param seriesUID a DicomSeriesId
+	 * @param studyUID a DicomStudyId
+	 */
+	public void put(DicomSeriesUID seriesUID, DicomStudyUID studyUID)
+	{
+		seriesMap.put(seriesUID, studyUID);
+	}
 
-    /**
-     * Add a Study to Series relationship mapping.
-     * @param seriesUID a DicomSeriesId
-     * @param studyUID  a DicomStudyId
-     */
-    public void put(DicomSeriesUID seriesUID,DicomStudyUID studyUID){
-        seriesMap.put(seriesUID,studyUID);
-    }
+	/**
+	 * Returns true if the images for this series are known.
+	 * 
+	 * @param seriesUID seriesId
+	 * @return true if all images for this series are known.
+	 */
+	public boolean hasImagesForSeries(DicomSeriesUID seriesUID)
+	{
+		return imagesMap.containsKey(seriesUID);
+	}
 
-    /**
-     * Returns true if the images for this series are known.
-     * @param seriesUID seriesId
-     * @return true if all images for this series are known.
-     */
-    public boolean hasImagesForSeries(DicomSeriesUID seriesUID){
-        return imagesMap.containsKey(seriesUID);
-    }
+	/**
+	 * Returns the list if DicomImageUIDs for this series.
+	 * 
+	 * @param seriesUID
+	 * @return List<DicomImageUID> a list of images for this series.
+	 */
+	public List<DicomImageData> getImagesForSeries(DicomSeriesUID seriesUID)
+	{
+		return imagesMap.get(seriesUID);
+	}
 
-    /**
-     * Returns the list if DicomImageUIDs for this series.
-     * @param seriesUID
-     * @return List<DicomImageUID> a list of images for this series.
-     */
-    public List<DicomImageData> getImagesForSeries(DicomSeriesUID seriesUID){
-        return imagesMap.get(seriesUID);
-    }
+	/**
+	 * Get just the list of ImageUIDs in sorted order.
+	 * 
+	 * @param seriesUID
+	 * @return List<DicomImageUID>
+	 */
+	public List<DicomImageUID> getImageUIDsForSeries(DicomSeriesUID seriesUID)
+	{
 
-    /**
-     * Get just the list of ImageUIDs in sorted order.
-     * @param seriesUID
-     * @return List<DicomImageUID>
-     */
-    public List<DicomImageUID> getImageUIDsForSeries(DicomSeriesUID seriesUID){
+		List<DicomImageUID> retVal = new ArrayList<DicomImageUID>();
+		for (DicomImageData data : getImagesForSeries(seriesUID)) {
+			retVal.add(data.getSopInstanceId());
+		}
+		return retVal;
+	}
 
-        List<DicomImageUID> retVal = new ArrayList<DicomImageUID>();
-        for(DicomImageData data : getImagesForSeries(seriesUID)){
-            retVal.add(data.getSopInstanceId());
-        }
-        return retVal;
-    }
-
-    /**
-     * Save the list of sorted dicom images for this series.
-     * @param images  List<DicomImageUID> this list must be sorted from 1 to n.
-     */
-    public void putImagesForSeries(DicomSeriesUID seriesId, List<DicomImageData> images){
-        imagesMap.put(seriesId,images);
-    }
+	/**
+	 * Save the list of sorted dicom images for this series.
+	 * 
+	 * @param images List<DicomImageUID> this list must be sorted from 1 to n.
+	 */
+	public void putImagesForSeries(DicomSeriesUID seriesId, List<DicomImageData> images)
+	{
+		imagesMap.put(seriesId, images);
+	}
 }

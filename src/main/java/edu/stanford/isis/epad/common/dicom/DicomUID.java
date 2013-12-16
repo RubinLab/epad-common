@@ -9,27 +9,29 @@ package edu.stanford.isis.epad.common.dicom;
 
 /**
  * To strongly type the IDs which are Strings.
- *
+ * 
  * ID look like:
- *
+ * 
  * 1.2.826.0.1.3680043.8.420.14244124819651886510040305253484131351
- *
- *  - or -
- *
+ * 
+ * - or -
+ * 
  * 281871669181413707956703696581366588089
- *
+ * 
  * @author amsnyder
  */
-public abstract class DicomUID {
+public abstract class DicomUID
+{
+	protected final String id;
 
-    String id;
+	public DicomUID(String idString)
+	{
+		id = idString;
+	}
 
-    public DicomUID(String idString){
-        id = idString;
-    }
-
-    @Override
-    public String toString(){
-        return id;
-    }
+	@Override
+	public String toString()
+	{
+		return id;
+	}
 }

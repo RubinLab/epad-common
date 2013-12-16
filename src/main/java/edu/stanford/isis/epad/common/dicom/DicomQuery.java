@@ -94,7 +94,6 @@ import edu.stanford.isis.epad.common.util.EPADLogger;
  */
 public class DicomQuery
 {
-
 	private static EPADLogger log = EPADLogger.getInstance();
 
 	public static void main(String[] args)
@@ -337,7 +336,7 @@ public class DicomQuery
 	private static List<DicomImageData> parseImageSearchResult()
 	{
 		boolean isReadingTags = false;
-		List<RImageData> retVal = new ArrayList<RImageData>();
+		List<ResultImageData> retVal = new ArrayList<ResultImageData>();
 
 		String messages = LOG.toString();
 		LOG.clear();
@@ -352,7 +351,7 @@ public class DicomQuery
 				if (currLine.indexOf(")") < 0) {
 					isReadingTags = false;
 
-					retVal.add(new RImageData(tags));
+					retVal.add(new ResultImageData(tags));
 
 				} else {
 					DicomTag tag = parseDcm4cheeTagFromLine(currLine);

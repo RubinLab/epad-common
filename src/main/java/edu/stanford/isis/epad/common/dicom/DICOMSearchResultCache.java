@@ -19,10 +19,9 @@ public class DICOMSearchResultCache
 {
 	private static DICOMSearchResultCache ourInstance = new DICOMSearchResultCache();
 
-	final Map<SearchKey, DICOMSearchResultImpl> cache = new ConcurrentHashMap<SearchKey, DICOMSearchResultImpl>();
-	final Map<SearchKey, Long> cacheTimestamp = new ConcurrentHashMap<SearchKey, Long>();
-
-	final Map<UserKey, DICOMSearchResultImpl> mostRecent = new ConcurrentHashMap<UserKey, DICOMSearchResultImpl>();
+	private final Map<SearchKey, DICOMSearchResultImpl> cache = new ConcurrentHashMap<SearchKey, DICOMSearchResultImpl>();
+	private final Map<SearchKey, Long> cacheTimestamp = new ConcurrentHashMap<SearchKey, Long>();
+	private final Map<UserKey, DICOMSearchResultImpl> mostRecent = new ConcurrentHashMap<UserKey, DICOMSearchResultImpl>();
 
 	public static DICOMSearchResultCache getInstance()
 	{

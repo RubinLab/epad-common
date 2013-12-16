@@ -17,7 +17,7 @@ public enum DicomStudySearchType {
 
 	private String name;
 
-	DicomStudySearchType(String type)
+	private DicomStudySearchType(String type)
 	{
 		this.name = type;
 	}

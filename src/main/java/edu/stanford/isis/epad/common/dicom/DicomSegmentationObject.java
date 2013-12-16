@@ -15,12 +15,12 @@ import com.pixelmed.geometry.GeometryOfVolume;
 import edu.stanford.isis.epad.common.util.EPADLogger;
 
 /**
- * Originally derived from DicomSegmentationObject in ePAD viewer project.
+ * Represents a DICOM segmentation objecyt
  * 
  */
 public class DicomSegmentationObject
 {
-	static final EPADLogger logger = EPADLogger.getInstance();
+	private static final EPADLogger logger = EPADLogger.getInstance();
 
 	public GeometryOfVolume getGeometry(AttributeList list)
 	{

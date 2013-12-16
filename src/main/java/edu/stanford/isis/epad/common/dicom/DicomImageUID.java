@@ -10,22 +10,28 @@ package edu.stanford.isis.epad.common.dicom;
 /**
  * @author amsnyder
  */
-public class DicomImageUID extends DicomUID {
-    public DicomImageUID(String idString) {
-        super(idString);
-    }
+public class DicomImageUID extends DicomUID
+{
+	public DicomImageUID(String idString)
+	{
+		super(idString);
+	}
 
-    @Override
-    public boolean equals(Object o){
-        if(o==this) return true;
-        if(!(o instanceof DicomImageUID)) return false;
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o == this)
+			return true;
+		if (!(o instanceof DicomImageUID))
+			return false;
 
-        DicomImageUID diu = (DicomImageUID) o;
-        return id.equals(diu.id);
-    }
+		DicomImageUID diu = (DicomImageUID)o;
+		return id.equals(diu.id);
+	}
 
-    @Override
-    public int hashCode(){
-        return 43+id.hashCode();
-    }
+	@Override
+	public int hashCode()
+	{
+		return 43 + id.hashCode();
+	}
 }

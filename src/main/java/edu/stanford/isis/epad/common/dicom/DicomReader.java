@@ -35,8 +35,6 @@ public class DicomReader
 {
 	protected final File dicomFile;
 
-	// private static final EPADLogger log = EPADLogger.getInstance();
-
 	public DicomReader(File dicomFile)
 	{
 		this.dicomFile = dicomFile;

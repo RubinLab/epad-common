@@ -11,34 +11,33 @@ package edu.stanford.isis.epad.common.dicom;
  * @author amsnyder
  */
 public enum DicomQueryLevel {
+	STUDY("edu.stanford.isis.dicomproxy.DicomStudyData", true), SERIES("edu.stanford.isis.dicomproxy.DicomSeriesData",
+			true), INSTANCE("edu.stanford.isis.dicomproxy.DicomImageData", false);
 
-    STUDY("edu.stanford.isis.dicomproxy.DicomStudyData",true),
-    SERIES("edu.stanford.isis.dicomproxy.DicomSeriesData",true),
-    INSTANCE("edu.stanford.isis.dicomproxy.DicomImageData",false);
+	private String className;
+	private boolean hasDicomRowData;
 
-    String className;
-    boolean hasDicomRowData;
+	DicomQueryLevel(String className, boolean hasRowData)
+	{
+		this.className = className;
+		hasDicomRowData = hasRowData;
+	}
 
-    DicomQueryLevel(String className, boolean hasRowData){
-        this.className = className;
-        hasDicomRowData = hasRowData;
-    }
+	/**
+	 * 
+	 * @return Class type of class this should be cast to.
+	 * @throws ClassNotFoundException
+	 */
+	Class<?> cast() throws ClassNotFoundException
+	{
+		return Class.forName(className);
+	}
 
-    /**
-     *
-     * @return Class type of class this should be cast to.
-     * @throws ClassNotFoundException
-     */
-    Class<?> cast()
-        throws ClassNotFoundException
-    {
-        return Class.forName(className);
-    }
-
-    /**
-     * @return true if type has DicomRowData interface.
-     */
-    boolean hasDicomRowData(){
-        return hasDicomRowData;
-    }
+	/**
+	 * @return true if type has DicomRowData interface.
+	 */
+	boolean hasDicomRowData()
+	{
+		return hasDicomRowData;
+	}
 }

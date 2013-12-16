@@ -27,7 +27,6 @@ import com.pixelmed.dicom.TagFromName;
  * @author Wei Lu (luwei@tju.edu.cn)
  * @date 2013-5
  */
-
 public class ConvertTIFFMasksToSegmentationObjects
 {
 	private AttributeList list = new AttributeList();

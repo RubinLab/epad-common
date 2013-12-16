@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import edu.stanford.isis.epad.common.dicom.UIdType;
+import edu.stanford.isis.epad.common.dicom.UIDType;
 
 /**
  * This is the interface for getting files from the ePAD.
@@ -121,7 +121,7 @@ public interface EPadFiles
 	 * 
 	 * @return Map of UIdTypes to String
 	 */
-	public Map<UIdType, String> getCurrentSliceUIDs();
+	public Map<UIDType, String> getCurrentSliceUIDs();
 
 	/**
 	 * Get the base directory as a File. The user should be able to get the full path by calling File.getCanonicalPath();

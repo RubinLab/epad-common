@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.stanford.isis.epad.common.dicom.DicomFormatUtil;
-import edu.stanford.isis.epad.common.dicom.UIdType;
+import edu.stanford.isis.epad.common.dicom.UIDType;
 import edu.stanford.isis.epad.common.plugins.EPadFiles;
 import edu.stanford.isis.epad.common.util.EPADLogger;
 import edu.stanford.isis.epad.common.util.FileKey;
@@ -173,7 +173,7 @@ public class EPadFilesImpl implements EPadFiles
 	}
 
 	@Override
-	public Map<UIdType, String> getCurrentSliceUIDs()
+	public Map<UIDType, String> getCurrentSliceUIDs()
 	{
 		// ToDo: Will need a plugin handler which in addition for forwarding calls will
 		// also need to get the current slice. Maybe this isn't needed if it is
