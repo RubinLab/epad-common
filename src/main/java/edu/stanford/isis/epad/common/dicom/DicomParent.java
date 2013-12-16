@@ -7,7 +7,6 @@ package edu.stanford.isis.epad.common.dicom;
  */
 public class DicomParent
 {
-
 	final String dicomUID;
 	final DicomParentType type;
 
