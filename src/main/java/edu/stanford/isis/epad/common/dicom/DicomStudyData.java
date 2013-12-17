@@ -14,12 +14,4 @@ package edu.stanford.isis.epad.common.dicom;
  */
 public interface DicomStudyData extends DicomData, DicomRowData
 {
-	public DicomStudyUID getStudyId();
-
-	/**
-	 * Returns true if the series data has been queried.
-	 * 
-	 * @return true
-	 */
-	public boolean hasSeriesData();
 }

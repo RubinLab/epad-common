@@ -7,7 +7,6 @@
  */
 package edu.stanford.isis.epad.common.dicom;
 
-import java.util.List;
 
 /**
  * The interface for a search result.
@@ -16,7 +15,4 @@ import java.util.List;
  */
 public interface DicomSearchResult
 {
-	List<DicomStudyData> getStudies();
-
-	List<DicomImageData> getSOPInstancesForSeriesId(String seriesID);
 }

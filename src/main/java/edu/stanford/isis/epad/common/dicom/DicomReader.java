@@ -3,13 +3,8 @@ package edu.stanford.isis.epad.common.dicom;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.File;
-// import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import javax.imageio.ImageIO;
 // import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.FileImageInputStream;
 
@@ -20,6 +15,8 @@ import org.dcm4che2.imageioimpl.plugins.dcm.DicomImageReader;
 import org.dcm4che2.imageioimpl.plugins.dcm.DicomImageReaderSpi;
 import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
+
+// import java.io.FileInputStream;
 
 /**
  * Read a DICOM instance and generate a variety of other formats that can be used to create files.
@@ -38,35 +35,6 @@ public class DicomReader
 	public DicomReader(File dicomFile)
 	{
 		this.dicomFile = dicomFile;
-	}
-
-	/**
-	 * Obtain a DicomObject object using the DICOM file.
-	 * <p>
-	 * This object does not contain pixel data.
-	 * 
-	 * @return DicomObject object.
-	 * @throws IOException
-	 */
-	public DicomObject getDicomObject() throws Exception
-	{
-		DicomInputStream dis = null;
-		StopTagInputHandler stop = new StopTagInputHandler(Tag.PixelData);
-		dis = new DicomInputStream(dicomFile);
-		dis.setHandler(stop);
-		dis.close();
-		return dis.readDicomObject();
-	}
-
-	/**
-	 * Generate a buffered image using the parameters in the file.
-	 * 
-	 * @return image
-	 * @throws IOException
-	 */
-	public BufferedImage getImage() throws IOException
-	{
-		return getImage(0);
 	}
 
 	/**
@@ -156,32 +124,4 @@ public class DicomReader
 		dis.close();
 		return studyIUID;
 	}
-
-	/**
-	 * Test driver.
-	 * 
-	 * @param args first argument is name of Dicom file
-	 */
-	public static void main(String[] args)
-	{
-		try {
-			File input = new File(args[0]);
-			File outputFile = null;
-			OutputStream outputStream = null;
-			DicomReader instance = new DicomReader(input);
-			outputFile = new File("packed.png");
-			outputStream = new FileOutputStream(outputFile);
-			ImageIO.write(instance.getPackedImage(), "png", outputStream);
-			outputStream.close();
-			outputFile = new File("image.jpeg");
-			outputStream = new FileOutputStream(outputFile);
-			ImageIO.write(instance.getImage(), "jpeg", outputStream);
-			outputStream.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 }

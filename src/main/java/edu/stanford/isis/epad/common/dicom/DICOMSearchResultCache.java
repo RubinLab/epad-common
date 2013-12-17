@@ -47,18 +47,6 @@ public class DICOMSearchResultCache
 	}
 
 	/**
-	 * Set the most recent search result for this user.
-	 * 
-	 * @param searchResult
-	 * @param remoteAddr
-	 */
-	public void setMostRecent(DICOMSearchResultImpl searchResult, String remoteAddr)
-	{
-		UserKey key = new UserKey(remoteAddr);
-		mostRecent.put(key, searchResult);
-	}
-
-	/**
 	 * 
 	 * @param remoteAddr
 	 * @return
@@ -69,43 +57,8 @@ public class DICOMSearchResultCache
 		return mostRecent.get(key);
 	}
 
-	/**
-	 * Look to see if a similar search has occurred recently.
-	 * 
-	 * @param searchType
-	 * @param searchParam
-	 * @return
-	 */
-	public DICOMSearchResultImpl find(DicomStudySearchType searchType, String searchParam)
-	{
-		SearchKey key = new SearchKey(searchType, searchParam);
-		// check the time-to-live of this request.
-		Long timestamp = cacheTimestamp.get(key);
-		if (timestamp == null) {
-			return null;
-		}
-		if (exceedsCacheTime(timestamp)) {
-			cacheTimestamp.remove(key);
-			cache.remove(key);
-			return null;
-		}
-		return cache.get(key);
-	}
-
-	private boolean exceedsCacheTime(Long timestamp)
-	{
-		long currTime = System.currentTimeMillis();
-		long FIVE_MIN_IN_MILLISECONDS = 5 * 60 * 1000;
-
-		if (currTime - FIVE_MIN_IN_MILLISECONDS > timestamp) {
-			return true; // exceeds time limit.
-		}
-		return false;
-	}
-
 	class SearchKey
 	{
-
 		final DicomStudySearchType type;
 		final String param;
 

@@ -69,40 +69,4 @@ public class DicomFileUtil
 		}
 		return newName;
 	}
-
-	public static void main(String[] args)
-	{
-		File dicomFile = new File("/Users/alansnyder/work/2012-06/IM-0001-0001.dcm");
-
-		log.info("TEST #1");
-		if (DicomFileUtil.hasMagicWordInHeader(dicomFile)) {
-			log.info("TEST PASS!!");
-		} else {
-			log.info("TEST FAIL!!");
-		}
-
-		printFileExists(dicomFile);
-		log.info("#1 DONE");
-
-		// no extension.
-		File dicomFile2 = new File("/Users/alansnyder/work/2012-06/DICOM-FILE-NO-EXT");
-		log.info("TEST #2 - add extension.");
-
-		printFileExists(dicomFile2);
-		File df2 = DicomFileUtil.addDcmExtensionToFile(dicomFile2);
-		printFileExists(df2);
-
-	}
-
-	private static void printFileExists(File f)
-	{
-		if (f.exists()) {
-			log.info("Found: " + f.getName());
-		} else {
-			log.info("Not Found: " + f.getAbsolutePath());
-			if (f.isDirectory()) {
-				log.info("Java thinks " + f.getName() + " is a directory.");
-			}
-		}
-	}
 }

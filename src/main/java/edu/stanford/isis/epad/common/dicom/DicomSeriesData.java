@@ -22,11 +22,4 @@ public interface DicomSeriesData extends DicomData, DicomRowData
 	public String getThumbnailURL();
 
 	public DicomSeriesUID getSeriesId();
-
-	/**
-	 * Returns true if the Image data has been queried;
-	 * 
-	 * @return boolean true if it has queries the image data.
-	 */
-	public boolean hasImageData();
 }

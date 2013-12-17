@@ -26,18 +26,6 @@ public class ResultStudyData implements DicomStudyData
 	}
 
 	@Override
-	public DicomStudyUID getStudyId()
-	{
-		return new DicomStudyUID(getTag(Tag.StudyInstanceUID));
-	}
-
-	@Override
-	public boolean hasSeriesData()
-	{
-		return false; // To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	@Override
 	public String getPatientId()
 	{
 		return getTag(Tag.PatientID);

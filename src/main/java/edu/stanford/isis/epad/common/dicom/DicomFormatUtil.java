@@ -7,8 +7,6 @@
  */
 package edu.stanford.isis.epad.common.dicom;
 
-import java.io.File;
-
 import edu.stanford.isis.epad.common.util.EPADResources;
 
 /**
@@ -52,14 +50,5 @@ public class DicomFormatUtil
 	public static String createOrderFilePath(String studyUID, String seriesUID)
 	{
 		return createDicomDirPath(studyUID) + "/series_" + formatUidToDir(seriesUID) + ".order";
-	}
-
-	public static boolean hasSeriesDir(String studyUID, String seriesUID)
-	{
-		String checkPath = EPADResources.getEPADWebServerDicomDir() + formatUidToDir(studyUID) + "/"
-				+ formatUidToDir(seriesUID);
-		File checkFile = new File(checkPath);
-
-		return checkFile.exists();
 	}
 }

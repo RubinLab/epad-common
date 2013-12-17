@@ -59,25 +59,6 @@ public class DICOMSearchResultImpl implements DicomSearchResult
 		searchMap = DicomSearchMap.getInstance();
 	}
 
-	@Override
-	public List<DicomStudyData> getStudies()
-	{
-		List<DicomStudyData> retVal = new ArrayList<DicomStudyData>();
-
-		for (DicomStudyUID currID : studyList) {
-			Tree<DicomData> studyTree = searchResultMap.get(currID);
-			Node<DicomData> node = studyTree.getRootElement();
-			retVal.add((DicomStudyData)node.getData());
-		}
-		return retVal;
-	}
-
-	@Override
-	public List<DicomImageData> getSOPInstancesForSeriesId(String seriesID)
-	{
-		return null; // To change body of implemented methods use File | Settings | File Templates.
-	}
-
 	/**
 	 * Add a series to the
 	 * 
@@ -106,7 +87,6 @@ public class DICOMSearchResultImpl implements DicomSearchResult
 	 */
 	public void addSeriesToStudy(DicomStudyUID dicomStudyUID, Map<DicomTag, String> data)
 	{
-
 		logger.info("Add Series to Study: studyUID=" + dicomStudyUID);
 
 		String seriesInstanceId = data.get(DicomTag.forInt(Tag.SeriesInstanceUID));
@@ -123,16 +103,6 @@ public class DICOMSearchResultImpl implements DicomSearchResult
 		studyNode.addChild(new Node<DicomData>(seriesData));
 
 		searchMap.put(seriesUID, dicomStudyUID);
-	}
-
-	/**
-	 * Add Image results to a series.
-	 * 
-	 * @param data - Map<Tag,String> data
-	 */
-	void addImagesToSeries(DicomSeriesUID seriesId, Map<DicomTag, String> data)
-	{
-
 	}
 
 	/**

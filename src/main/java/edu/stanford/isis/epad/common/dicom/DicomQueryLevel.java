@@ -14,30 +14,12 @@ public enum DicomQueryLevel {
 	STUDY("edu.stanford.isis.dicomproxy.DicomStudyData", true), SERIES("edu.stanford.isis.dicomproxy.DicomSeriesData",
 			true), INSTANCE("edu.stanford.isis.dicomproxy.DicomImageData", false);
 
-	private String className;
-	private boolean hasDicomRowData;
+	public final String className;
+	public final boolean hasDicomRowData;
 
-	DicomQueryLevel(String className, boolean hasRowData)
+	private DicomQueryLevel(String className, boolean hasRowData)
 	{
 		this.className = className;
 		hasDicomRowData = hasRowData;
-	}
-
-	/**
-	 * 
-	 * @return Class type of class this should be cast to.
-	 * @throws ClassNotFoundException
-	 */
-	Class<?> cast() throws ClassNotFoundException
-	{
-		return Class.forName(className);
-	}
-
-	/**
-	 * @return true if type has DicomRowData interface.
-	 */
-	boolean hasDicomRowData()
-	{
-		return hasDicomRowData;
 	}
 }

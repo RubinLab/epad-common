@@ -76,12 +76,6 @@ public class ResultSeriesData implements DicomSeriesData
 		thumbnail = path;
 	}
 
-	@Override
-	public boolean hasImageData()
-	{
-		return false; // To change body of implemented methods use File | Settings | File Templates.
-	}
-
 	/**
 	 * Header names are sent in comma-delimited format.
 	 * 
