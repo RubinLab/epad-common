@@ -20,10 +20,4 @@ public class DicomParent
 	{
 		return dicomUID;
 	}
-
-	public DicomParentType getType()
-	{
-		return type;
-	}
-
 }

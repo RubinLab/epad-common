@@ -21,7 +21,5 @@ public interface DicomImageData extends DicomData
 	 */
 	int getStackOrder();
 
-	String getRawDataURL();
-
 	DicomImageUID getSopInstanceId();
 }

@@ -38,12 +38,6 @@ public class ResultStudyData implements DicomStudyData
 	}
 
 	@Override
-	public DicomQueryLevel getType()
-	{
-		return DicomQueryLevel.STUDY;
-	}
-
-	@Override
 	public String getPatientId()
 	{
 		return getTag(Tag.PatientID);

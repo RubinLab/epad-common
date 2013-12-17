@@ -36,12 +36,6 @@ public class ResultSeriesData implements DicomSeriesData
 	}
 
 	@Override
-	public DicomQueryLevel getType()
-	{
-		return DicomQueryLevel.SERIES;
-	}
-
-	@Override
 	public String getPatientId()
 	{
 		return getTag(Tag.PatientID);

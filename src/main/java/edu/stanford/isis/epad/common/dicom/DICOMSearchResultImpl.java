@@ -8,10 +8,8 @@
 package edu.stanford.isis.epad.common.dicom;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.dcm4che2.data.Tag;
@@ -72,47 +70,6 @@ public class DICOMSearchResultImpl implements DicomSearchResult
 			retVal.add((DicomStudyData)node.getData());
 		}
 		return retVal;
-	}
-
-	@Override
-	public List<DicomSeriesData> getSeriesForStudyId(String studyID)
-	{
-		List<DicomSeriesData> retVal = new ArrayList<DicomSeriesData>();
-
-		DicomStudyUID studyUID = new DicomStudyUID(studyID);
-		Tree<DicomData> tree = searchResultMap.get(studyUID);
-
-		if (tree == null) {
-			logger.info("WARNING: No Series found for study " + studyID + "! Returning empty list.");
-			return retVal;
-		}
-
-		Node<DicomData> node = tree.getRootElement();
-
-		Set<DicomSeriesUID> seriesUIDSet = new HashSet<DicomSeriesUID>();
-		for (Node<DicomData> currNode : node.getChildren()) {
-
-			// ToDo: Need to determine why Tree give nodes twice.
-			if (isNew(seriesUIDSet, currNode)) {
-				retVal.add((DicomSeriesData)currNode.getData());
-			}
-		}
-		return retVal;
-	}
-
-	/**
-	 * Check if this is new.
-	 * 
-	 * @param set
-	 * @param currNode
-	 * @return true if this ID hasn't been seen before. False if it has already been seen.
-	 */
-	private static boolean isNew(Set<DicomSeriesUID> set, Node<DicomData> currNode)
-	{
-		DicomSeriesData data = (DicomSeriesData)currNode.getData();
-		DicomSeriesUID seriesId = data.getSeriesId();
-
-		return set.add(seriesId);
 	}
 
 	@Override

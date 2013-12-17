@@ -62,26 +62,4 @@ public class DicomFormatUtil
 
 		return checkFile.exists();
 	}
-
-	/**
-	 * Return a true if a file of this type exists.
-	 * 
-	 * @return boolean
-	 */
-	public static boolean hasFileWithExtension(String studyUID, String seriesUID, String sopInstanceUID, String extension)
-	{
-		if (!hasSeriesDir(studyUID, seriesUID)) {
-			return false;
-		}
-
-		if (!extension.startsWith(".")) {
-			extension = "." + extension;
-		}
-
-		String checkFilePath = EPADResources.getEPADWebServerDicomDir() + formatUidToDir(studyUID) + "/"
-				+ formatUidToDir(seriesUID) + "/" + formatUidToDir(sopInstanceUID) + extension;
-		File checkFile = new File(checkFilePath);
-
-		return checkFile.exists();
-	}
 }

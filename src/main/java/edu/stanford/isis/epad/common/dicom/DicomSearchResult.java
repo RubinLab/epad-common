@@ -18,7 +18,5 @@ public interface DicomSearchResult
 {
 	List<DicomStudyData> getStudies();
 
-	List<DicomSeriesData> getSeriesForStudyId(String studyID);
-
 	List<DicomImageData> getSOPInstancesForSeriesId(String seriesID);
 }

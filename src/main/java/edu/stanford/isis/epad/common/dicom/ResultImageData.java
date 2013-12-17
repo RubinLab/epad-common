@@ -31,21 +31,9 @@ public class ResultImageData implements DicomImageData, Comparable<DicomImageDat
 	}
 
 	@Override
-	public String getRawDataURL()
-	{
-		return null; // To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	@Override
 	public DicomImageUID getSopInstanceId()
 	{
 		return new DicomImageUID(getTag(Tag.SOPInstanceUID));
-	}
-
-	@Override
-	public DicomQueryLevel getType()
-	{
-		return DicomQueryLevel.INSTANCE;
 	}
 
 	@Override

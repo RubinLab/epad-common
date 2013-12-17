@@ -14,8 +14,6 @@ package edu.stanford.isis.epad.common.dicom;
  */
 public interface DicomData
 {
-	DicomQueryLevel getType();
-
 	String getPatientId();
 
 	String getPatientName();

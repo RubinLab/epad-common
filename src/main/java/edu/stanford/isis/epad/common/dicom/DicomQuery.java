@@ -96,25 +96,6 @@ public class DicomQuery
 {
 	private static EPADLogger log = EPADLogger.getInstance();
 
-	public static void main(String[] args)
-	{
-		DicomSearchResult retVal = DicomQuery.searchForStudies(DicomStudySearchType.PATIENT_ID,
-				"83393488148532965622665512597663741359");
-
-		log.info("#studies found: " + retVal.getStudies().size());
-		// int debug=1;
-
-		for (DicomStudyData curr : retVal.getStudies()) {
-			log.info("studyId=" + curr.getStudyId());
-			log.info("patientName=" + curr.getPatientName());
-			log.info("patientId=" + curr.getPatientId());
-			log.info("examType=" + curr.getExamType());
-			log.info("studyDate=" + curr.getStudyDate());
-		}
-
-		// debug=2;
-	}
-
 	/**
 	 * Obtain a list of studies, based on a specified type of search and a search criteria.
 	 * 
