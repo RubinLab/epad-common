@@ -3,8 +3,6 @@ package edu.stanford.isis.epad.common.plugins;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.stanford.hakan.aim3api.base.ImageAnnotation;
-
 /**
  * Any HTTP GET or POST calls with in the format /plugin/[name] are forwarded on to this handler for a plugin registered
  * with [name].
@@ -55,20 +53,6 @@ public interface PluginServletHandler
 	String getName();
 
 	/**
-	 * Get the set of valid shapes for this plugin.
-	 * 
-	 * @return Set of AimShape that are valid.
-	 */
-	AimShape[] getValidShapes();
-
-	/**
-	 * 
-	 * @param imageAnnotation ImageAnnotation
-	 * @return boolean
-	 */
-	boolean hasValidShape(ImageAnnotation imageAnnotation);
-
-	/**
 	 * Contact info for the author(s).
 	 * 
 	 * @return String
@@ -81,5 +65,4 @@ public interface PluginServletHandler
 	 * @return String
 	 */
 	String getDescription();
-
 }

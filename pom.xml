@@ -15,12 +15,6 @@
 
   <dependencies>
 
-   <dependency>
-     <groupId>edu.stanford.hakan.aim3api</groupId>
-     <artifactId>aim3api</artifactId>
-     <version>${aim3api.version}</version>
-   </dependency>
-
    <!-- This is in the project repository (in ./lib) because we could not find a public Maven repository containing it. -->
    <dependency>
      <groupId>com.pixelmed</groupId>
