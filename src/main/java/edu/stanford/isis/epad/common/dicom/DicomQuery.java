@@ -389,15 +389,15 @@ public class DicomQuery
 		EPADConfig proxyConfig = EPADConfig.getInstance();
 
 		StringBuilder sb = new StringBuilder();
-		sb.append(proxyConfig.getParam("DicomServerAETitle"));
+		sb.append(proxyConfig.getStringPropertyValue("DicomServerAETitle"));
 		sb.append("@");
-		sb.append(proxyConfig.getParam("DicomServerIP")); // ("171.65.102.125");
+		sb.append(proxyConfig.getStringPropertyValue("DicomServerIP")); // ("171.65.102.125");
 		sb.append(":");
-		sb.append(proxyConfig.getParam("DicomServerPort")); // ("11112");
+		sb.append(proxyConfig.getIntegerPropertyValue("DicomServerPort")); // ("11112");
 		sb.append(" -L ");
-		sb.append(proxyConfig.getParam("ListenIP")); // ("171.65.102.233");
+		sb.append(proxyConfig.getStringPropertyValue("ListenIP")); // ("171.65.102.233");
 		sb.append(":");
-		sb.append(proxyConfig.getParam("ListenPort")); // ("4096");
+		sb.append(proxyConfig.getIntegerPropertyValue("ListenPort")); // ("4096");
 		sb.append(" -q ");
 		sb.append("SeriesInstanceUID=");
 		sb.append(seriesUID);
@@ -432,15 +432,15 @@ public class DicomQuery
 		EPADConfig proxyConfig = EPADConfig.getInstance();
 
 		StringBuilder sb = new StringBuilder();
-		sb.append(proxyConfig.getParam("DicomServerAETitle"));
+		sb.append(proxyConfig.getStringPropertyValue("DicomServerAETitle"));
 		sb.append("@");
-		sb.append(proxyConfig.getParam("DicomServerIP")); // ("171.65.102.125");
+		sb.append(proxyConfig.getStringPropertyValue("DicomServerIP")); // ("171.65.102.125");
 		sb.append(":");
-		sb.append(proxyConfig.getParam("DicomServerPort")); // ("11112");
+		sb.append(proxyConfig.getIntegerPropertyValue("DicomServerPort")); // ("11112");
 		sb.append(" -L ");
-		sb.append(proxyConfig.getParam("ListenIP")); // ("171.65.102.233");
+		sb.append(proxyConfig.getStringPropertyValue("ListenIP")); // ("171.65.102.233");
 		sb.append(":");
-		sb.append(proxyConfig.getParam("ListenPort")); // ("4096");
+		sb.append(proxyConfig.getIntegerPropertyValue("ListenPort")); // ("4096");
 		sb.append(" -q ");
 		sb.append("StudyInstanceUID=");
 		sb.append(studyUID);
@@ -479,15 +479,15 @@ public class DicomQuery
 		Set<String> neededParams = createRequiredParams();
 
 		StringBuilder sb = new StringBuilder();
-		sb.append(proxyConfig.getParam("DicomServerAETitle"));// ("DCM4CHEE"); //
+		sb.append(proxyConfig.getStringPropertyValue("DicomServerAETitle"));// ("DCM4CHEE"); //
 		sb.append("@");
-		sb.append(proxyConfig.getParam("DicomServerIP"));// ("171.65.102.125"); //
+		sb.append(proxyConfig.getStringPropertyValue("DicomServerIP"));// ("171.65.102.125"); //
 		sb.append(":");
-		sb.append(proxyConfig.getParam("DicomServerPort"));// ("11112"); //
+		sb.append(proxyConfig.getIntegerPropertyValue("DicomServerPort"));// ("11112"); //
 		sb.append(" -L ");
-		sb.append(proxyConfig.getParam("ListenIP"));// ("171.65.102.233"); //
+		sb.append(proxyConfig.getStringPropertyValue("ListenIP"));// ("171.65.102.233"); //
 		sb.append(":");
-		sb.append(proxyConfig.getParam("ListenPort"));// ("4096"); //
+		sb.append(proxyConfig.getIntegerPropertyValue("ListenPort"));// ("4096"); //
 		sb.append(" -q ");
 		switch (searchType) {
 		case PATIENT_NAME:

@@ -17,20 +17,20 @@ import org.apache.commons.httpclient.methods.GetMethod;
 
 public class EPADTools
 {
-	public static String serverProxy = EPADConfig.getInstance().getParam("serverProxy");
-	public static String baseAnnotationDir = EPADConfig.getInstance().getParam("baseAnnotationDir");
-	public static String dbpath = EPADConfig.getInstance().getParam("dbpath");
-	public static String templatePath = EPADConfig.getInstance().getParam("baseTemplatesDir");
-	public static String wadoProxy = EPADConfig.getInstance().getParam("wadoProxy");
-	public static final String dicomServerPort = EPADConfig.getInstance().getParam("DicomServerPort");
-	public static final String aeTitle = EPADConfig.getInstance().getParam("DicomServerAETitle");
-	public static final String username = EPADConfig.getInstance().getParam("username");
-	public static final String password = EPADConfig.getInstance().getParam("password");
-	public static final String collection = EPADConfig.getInstance().getParam("collection"); // "defaultcontainer";
-	public static final String aim3Namespace = EPADConfig.getInstance().getParam("namespace");
-	public static final String existURI = EPADConfig.getInstance().getParam("serverUrlUpload");
-	public static final String eventResourceURI = EPADConfig.getInstance().getParam("eventResourceURI");
-	public static final String seriesOrderURI = EPADConfig.getInstance().getParam("seriesOrderURI");
+	public static String serverProxy = EPADConfig.getInstance().getStringPropertyValue("serverProxy");
+	public static String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
+	public static String dbpath = EPADConfig.getInstance().getStringPropertyValue("dbpath");
+	public static String templatePath = EPADConfig.getInstance().getStringPropertyValue("baseTemplatesDir");
+	public static String wadoProxy = EPADConfig.getInstance().getStringPropertyValue("wadoProxy");
+	public static final String dicomServerPort = EPADConfig.getInstance().getStringPropertyValue("DicomServerPort");
+	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
+	public static final String username = EPADConfig.getInstance().getStringPropertyValue("username");
+	public static final String password = EPADConfig.getInstance().getStringPropertyValue("password");
+	public static final String collection = EPADConfig.getInstance().getStringPropertyValue("collection"); // "defaultcontainer";
+	public static final String aim3Namespace = EPADConfig.getInstance().getStringPropertyValue("namespace");
+	public static final String existURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
+	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");
+	public static final String seriesOrderURI = EPADConfig.getInstance().getStringPropertyValue("seriesOrderURI");
 
 	private static final EPADLogger logger = EPADLogger.getInstance();
 	private static final EPADConfig config = EPADConfig.getInstance();
@@ -48,9 +48,9 @@ public class EPADTools
 	public static int downloadDICOMFileFromWADO(File temp, String studyID, String seriesID, String imageID)
 			throws IOException
 	{
-		String host = config.getParam("NameServer");
-		int port = config.getIntParam("DicomServerWadoPort");
-		String base = config.getParam("WadoUrlExtension");
+		String host = config.getStringPropertyValue("NameServer");
+		int port = config.getIntegerPropertyValue("DicomServerWadoPort");
+		String base = config.getStringPropertyValue("WadoUrlExtension");
 
 		WadoUrlBuilder wadoUrlBuilder = new WadoUrlBuilder(host, port, base, WadoUrlBuilder.ContentType.FILE);
 

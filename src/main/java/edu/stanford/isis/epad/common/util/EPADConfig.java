@@ -20,21 +20,21 @@ import java.util.Set;
  * <li>
  * ePadClientPort - port number on which Jetty server is listening.</li>
  * <li>
- * ListenIP - IP address or domain name where Dicom server will be listening as a C-STORE SCP.</li>
+ * ListenIP - IP address or domain name where DICOM server will be listening as a C-STORE SCP.</li>
  * <li>
- * ListenPort - Port number where Dicom server will be listening as a C-STORE SCP.</li>
+ * ListenPort - Port number where DICOM server will be listening as a C-STORE SCP.</li>
  * <li>
- * ListenAETitle - This value is not present in the file, but would represent the application entity title for the Dicom
+ * ListenAETitle - This value is not present in the file, but would represent the application entity title for the DICOM
  * server that will be listening as a C-STORE SCP. It will be necessary to set up an application entity title to allow
- * the process to accept Dicom instances.</li>
+ * the process to accept DICOM instances.</li>
  * <li>
- * DicomServerAETitle - Application entity title for Dicom server from which DicomProxy will retrieve information and
+ * DicomServerAETitle - Application entity title for DICOM server from which DicomProxy will retrieve information and
  * instances.</li>
  * <li>
- * DicomServerIP - IP address or domain name for Dicom server from which DicomProxy will retrieve information and
+ * DicomServerIP - IP address or domain name for DICOM server from which DicomProxy will retrieve information and
  * instances.</li>
  * <li>
- * DicomServerPort - Port number for Dicom server from which DicomProxy will retrieve information and instances.</li>
+ * DicomServerPort - Port number for DICOM server from which ePAD will retrieve information and instances.</li>
  * <li>
  * DicomServerWadoPort</li>
  * <li>
@@ -63,7 +63,7 @@ public class EPADConfig
 	{
 		try {
 			properties = new Properties();
-			File configFile = getConfigFile();
+			File configFile = getConfigurationFile();
 			if (!configFile.exists())
 				throw new IllegalStateException("Could not find configuration file: " + configFile.getAbsolutePath());
 
@@ -80,7 +80,7 @@ public class EPADConfig
 		}
 	}
 
-	private File getConfigFile()
+	private File getConfigurationFile()
 	{
 		File configFile = new File(EPADResources.getEPADWebServerConfigFilePath());
 		log.info("Configuration file: " + configFile.getAbsolutePath());
@@ -89,7 +89,7 @@ public class EPADConfig
 	}
 
 	/**
-	 * Returns the values of a key in the proxy-config.properties file.
+	 * Returns the values of a property in ePAD's configuration file.
 	 * 
 	 * @param name key in config file.
 	 * @return the value of that parameter.
@@ -118,16 +118,16 @@ public class EPADConfig
 
 	/**
 	 * 
-	 * @param parameterName
+	 * @param propertyName
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
-	public String getStringConfigurationParameter(String parameterName)
+	public String getStringPropertyValue(String propertyName)
 	{
-		String parameterValue = getParam(parameterName);
+		String parameterValue = getParam(propertyName);
 
-		if (parameterValue == null) {
-			String errorMessage = "no value for parameter " + parameterName + " in configuration file";
+		if (parameterValue == null || parameterValue.length() == 0) {
+			String errorMessage = "no value for parameter " + propertyName + " in configuration file";
 			log.warning(errorMessage);
 			throw new IllegalArgumentException(errorMessage);
 		}
@@ -136,17 +136,17 @@ public class EPADConfig
 
 	/**
 	 * 
-	 * @param parameterName
+	 * @param propertyName
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
-	public int getIntegerConfigurationParameter(String parameterName)
+	public int getIntegerPropertyValue(String propertyName)
 	{
-		String parameterValue = getStringConfigurationParameter(parameterName);
+		String parameterValue = getStringPropertyValue(propertyName);
 		try {
 			return Integer.parseInt(parameterValue);
 		} catch (NumberFormatException nfe) {
-			throw new IllegalArgumentException("The parameter in : " + parameterName + " needs to be an integer. It was: "
+			throw new IllegalArgumentException("The parameter in : " + propertyName + " needs to be an integer. It was: "
 					+ parameterValue);
 		}
 	}
@@ -156,7 +156,7 @@ public class EPADConfig
 	 * 
 	 * @return Map of String keys to String values
 	 */
-	public Map<String, String> getAllParams()
+	public Map<String, String> getAllPropertyValues()
 	{
 		Set<String> keys = properties.stringPropertyNames();
 		Map<String, String> retVal = new HashMap<String, String>();

@@ -85,7 +85,7 @@ public class ResultSeriesData implements DicomSeriesData
 	{
 
 		EPADConfig config = EPADConfig.getInstance();
-		String separator = config.getParam("fieldSeparator");
+		String separator = config.getStringPropertyValue("fieldSeparator");
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("Series Id ").append(separator);
@@ -115,7 +115,7 @@ public class ResultSeriesData implements DicomSeriesData
 	{
 
 		EPADConfig config = EPADConfig.getInstance();
-		String separator = config.getParam("fieldSeparator");
+		String separator = config.getStringPropertyValue("fieldSeparator");
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(getSeriesId()).append(separator);
