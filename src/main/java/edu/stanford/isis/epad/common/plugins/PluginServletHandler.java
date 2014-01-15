@@ -4,8 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Any HTTP GET or POST calls with in the format /plugin/[name] are forwarded on to this handler for a plugin registered
- * with [name].
+ * Any HTTP GET or POST calls with in the format /epad/plugin/[name] are forwarded on to this handler for a plugin
+ * registered with [name].
  * 
  * These HttpServlet classes work the same as a standard J2EE HttpServlet with some abstract classes to define where
  * they fit in the plugin structure.
