@@ -19,8 +19,6 @@ public class EPADTools
 {
 	public static String serverProxy = EPADConfig.getInstance().getStringPropertyValue("serverProxy");
 	public static String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
-	public static String dbpath = EPADConfig.getInstance().getStringPropertyValue("dbpath");
-	public static String templatePath = EPADConfig.getInstance().getStringPropertyValue("baseTemplatesDir");
 	public static String wadoProxy = EPADConfig.getInstance().getStringPropertyValue("wadoProxy");
 	public static final String dicomServerPort = EPADConfig.getInstance().getStringPropertyValue("DicomServerPort");
 	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
