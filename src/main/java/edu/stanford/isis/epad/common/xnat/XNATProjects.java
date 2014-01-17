@@ -1,5 +1,6 @@
 package edu.stanford.isis.epad.common.xnat;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,7 +42,7 @@ public class XNATProjects
 
 		public XNATProjectResultSet(List<XNATProjectDescription> Result, int totalRecords)
 		{
-			this.Result = Result;
+			this.Result = Collections.unmodifiableList(Result);
 			this.totalRecords = totalRecords;
 		}
 	}

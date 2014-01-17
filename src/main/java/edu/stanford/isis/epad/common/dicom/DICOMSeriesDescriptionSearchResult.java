@@ -8,6 +8,7 @@ import java.util.List;
  * Result returned from an ePAD series description query.
  * 
  * @author martin
+ * @see DICOMSeriesOrderHandler
  */
 public class DICOMSeriesDescriptionSearchResult
 {

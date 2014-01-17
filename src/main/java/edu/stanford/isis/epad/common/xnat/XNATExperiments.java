@@ -1,5 +1,6 @@
 package edu.stanford.isis.epad.common.xnat;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,7 +41,7 @@ public class XNATExperiments
 
 		public XNATExperimentResultSet(List<XNATExperimentDescription> Result, int totalRecords)
 		{
-			this.Result = Result;
+			this.Result = Collections.unmodifiableList(Result);
 			this.totalRecords = totalRecords;
 		}
 	}
