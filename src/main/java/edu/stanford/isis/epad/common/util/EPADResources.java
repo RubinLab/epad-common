@@ -21,7 +21,7 @@ import edu.stanford.isis.epad.common.dicom.DicomStudyUID;
 
 /**
  * 
- * @author amsnyder
+ * @author martin
  */
 public class EPADResources
 {
@@ -63,19 +63,6 @@ public class EPADResources
 	}
 
 	/**
-	 * Create this directory and all of it's ancestors. Throw an exception if this is an invalid file.
-	 * 
-	 * @param dir
-	 */
-	private static void createAncestors(File dir) throws IOException
-	{
-		if (!dir.exists()) {
-			createAncestors(dir.getParentFile());
-		}
-		dir.mkdir();
-	}
-
-	/**
 	 * Get the base directory for the ePAD web server.
 	 * <p>
 	 * For the moment, we use ~/DicomProxy as the base directory for compatibility with pre-Restlet calls. Ultimately we
@@ -103,7 +90,7 @@ public class EPADResources
 		return getEPADWebServerBaseDir() + "etc/";
 	}
 
-	private static String getEPADWebServerDICOMScriptsDir()
+	public static String getEPADWebServerDICOMScriptsDir()
 	{
 		return getEPADWebServerEtcDir() + "scripts/";
 	}
@@ -223,4 +210,18 @@ public class EPADResources
 
 		return getEPADWebServerResourcesDir() + "/dicom/" + studyDir + "/thumbnail_" + seriesName + ".jpg";
 	}
+
+	/**
+	 * Create this directory and all of it's ancestors. Throw an exception if this is an invalid file.
+	 * 
+	 * @param dir
+	 */
+	private static void createAncestors(File dir) throws IOException
+	{
+		if (!dir.exists()) {
+			createAncestors(dir.getParentFile());
+		}
+		dir.mkdir();
+	}
+
 }

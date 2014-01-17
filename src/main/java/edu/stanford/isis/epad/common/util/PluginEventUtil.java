@@ -13,11 +13,11 @@ public class PluginEventUtil
 {
 	private static final EPADLogger logger = EPADLogger.getInstance();
 
-	public static void postEvent(String username, String event_status, String aimUid, String aimName, String patientID,
-			String patientName, String templateID, String templateName, String pluginName, String sessionID)
+	public static void postEvent(String sessionID, String event_status, String aimUid, String aimName, String patientID,
+			String patientName, String templateID, String templateName, String pluginName)
 	{
 		try {
-			String urlEncoded = EPADTools.eventResourceURI + "?" + "username=" + username + "&" + "event_status="
+			String urlEncoded = EPADTools.eventResourceURI + "?" + "username=" + sessionID + "&" + "event_status="
 					+ java.net.URLEncoder.encode(event_status, "UTF-8") + "&" + "aim_uid="
 					+ java.net.URLEncoder.encode(aimUid, "UTF-8") + "&" + "aim_name="
 					+ java.net.URLEncoder.encode(aimName, "UTF-8") + "&" + "patient_id="
