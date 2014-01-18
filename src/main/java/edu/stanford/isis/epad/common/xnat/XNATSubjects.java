@@ -31,9 +31,19 @@ public class XNATSubjects
 {
 	public final XNATSubjectResultSet ResultSet;
 
-	public XNATSubjects(List<XNATSubjectDescription> Result, int totalRecords)
+	public XNATSubjects(List<XNATSubjectDescription> Result)
 	{
-		this.ResultSet = new XNATSubjectResultSet(Result, totalRecords);
+		this.ResultSet = new XNATSubjectResultSet(Result);
+	}
+
+	public XNATSubjects()
+	{
+		this.ResultSet = new XNATSubjectResultSet();
+	}
+
+	public static XNATSubjects emptySubjects()
+	{
+		return new XNATSubjects();
 	}
 
 	public class XNATSubjectResultSet
@@ -41,10 +51,16 @@ public class XNATSubjects
 		public final List<XNATSubjectDescription> Result;
 		public final int totalRecords;
 
-		public XNATSubjectResultSet(List<XNATSubjectDescription> Result, int totalRecords)
+		public XNATSubjectResultSet(List<XNATSubjectDescription> Result)
 		{
 			this.Result = Collections.unmodifiableList(Result);
-			this.totalRecords = totalRecords;
+			this.totalRecords = Result.size();
+		}
+
+		public XNATSubjectResultSet()
+		{
+			this.Result = Collections.emptyList();
+			this.totalRecords = 0;
 		}
 	}
 }

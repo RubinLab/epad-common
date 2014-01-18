@@ -29,9 +29,19 @@ public class XNATExperiments
 {
 	public final XNATExperimentResultSet ResultSet;
 
-	public XNATExperiments(List<XNATExperimentDescription> Result, int totalRecords)
+	public XNATExperiments(List<XNATExperimentDescription> Result)
 	{
-		this.ResultSet = new XNATExperimentResultSet(Result, totalRecords);
+		this.ResultSet = new XNATExperimentResultSet(Result);
+	}
+
+	public XNATExperiments()
+	{
+		this.ResultSet = new XNATExperimentResultSet();
+	}
+
+	public static XNATExperiments emptyExperiments()
+	{
+		return new XNATExperiments();
 	}
 
 	public class XNATExperimentResultSet
@@ -39,10 +49,16 @@ public class XNATExperiments
 		public final List<XNATExperimentDescription> Result;
 		public final int totalRecords;
 
-		public XNATExperimentResultSet(List<XNATExperimentDescription> Result, int totalRecords)
+		public XNATExperimentResultSet(List<XNATExperimentDescription> Result)
 		{
 			this.Result = Collections.unmodifiableList(Result);
-			this.totalRecords = totalRecords;
+			this.totalRecords = Result.size();
+		}
+
+		public XNATExperimentResultSet()
+		{
+			this.Result = Collections.emptyList();
+			this.totalRecords = 0;
 		}
 	}
 }

@@ -30,9 +30,19 @@ public class XNATProjects
 {
 	public final XNATProjectResultSet ResultSet;
 
-	public XNATProjects(List<XNATProjectDescription> Result, int totalRecords)
+	public XNATProjects(List<XNATProjectDescription> Result)
 	{
-		this.ResultSet = new XNATProjectResultSet(Result, totalRecords);
+		this.ResultSet = new XNATProjectResultSet(Result);
+	}
+
+	public XNATProjects()
+	{
+		this.ResultSet = new XNATProjectResultSet();
+	}
+
+	public static XNATProjects emptyProjects()
+	{
+		return new XNATProjects();
 	}
 
 	public class XNATProjectResultSet
@@ -40,10 +50,16 @@ public class XNATProjects
 		public final List<XNATProjectDescription> Result;
 		public final int totalRecords;
 
-		public XNATProjectResultSet(List<XNATProjectDescription> Result, int totalRecords)
+		public XNATProjectResultSet(List<XNATProjectDescription> Result)
 		{
 			this.Result = Collections.unmodifiableList(Result);
-			this.totalRecords = totalRecords;
+			this.totalRecords = Result.size();
+		}
+
+		public XNATProjectResultSet()
+		{
+			this.Result = Collections.emptyList();
+			this.totalRecords = 0;
 		}
 	}
 }
