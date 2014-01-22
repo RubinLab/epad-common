@@ -17,7 +17,7 @@ package edu.stanford.isis.epad.common.xnat;
  *    [ 
  *      {"project":"PRJ1","insert_user":"bob","ID":"EPAD_S00002","insert_date":"...","label":"SID1","URI":"/data/subjects/EPAD_S00002", "src": ""},
  *    ], 
- *    "totalRecords": "1"
+ *    "totalRecords" : "1"
  *  }
  * }
  * </code>

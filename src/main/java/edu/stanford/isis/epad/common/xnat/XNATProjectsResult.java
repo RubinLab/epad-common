@@ -26,23 +26,23 @@ import java.util.List;
  * 
  * @author martin
  */
-public class XNATProjects
+public class XNATProjectsResult
 {
 	public final XNATProjectResultSet ResultSet;
 
-	public XNATProjects(List<XNATProjectDescription> Result)
+	public XNATProjectsResult(List<XNATProjectDescription> Result)
 	{
 		this.ResultSet = new XNATProjectResultSet(Result);
 	}
 
-	public XNATProjects()
+	public XNATProjectsResult()
 	{
 		this.ResultSet = new XNATProjectResultSet();
 	}
 
-	public static XNATProjects emptyProjects()
+	public static XNATProjectsResult emptyProjects()
 	{
-		return new XNATProjects();
+		return new XNATProjectsResult();
 	}
 
 	public class XNATProjectResultSet

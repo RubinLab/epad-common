@@ -25,23 +25,23 @@ import java.util.List;
  * 
  * @author martin
  */
-public class XNATExperiments
+public class XNATExperimentsResult
 {
 	public final XNATExperimentResultSet ResultSet;
 
-	public XNATExperiments(List<XNATExperimentDescription> Result)
+	public XNATExperimentsResult(List<XNATExperimentDescription> Result)
 	{
 		this.ResultSet = new XNATExperimentResultSet(Result);
 	}
 
-	public XNATExperiments()
+	public XNATExperimentsResult()
 	{
 		this.ResultSet = new XNATExperimentResultSet();
 	}
 
-	public static XNATExperiments emptyExperiments()
+	public static XNATExperimentsResult emptyExperiments()
 	{
-		return new XNATExperiments();
+		return new XNATExperimentsResult();
 	}
 
 	public class XNATExperimentResultSet

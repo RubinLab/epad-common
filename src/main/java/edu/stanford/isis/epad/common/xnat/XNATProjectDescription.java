@@ -16,7 +16,7 @@ package edu.stanford.isis.epad.common.xnat;
  *    [ 
  *     {"secondary_ID":"epad-xnat","pi_lastname":"MrPI","description":"", "name":"XNAT Project","ID":"EPAD_PROJECT","pi_firstname":"An","URI":"/data/projects/EPAD_PROJECT"},
  *    ], 
- *    "totalRecords": "1"
+ *    "totalRecords" : "1"
  *  }
  * }
  * </code>
