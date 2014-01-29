@@ -665,35 +665,34 @@ public class EPADFileUtils
 	/**
 	 * Delete a directory and all of its contents.
 	 * 
-	 * @param dirToDelete File
+	 * @param directoryToDelete File
 	 * @return boolean true if everything deleted.
 	 */
-	public static boolean deleteDirAndContents(File dirToDelete)
+	public static boolean deleteDirectoryAndContents(File directoryToDelete)
 	{
 		try {
-			List<File> dirs = getDirectoriesIn(dirToDelete);
-			// delete all the sub-directories.
+			List<File> dirs = getDirectoriesIn(directoryToDelete);
 			for (File currDir : dirs) {
-				if (!deleteDirAndContents(currDir)) {
-					throw new IllegalStateException("Filed to delete dir=" + dirToDelete.getAbsolutePath());
+				if (!deleteDirectoryAndContents(currDir)) {
+					throw new IllegalStateException("Filed to delete dir=" + directoryToDelete.getAbsolutePath());
 				}
 			}
-			File[] files = dirToDelete.listFiles();
+			File[] files = directoryToDelete.listFiles();
 			for (File currFile : files) {
 				if (!currFile.delete()) {
 					throw new IllegalStateException("Could not delete file=" + currFile.getAbsolutePath());
 				}
 			}
-			if (!dirToDelete.delete()) {
-				throw new IllegalStateException("Could not delete: " + dirToDelete.getAbsolutePath());
+			if (!directoryToDelete.delete()) {
+				throw new IllegalStateException("Could not delete: " + directoryToDelete.getAbsolutePath());
 			}
 			return true;
 
 		} catch (IllegalStateException ise) {
-			// log.info(ise.getMessage());
+			log.warning("Warning: error deleting directory " + directoryToDelete.getAbsolutePath(), ise);
 			return false;
 		} catch (Exception e) {
-			// log.warning("Had: "+e.getMessage()+" for "+dirToDelete.getAbsolutePath(),e);
+			log.warning("Warning: error deleting directory " + directoryToDelete.getAbsolutePath(), e);
 			return false;
 		}
 	}
@@ -718,7 +717,7 @@ public class EPADFileUtils
 		}
 	}
 
-	public static boolean deleteFilesInDirWithExtension(File dir, String extension)
+	public static boolean deleteFilesInDirectoryWithExtension(File dir, String extension)
 	{
 		try {
 			Collection<File> files = getAllFilesWithExtension(dir, extension, true);
