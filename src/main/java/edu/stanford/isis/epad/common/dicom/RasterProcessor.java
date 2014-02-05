@@ -758,6 +758,8 @@ public class RasterProcessor
 	public BufferedImage buildPng(Raster raster)
 	{
 		BufferedImage pngImage = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+		// BufferedImage pngImage = new BufferedImage(raster.getWidth(), raster.getHeight(),
+		// BufferedImage.TYPE_USHORT_GRAY);
 		WritableRaster writablePNGRaster = pngImage.getRaster();
 		Distribution rawValuesDistribution = null;
 		Distribution highOrderBitsDistribution = null;
@@ -765,6 +767,7 @@ public class RasterProcessor
 		int[] grayInputArray = new int[1];
 		int[] grayArray = new int[1];
 		int[] bgrArray = new int[3];
+		// int[] pngGrayArray = new int[2];
 
 		if (debugLevel > 0) {
 			// if (pixelRepresentation == 0) {
@@ -790,6 +793,8 @@ public class RasterProcessor
 				}
 				bgrArray[0] = high(pixelValue);
 				bgrArray[1] = low(pixelValue);
+				// pngGrayArray[1] = high(pixelValue);
+				// pngGrayArray[0] = low(pixelValue);
 				if (y == 0 && x == 0) {
 					bgrArray[2] = high(getAdjustment());
 				} else if (y == 0 && x == 1) {
@@ -798,6 +803,7 @@ public class RasterProcessor
 					bgrArray[2] = 0;
 				}
 				writablePNGRaster.setPixel(x, y, bgrArray);
+				// writablePNGRaster.setPixel(x, y, pngGrayArray);
 			}
 		}
 		/*
