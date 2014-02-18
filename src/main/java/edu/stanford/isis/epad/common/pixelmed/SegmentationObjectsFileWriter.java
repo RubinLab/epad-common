@@ -493,7 +493,7 @@ public class SegmentationObjectsFileWriter
 	 * @param type should be a value defined in future SegmentationPropertyTypes.
 	 * @throws DicomException
 	 */
-	public void AddOneSegment(String description, CodedConcept category, CodedConcept type) throws DicomException
+	public void addOneSegment(String description, CodedConcept category, CodedConcept type) throws DicomException
 	{
 		// Validate the parameters.
 		current_segment++;
@@ -611,7 +611,7 @@ public class SegmentationObjectsFileWriter
 	 * @throws DicomException
 	 * @throws IOException
 	 */
-	public void AddAllFrames(byte[] frames, int frame_num, int image_width, int image_height, String type,
+	public void addAllFrames(byte[] frames, int frame_num, int image_width, int image_height, String type,
 			short stack_id, double[][] positions) throws DicomException, IOException
 	{
 		// Validate the input data and parameter.
@@ -809,7 +809,7 @@ public class SegmentationObjectsFileWriter
 	 * @throws DicomException
 	 * @throws IOException
 	 */
-	public void SaveDicomFile(String file_name) throws IOException, DicomException
+	public void saveDicomFile(String file_name) throws IOException, DicomException
 	{
 		// Add object Segment Sequence.
 		list.put(TagFromName.SegmentSequence, segment_sequence);
@@ -1215,18 +1215,18 @@ public class SegmentationObjectsFileWriter
 			 * positions, short [] patient_orientation, double slice_thickness, double [] pixel_spacing, short stack_id)
 			 */
 			// Segment 1
-			obj.AddOneSegment("Segment No.1 is for ...", category, type);
-			obj.AddAllFrames(pixels, image_frames, image_width, image_height, "binary", (short)0, positions);
+			obj.addOneSegment("Segment No.1 is for ...", category, type);
+			obj.addAllFrames(pixels, image_frames, image_width, image_height, "binary", (short)0, positions);
 			short stack_id = 2;
 			positions[0][0] = 0.2;
-			obj.AddAllFrames(pixels, image_frames, image_width, image_height, "binary", stack_id, positions);
+			obj.addAllFrames(pixels, image_frames, image_width, image_height, "binary", stack_id, positions);
 			// Segment 2
 			// obj.AddOneSegment(null, null, null);
-			obj.AddOneSegment("Segment No.2 is for ...", category, type);
-			obj.AddAllFrames(pixels, image_frames, image_width, image_height, "binary", (short)1, positions);
-			obj.AddAllFrames(pixels, image_frames, image_width, image_height, "binary", stack_id, positions);
+			obj.addOneSegment("Segment No.2 is for ...", category, type);
+			obj.addAllFrames(pixels, image_frames, image_width, image_height, "binary", (short)1, positions);
+			obj.addAllFrames(pixels, image_frames, image_width, image_height, "binary", stack_id, positions);
 
-			obj.SaveDicomFile(output_file);
+			obj.saveDicomFile(output_file);
 
 		} catch (Exception e) {
 			System.err.println(e);
