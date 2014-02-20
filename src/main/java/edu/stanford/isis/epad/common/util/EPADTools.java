@@ -22,11 +22,11 @@ public class EPADTools
 	public static String wadoProxy = EPADConfig.getInstance().getStringPropertyValue("wadoProxy");
 	public static final String dicomServerPort = EPADConfig.getInstance().getStringPropertyValue("DicomServerPort");
 	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
-	public static final String username = EPADConfig.getInstance().getStringPropertyValue("username");
-	public static final String password = EPADConfig.getInstance().getStringPropertyValue("password");
+	public static final String eXistUsername = EPADConfig.getInstance().getStringPropertyValue("username");
+	public static final String eXistPassword = EPADConfig.getInstance().getStringPropertyValue("password");
 	public static final String collection = EPADConfig.getInstance().getStringPropertyValue("collection"); // "defaultcontainer";
 	public static final String aim3Namespace = EPADConfig.getInstance().getStringPropertyValue("namespace");
-	public static final String existURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
+	public static final String eXistURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
 	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");
 	public static final String seriesOrderURI = EPADConfig.getInstance().getStringPropertyValue("seriesOrderURI");
 
