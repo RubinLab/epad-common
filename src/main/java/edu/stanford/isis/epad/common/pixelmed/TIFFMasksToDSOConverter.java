@@ -51,7 +51,7 @@ public class TIFFMasksToDSOConverter
 			getAttributesFromDICOMFiles(dicomFiles);
 			getPixelsFromMaskFiles(maskFiles);
 		} catch (Exception e) {
-			throw (new DicomException("Error reading dicom files!"));
+			throw (new DicomException("Error reading dicom files: " + e.getMessage()));
 		}
 
 		SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(attributeList, orientation, spacing,
@@ -140,7 +140,8 @@ public class TIFFMasksToDSOConverter
 			DicomException
 	{
 		for (int i = 0; i < maskFileNames.size(); i++) {
-			BufferedImage maskImage = ImageIO.read(new File(maskFileNames.get(i)));
+			File maskFile = new File(maskFileNames.get(i));
+			BufferedImage maskImage = ImageIO.read(maskFile);
 			// BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(),
 			// BufferedImage.TYPE_BYTE_BINARY);
 			byte[] new_frame = ((DataBufferByte)maskImage.getRaster().getDataBuffer()).getData();
@@ -160,12 +161,17 @@ public class TIFFMasksToDSOConverter
 	 */
 	public static void main(String[] args)
 	{
-		String maskFilesDirectory = "./DicomFiles/Images/TIFF/";
-		String dicomFilesDirectory = "./DicomFiles/Images/PET/";
-		String outputFileName = "./TEMP/tiff.sobin";
+		String maskFilesDirectory = args[0];
+		String dicomFilesDirectory = args[1];
+		String outputFileName = args[2];
 
 		List<String> dicomFileNames = listFilesInAlphabeticOrder(dicomFilesDirectory);
 		List<String> maskFileNames = listFilesInAlphabeticOrder(maskFilesDirectory);
+
+		if (dicomFileNames.size() > maskFileNames.size())
+			dicomFileNames = dicomFileNames.subList(0, maskFileNames.size());
+		else if (maskFileNames.size() > dicomFileNames.size())
+			maskFileNames = maskFileNames.subList(0, dicomFileNames.size());
 
 		try {
 			TIFFMasksToDSOConverter converter = new TIFFMasksToDSOConverter();

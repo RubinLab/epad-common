@@ -15,10 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import edu.stanford.isis.epad.common.dicom.DicomFormatUtil;
-import edu.stanford.isis.epad.common.dicom.UIDType;
 import edu.stanford.isis.epad.common.plugins.EPadFiles;
 import edu.stanford.isis.epad.common.util.EPADLogger;
-import edu.stanford.isis.epad.common.util.FileKey;
 import edu.stanford.isis.epad.common.util.EPADResources;
 
 /**
@@ -172,27 +170,6 @@ public class EPadFilesImpl implements EPadFiles
 		return null;
 	}
 
-	@Override
-	public Map<UIDType, String> getCurrentSliceUIDs()
-	{
-		// ToDo: Will need a plugin handler which in addition for forwarding calls will
-		// also need to get the current slice. Maybe this isn't needed if it is
-		// included in the call.
-		return null; // To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	@Override
-	public File getBaseDir()
-	{
-		return new File("../");
-	}
-
-	@Override
-	public String getBaseDirPath()
-	{
-		return FileKey.getCanonicalPath(getBaseDir());
-	}
-
 	/**
 	 * Get the base directory.
 	 * 
@@ -220,5 +197,4 @@ public class EPadFilesImpl implements EPadFiles
 		}
 		return "";
 	}
-
 }

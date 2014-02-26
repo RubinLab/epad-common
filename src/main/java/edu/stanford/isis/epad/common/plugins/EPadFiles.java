@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import edu.stanford.isis.epad.common.dicom.UIDType;
-
 /**
  * This is the interface for getting files from the ePAD.
  */
@@ -115,26 +113,4 @@ public interface EPadFiles
 	 * @return File AIM xml file or null it name doesn't exist.
 	 */
 	public File getAimFile(String aimFileName);
-
-	/**
-	 * Return the UIDs for the currently selected slice on the client.
-	 * 
-	 * @return Map of UIdTypes to String
-	 */
-	public Map<UIDType, String> getCurrentSliceUIDs();
-
-	/**
-	 * Get the base directory as a File. The user should be able to get the full path by calling File.getCanonicalPath();
-	 * 
-	 * @return File
-	 */
-	public File getBaseDir();
-
-	/**
-	 * Get the base directory as String in canonical path form, instead of as a file.
-	 * 
-	 * @return String fully qualified canonical path.
-	 */
-	public String getBaseDirPath();
-
 }
