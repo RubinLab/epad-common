@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.gson.Gson;
+
 /**
  * Result returned from an ePAD series description query.
  * 
  * @author martin
  * @see DICOMSeriesOrderHandler
  */
-public class DICOMSeriesDescription
+public class EPADSeries
 {
-	public final List<DicomImageDescription> ResultSet; // TODO Move to lower case but sync with front end
-																																	// call first
+	public final List<EPADImage> ResultSet; // TODO Move to lower case but sync with front end first
 
-	public DICOMSeriesDescription(List<DicomImageDescription> resultSet)
+	public EPADSeries(List<EPADImage> resultSet)
 	{
 		this.ResultSet = Collections.unmodifiableList(resultSet);
 	}
@@ -28,7 +29,7 @@ public class DICOMSeriesDescription
 	public List<String> getImageUIDs()
 	{
 		List<String> result = new ArrayList<String>();
-		for (DicomImageDescription imageDescription : ResultSet) {
+		for (EPADImage imageDescription : ResultSet) {
 			result.add(imageDescription.getImageUID());
 		}
 		return result;
@@ -41,11 +42,19 @@ public class DICOMSeriesDescription
 	 */
 	public int getImageIndex(String imageUID)
 	{
-		for (DicomImageDescription imageDescription : ResultSet) {
+		for (EPADImage imageDescription : ResultSet) {
 			if (imageDescription.getImageUID().equals(imageUID)) {
 				return imageDescription.instanceNumber;
 			}
 		}
 		return -1;
 	}
+
+	public String toJSON()
+	{
+		Gson gson = new Gson();
+
+		return gson.toJson(this);
+	}
+
 }

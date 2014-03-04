@@ -1,19 +1,19 @@
 package edu.stanford.isis.epad.common.dicom;
 
 /**
- * Represents an image description in the result from an ePAD DICOM series description query.
+ * Represents an image in the result from aa query to the ePAD database.
  * 
  * @author martin
  * 
- * @see DICOMSeriesDescription
+ * @see EPADSeries
  */
-public class DicomImageDescription
+public class EPADImage
 {
 	public final String fileName;
 	public final int instanceNumber;
 	public final String sliceLocation, contentTime;
 
-	public DicomImageDescription(String fileName, int instanceNumber, String sliceLocation, String contentTime)
+	public EPADImage(String fileName, int instanceNumber, String sliceLocation, String contentTime)
 	{
 		this.fileName = fileName;
 		this.instanceNumber = instanceNumber;

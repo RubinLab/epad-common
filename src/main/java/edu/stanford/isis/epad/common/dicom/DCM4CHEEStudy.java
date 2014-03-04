@@ -1,11 +1,13 @@
 package edu.stanford.isis.epad.common.dicom;
 
+import com.google.gson.Gson;
+
 /**
- * Represents result returned by ePAD study search.
+ * Represents result returned by DCM4CHEE study search.
  * 
  * @author martin
  */
-public class DICOMStudySearchResult
+public class DCM4CHEEStudy
 {
 	public final String studyUID, patientName, patientID, examType, dateAcquired;
 	public int studyStatus, seriesCount;
@@ -13,7 +15,7 @@ public class DICOMStudySearchResult
 	public int imagesCount;
 	public String studyID, studyDescription, physicianName, birthdate, sex;
 
-	public DICOMStudySearchResult(String studyUID, String patientName, String patientID, String examType,
+	public DCM4CHEEStudy(String studyUID, String patientName, String patientID, String examType,
 			String dateAcquired, int studyStatus, int seriesCount, String firstSeriesUID, String firstSeriesDateAcquired,
 			String studyAccessionNumber, int imagesCount, String studyID, String studyDescription, String physicianName,
 			String birthdate, String sex)
@@ -34,5 +36,12 @@ public class DICOMStudySearchResult
 		this.physicianName = physicianName;
 		this.birthdate = birthdate;
 		this.sex = sex;
+	}
+
+	public String toJSON()
+	{
+		Gson gson = new Gson();
+
+		return gson.toJson(this);
 	}
 }
