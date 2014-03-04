@@ -69,4 +69,17 @@ public class DicomFileUtil
 		}
 		return newName;
 	}
+
+	public static String convertDicomFileNameToImageUID(String currFileName)
+	{
+		int lastDotIndex = currFileName.lastIndexOf('.');
+
+		String uidPart = currFileName;
+		if (lastDotIndex > 0) {
+			uidPart = currFileName.substring(0, lastDotIndex);
+		}
+		uidPart = uidPart.replaceAll("_", ".");
+		return uidPart;
+	}
+
 }

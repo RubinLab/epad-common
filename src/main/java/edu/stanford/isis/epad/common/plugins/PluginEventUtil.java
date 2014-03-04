@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.common.util;
+package edu.stanford.isis.epad.common.plugins;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.PostMethod;
+
+import edu.stanford.isis.epad.common.util.EPADLogger;
+import edu.stanford.isis.epad.common.util.EPADTools;
 
 public class PluginEventUtil
 {
