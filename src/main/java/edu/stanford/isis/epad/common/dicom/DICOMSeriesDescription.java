@@ -10,12 +10,12 @@ import java.util.List;
  * @author martin
  * @see DICOMSeriesOrderHandler
  */
-public class DICOMSeriesDescriptionSearchResult
+public class DICOMSeriesDescription
 {
-	public final List<DicomImageDescriptionSearchResult> ResultSet; // TODO Move to lower case but sync with front end
+	public final List<DicomImageDescription> ResultSet; // TODO Move to lower case but sync with front end
 																																	// call first
 
-	public DICOMSeriesDescriptionSearchResult(List<DicomImageDescriptionSearchResult> resultSet)
+	public DICOMSeriesDescription(List<DicomImageDescription> resultSet)
 	{
 		this.ResultSet = Collections.unmodifiableList(resultSet);
 	}
@@ -28,7 +28,7 @@ public class DICOMSeriesDescriptionSearchResult
 	public List<String> getImageUIDs()
 	{
 		List<String> result = new ArrayList<String>();
-		for (DicomImageDescriptionSearchResult imageDescription : ResultSet) {
+		for (DicomImageDescription imageDescription : ResultSet) {
 			result.add(imageDescription.getImageUID());
 		}
 		return result;
@@ -41,7 +41,7 @@ public class DICOMSeriesDescriptionSearchResult
 	 */
 	public int getImageIndex(String imageUID)
 	{
-		for (DicomImageDescriptionSearchResult imageDescription : ResultSet) {
+		for (DicomImageDescription imageDescription : ResultSet) {
 			if (imageDescription.getImageUID().equals(imageUID)) {
 				return imageDescription.instanceNumber;
 			}

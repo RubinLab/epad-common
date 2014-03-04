@@ -16,8 +16,6 @@ import org.dcm4che2.imageioimpl.plugins.dcm.DicomImageReaderSpi;
 import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
 
-// import java.io.FileInputStream;
-
 /**
  * Read a DICOM instance and generate a variety of other formats that can be used to create files.
  * 

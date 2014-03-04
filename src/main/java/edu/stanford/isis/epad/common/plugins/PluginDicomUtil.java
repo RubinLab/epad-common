@@ -12,7 +12,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 
 import com.google.gson.Gson;
 
-import edu.stanford.isis.epad.common.dicom.DICOMSeriesDescriptionSearchResult;
+import edu.stanford.isis.epad.common.dicom.DICOMSeriesDescription;
 import edu.stanford.isis.epad.common.dicom.DicomFileUtil;
 import edu.stanford.isis.epad.common.util.EPADLogger;
 import edu.stanford.isis.epad.common.util.EPADTools;
@@ -63,8 +63,8 @@ public class PluginDicomUtil
 		if (statusCode == HttpServletResponse.SC_OK) { // Get the result as stream
 			BufferedReader reader = new BufferedReader(new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8"));
 			Gson gson = new Gson();
-			DICOMSeriesDescriptionSearchResult dicomSeriesDescriptionSearchResult = gson.fromJson(reader,
-					DICOMSeriesDescriptionSearchResult.class);
+			DICOMSeriesDescription dicomSeriesDescriptionSearchResult = gson.fromJson(reader,
+					DICOMSeriesDescription.class);
 			return dicomSeriesDescriptionSearchResult.getImageUIDs();
 		} else {
 			log.warning("Error calling image search; statusCode=" + statusCode);
@@ -85,8 +85,8 @@ public class PluginDicomUtil
 		if (statusCode == HttpServletResponse.SC_OK) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8"));
 			Gson gson = new Gson();
-			DICOMSeriesDescriptionSearchResult dicomSeriesDescriptionSearchResult = gson.fromJson(reader,
-					DICOMSeriesDescriptionSearchResult.class);
+			DICOMSeriesDescription dicomSeriesDescriptionSearchResult = gson.fromJson(reader,
+					DICOMSeriesDescription.class);
 			positionOfImageInSeries = dicomSeriesDescriptionSearchResult.getImageIndex(imageUID);
 			if (positionOfImageInSeries > dicomSeriesDescriptionSearchResult.getNumberOfImagesInSeries())
 				positionOfImageInSeries = 1;
