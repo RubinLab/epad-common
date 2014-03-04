@@ -13,12 +13,44 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import com.google.gson.Gson;
 
 import edu.stanford.isis.epad.common.dicom.DICOMSeriesDescriptionSearchResult;
+import edu.stanford.isis.epad.common.dicom.DicomFileUtil;
 import edu.stanford.isis.epad.common.util.EPADLogger;
 import edu.stanford.isis.epad.common.util.EPADTools;
 
 public class PluginDicomUtil
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
+
+	public static String getDicomSeriesUIDFromImageUID(String imageUID)
+	{
+		// TODO Get from config file via EPADTools
+		String url = "http://localhost:8080/epad/segmentationpath/" + "?image_iuid=" + imageUID;
+		HttpClient client = new HttpClient();
+		GetMethod method = new GetMethod(url);
+
+		try {
+			int statusCode = client.executeMethod(method);
+
+			if (statusCode != -1) {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8"));
+				String line;
+				while ((line = reader.readLine()) != null) {
+					String[] cols = line.split(",");
+					if (cols != null && cols.length > 1) {
+						String seriesUD = cols[1];
+						if (!seriesUD.equals("SeriesUID")) {
+							return DicomFileUtil.convertDicomFileNameToImageUID(seriesUD);
+						}
+					}
+				}
+			}
+			log.warning("Could not find seriesUID for imageUID " + imageUID);
+			return "";
+		} catch (Exception e) {
+			log.warning("Error getting seriesUID for imageUID " + imageUID, e);
+			return "";
+		}
+	}
 
 	public static List<String> getDicomImageUIDsInSeries(String seriesUID, String sessionID) throws Exception
 	{

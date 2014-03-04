@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import edu.stanford.hakan.aim3api.base.AimException;
 import edu.stanford.hakan.aim3api.base.DICOMImageReference;
@@ -20,6 +21,7 @@ import edu.stanford.hakan.aim3api.base.TwoDimensionSpatialCoordinate;
 import edu.stanford.hakan.aim3api.base.User;
 import edu.stanford.hakan.aim3api.usage.AnnotationBuilder;
 import edu.stanford.hakan.aim3api.usage.AnnotationGetter;
+import edu.stanford.isis.epad.common.dicom.DicomTagFileUtils;
 import edu.stanford.isis.epad.common.util.EPADLogger;
 import edu.stanford.isis.epad.common.util.EPADResources;
 import edu.stanford.isis.epad.common.util.EPADTools;
@@ -27,6 +29,40 @@ import edu.stanford.isis.epad.common.util.EPADTools;
 public class PluginAIMUtil
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
+
+	public static ImageAnnotation generateDSOImageAnnotation(ImageAnnotation templateImageAnnotation,
+			Map<String, String> dicomHeaders) throws AimException
+	{
+		String username = PluginAIMUtil.getOwnerFromImageAnnotation(templateImageAnnotation);
+		Person person = PluginAIMUtil.getPersonFromImageAnnotation(templateImageAnnotation);
+		String sopClassUID = dicomHeaders.get(DicomTagFileUtils.SOP_CLASS_UID);
+		String dsoStudyInstanceUID = dicomHeaders.get(DicomTagFileUtils.STUDY_UID);
+		String dsoSeriesInstanceUID = dicomHeaders.get(DicomTagFileUtils.SERIES_UID);
+		String dsoSOPInstanceUID = dicomHeaders.get(DicomTagFileUtils.SOP_INST_UID);
+		String sourceSOPInstanceUID = dicomHeaders.get(DicomTagFileUtils.REFERENCED_SOP_INSTANCE_UID);
+		String sourceSeriesInstanceUID = PluginDicomUtil.getDicomSeriesUIDFromImageUID(sourceSOPInstanceUID);
+		String sourceStudyInstanceUID = dsoStudyInstanceUID; // Will be same study as DSO
+
+		// TODO Do header integrity checking here
+
+		ImageAnnotation dsoImageAnnotation = new ImageAnnotation(0, "", "2000-10-17T10:22:40", "segmentation", "SEG",
+				"SEG Only", "", "", "");
+
+		PluginAIMUtil.setImageAnnotationUser(dsoImageAnnotation, username);
+
+		PluginAIMUtil.addSegmentToImageAnnotation(sopClassUID, dsoSOPInstanceUID, dsoImageAnnotation);
+
+		PluginAIMUtil.addDICOMImageReferenceToImageAnnotation(dsoStudyInstanceUID, dsoSeriesInstanceUID, dsoSOPInstanceUID,
+				dsoImageAnnotation);
+		PluginAIMUtil.addDICOMImageReferenceToImageAnnotation(sourceStudyInstanceUID, sourceSeriesInstanceUID,
+				sourceSOPInstanceUID, dsoImageAnnotation);
+
+		dsoImageAnnotation.addPerson(person);
+
+		PluginAIMUtil.addPolylineToImageAnnotation(templateImageAnnotation);
+
+		return dsoImageAnnotation;
+	}
 
 	public static ImageAnnotation getImageAnnotationFromServer(String aimID) throws AimException
 	{
