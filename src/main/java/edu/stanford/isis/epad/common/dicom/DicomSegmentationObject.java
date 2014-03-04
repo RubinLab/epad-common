@@ -8,7 +8,7 @@ import com.pixelmed.display.SourceImage;
 import edu.stanford.isis.epad.common.util.EPADLogger;
 
 /**
- * Represents a DICOM segmentation objecyt
+ * Represents a DICOM segmentation object
  * 
  */
 public class DicomSegmentationObject

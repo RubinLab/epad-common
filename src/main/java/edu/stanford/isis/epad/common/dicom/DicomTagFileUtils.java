@@ -82,14 +82,14 @@ public class DicomTagFileUtils
 		if (directory.isDirectory()) {
 			Collection<File> dicomFiles = listDICOMFiles(directory);
 			for (File dicomFile : dicomFiles) {
-				generateDicomTagFile(dicomFile);
+				generateDICOMTagFile(dicomFile);
 			}
 		} else {
 			logger.warning("Path " + directory.getAbsolutePath() + " is not a directory");
 		}
 	}
 
-	public static File generateDicomTagFile(File dicomFile)
+	public static File generateDICOMTagFile(File dicomFile)
 	{
 		File tagFile = null;
 
@@ -99,8 +99,6 @@ public class DicomTagFileUtils
 		} else {
 			BufferedReader br = null;
 			FileWriter tagFileWriter = null;
-
-			logger.info("Generating DICOM tag file for file " + dicomFile.getAbsolutePath());
 
 			try {
 				String[] command = { "./dcm2txt", "-w", "120", dicomFile.getAbsolutePath() };
@@ -133,7 +131,7 @@ public class DicomTagFileUtils
 					tagFileWriter = new FileWriter(tagFile);
 					tagFileWriter.write(sb.toString());
 					tagFileWriter.flush();
-					logger.info("Generated tag file for DICOM file " + dicomFile.getAbsolutePath());
+					// logger.info("Generated tag file for DICOM file " + dicomFile.getAbsolutePath());
 				}
 			} catch (IOException e) {
 				logger.warning("Error generating tag file for DICOM file " + dicomFile.getAbsolutePath(), e);
@@ -225,7 +223,7 @@ public class DicomTagFileUtils
 	 * @return Map of String key and String values.
 	 * @throws IOException - when file not found for example.
 	 */
-	public static Map<String, String> readTagFile(File tagFile)
+	public static Map<String, String> readDICOMTagFile(File tagFile)
 	{
 		Map<String, String> tagMap = new HashMap<String, String>();
 

@@ -37,9 +37,9 @@ public class TIFFMasksToDSOConverter
 	private short imageWidth = 0, imageHeight = 0, imageFrames = 0;
 
 	/**
-	 * @param mask_files: Array of the TIFF files which save the masks.
-	 * @param dicom_files: Array of the original DICOM files.
-	 * @param output_file: Name of the output segmentation objects file.
+	 * @param maskFiles: Array of the TIFF files which save the masks.
+	 * @param dicomFiles: Array of the original DICOM files.
+	 * @param outputFile: Name of the output segmentation objects file.
 	 * @throws DicomException
 	 * @throws IOException
 	 */
