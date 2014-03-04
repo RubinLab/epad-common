@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.common.xnat;
+package edu.stanford.isis.epad.common.query;
 
 /**
  * A description of an XNAT project.
@@ -23,11 +23,11 @@ package edu.stanford.isis.epad.common.xnat;
  * 
  * @author martin
  */
-public class XNATProjectDescription
+public class XNATProject
 {
 	public final String secondaryID, piLastName, description, name, id, piFirstName, uri;
 
-	public XNATProjectDescription(String secondaryID, String piLastName, String description, String name, String id,
+	public XNATProject(String secondaryID, String piLastName, String description, String name, String id,
 			String piFirstName, String uri)
 	{
 		this.secondaryID = secondaryID;

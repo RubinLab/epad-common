@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.common.dicom;
+package edu.stanford.isis.epad.common.query;
 
 /**
  * Represents an image in the result from aa query to the ePAD database.

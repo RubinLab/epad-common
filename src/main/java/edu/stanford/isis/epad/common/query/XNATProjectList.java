@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.common.xnat;
+package edu.stanford.isis.epad.common.query;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,31 +26,31 @@ import java.util.List;
  * 
  * @author martin
  */
-public class XNATProjectsResult
+public class XNATProjectList
 {
 	public final XNATProjectResultSet ResultSet;
 
-	public XNATProjectsResult(List<XNATProjectDescription> Result)
+	public XNATProjectList(List<XNATProject> Result)
 	{
 		this.ResultSet = new XNATProjectResultSet(Result);
 	}
 
-	public XNATProjectsResult()
+	public XNATProjectList()
 	{
 		this.ResultSet = new XNATProjectResultSet();
 	}
 
-	public static XNATProjectsResult emptyProjects()
+	public static XNATProjectList emptyProjects()
 	{
-		return new XNATProjectsResult();
+		return new XNATProjectList();
 	}
 
 	public class XNATProjectResultSet
 	{
-		public final List<XNATProjectDescription> Result;
+		public final List<XNATProject> Result;
 		public final int totalRecords;
 
-		public XNATProjectResultSet(List<XNATProjectDescription> Result)
+		public XNATProjectResultSet(List<XNATProject> Result)
 		{
 			this.Result = Collections.unmodifiableList(Result);
 			this.totalRecords = Result.size();

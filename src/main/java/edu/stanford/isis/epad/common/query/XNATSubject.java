@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.common.xnat;
+package edu.stanford.isis.epad.common.query;
 
 /**
  * A description of an XNAT subject.
@@ -24,11 +24,11 @@ package edu.stanford.isis.epad.common.xnat;
  * 
  * @author martin
  */
-public class XNATSubjectDescription
+public class XNATSubject
 {
 	public final String project, insert_user, id, insert_date, label, uri, src;
 
-	public XNATSubjectDescription(String project, String insert_user, String id, String insert_date, String label,
+	public XNATSubject(String project, String insert_user, String id, String insert_date, String label,
 			String uri, String src)
 	{
 		this.project = project;

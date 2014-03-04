@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.common.dicom;
+package edu.stanford.isis.epad.common.query;
 
 import java.util.ArrayList;
 import java.util.Collections;

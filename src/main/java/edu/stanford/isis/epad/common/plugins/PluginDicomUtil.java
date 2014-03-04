@@ -12,8 +12,8 @@ import org.apache.commons.httpclient.methods.GetMethod;
 
 import com.google.gson.Gson;
 
-import edu.stanford.isis.epad.common.dicom.EPADSeries;
 import edu.stanford.isis.epad.common.dicom.DicomFileUtil;
+import edu.stanford.isis.epad.common.query.EPADSeries;
 import edu.stanford.isis.epad.common.util.EPADLogger;
 import edu.stanford.isis.epad.common.util.EPADTools;
 

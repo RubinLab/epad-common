@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.common.dicom;
+package edu.stanford.isis.epad.common.query;
 
 import com.google.gson.Gson;
 

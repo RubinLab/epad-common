@@ -1,4 +1,4 @@
-package edu.stanford.isis.epad.common.xnat;
+package edu.stanford.isis.epad.common.query;
 
 /**
  * A description of an XNAT experiment.
@@ -24,11 +24,11 @@ package edu.stanford.isis.epad.common.xnat;
  * 
  * @author martin
  */
-public class XNATExperimentDescription
+public class XNATExperiment
 {
 	public final String project, xsiType, id, insert_date, label, date, uri;
 
-	public XNATExperimentDescription(String project, String xsiType, String id, String insert_date, String label,
+	public XNATExperiment(String project, String xsiType, String id, String insert_date, String label,
 			String date, String uri)
 	{
 		this.project = project;
