@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.gson.Gson;
 
 /**
- * A result from XNAT listing a set of subjects.
+ * A result from XNAT listing a set of subjects. This is the default structure returned from an XNAT subject query.
  * <p>
  * Example query:
  * <p>

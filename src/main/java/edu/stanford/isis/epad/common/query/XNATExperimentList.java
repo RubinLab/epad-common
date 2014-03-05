@@ -6,7 +6,8 @@ import java.util.List;
 import com.google.gson.Gson;
 
 /**
- * A result from XNAT listing a set of experiments.
+ * A result from XNAT listing a set of experiments. This is the default structure returned from an XNAT experiments
+ * query.
  * <p>
  * <code>curl -b JSESSIONID=[session_key] -X GET "http:[host:port]/epad/projects/[project_id]/subjects/[subject_id]/experiments"</code>
  * <p>

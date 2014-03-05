@@ -5,6 +5,12 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
+/**
+ * 
+ * 
+ * 
+ * @author martin
+ */
 public class DCM4CHEESeriesList
 {
 	public final DCM4CHEESeriesResultSet ResultSet; // TODO Move to lower case but sync with front end call first
