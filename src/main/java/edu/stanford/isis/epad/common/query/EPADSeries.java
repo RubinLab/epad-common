@@ -9,13 +9,17 @@ import com.google.gson.Gson;
  */
 public class EPADSeries
 {
-	public final String id, insertDate, seriesDate;
+	public final String seriesID, seriesDate, examType;
+	public final int numberOfImages;
+	public final int numberOfAnnotations;
 
-	public EPADSeries(String id, String seriesDate, String insertDate)
+	public EPADSeries(String seriesID, String seriesDate, String examType, int numberOfImages, int numberOfAnnotations)
 	{
-		this.id = id;
+		this.seriesID = seriesID;
 		this.seriesDate = seriesDate;
-		this.insertDate = insertDate;
+		this.examType = examType;
+		this.numberOfImages = numberOfImages;
+		this.numberOfAnnotations = numberOfAnnotations;
 	}
 
 	public String toJSON()

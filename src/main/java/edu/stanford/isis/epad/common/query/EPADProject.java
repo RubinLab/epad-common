@@ -9,16 +9,22 @@ import com.google.gson.Gson;
  */
 public class EPADProject
 {
-	public final String name, id, description, uri;
-	public final EPADSubjectList subjects;
+	public final String secondaryID, piLastName, description, name, id, piFirstName, uri;
+	public final int numberOfSubjects;
+	public final int numberOfAnnotations;
 
-	public EPADProject(String name, String id, String description, String uri)
+	public EPADProject(String secondaryID, String piLastName, String description, String name, String id,
+			String piFirstName, String uri, int numberOfSubjects, int numberOfAnnotations)
 	{
+		this.secondaryID = secondaryID;
+		this.piLastName = piLastName;
 		this.description = description;
 		this.name = name;
 		this.id = id;
+		this.piFirstName = piFirstName;
 		this.uri = uri;
-		this.subjects = new EPADSubjectList();
+		this.numberOfSubjects = numberOfSubjects;
+		this.numberOfAnnotations = numberOfAnnotations;
 	}
 
 	public String toJSON()

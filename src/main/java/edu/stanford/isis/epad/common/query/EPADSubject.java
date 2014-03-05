@@ -8,16 +8,24 @@ import com.google.gson.Gson;
  */
 public class EPADSubject
 {
-	public final String projectID, name, id, uri;
-	public final EPADStudyList studies;
+	public final String project, insert_user, id, insert_date, label, uri, src;
+	public final int numberOfStudies;
+	public final int numberOfAnnotations;
 
-	public EPADSubject(String projectID, String name, String id, String uri)
+	// Set<String> examTypes;
+
+	public EPADSubject(String project, String insert_user, String id, String insert_date, String label, String uri,
+			String src, int numberOfStudies, int numberOfAnnotations)
 	{
-		this.projectID = projectID;
-		this.name = name;
+		this.project = project;
+		this.insert_user = insert_user;
 		this.id = id;
+		this.insert_date = insert_date;
+		this.label = label;
 		this.uri = uri;
-		this.studies = new EPADStudyList();
+		this.src = src;
+		this.numberOfStudies = numberOfStudies;
+		this.numberOfAnnotations = numberOfAnnotations;
 	}
 
 	public String toJSON()
