@@ -1,5 +1,7 @@
 package edu.stanford.isis.epad.common.query;
 
+import com.google.gson.Gson;
+
 /**
  * A description of an XNAT subject.
  * <p>
@@ -28,8 +30,8 @@ public class XNATSubject
 {
 	public final String project, insert_user, id, insert_date, label, uri, src;
 
-	public XNATSubject(String project, String insert_user, String id, String insert_date, String label,
-			String uri, String src)
+	public XNATSubject(String project, String insert_user, String id, String insert_date, String label, String uri,
+			String src)
 	{
 		this.project = project;
 		this.insert_user = insert_user;
@@ -38,5 +40,12 @@ public class XNATSubject
 		this.label = label;
 		this.uri = uri;
 		this.src = src;
+	}
+
+	public String toJSON()
+	{
+		Gson gson = new Gson();
+
+		return gson.toJson(this);
 	}
 }

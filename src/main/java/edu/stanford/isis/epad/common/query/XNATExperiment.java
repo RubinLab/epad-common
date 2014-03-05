@@ -1,5 +1,7 @@
 package edu.stanford.isis.epad.common.query;
 
+import com.google.gson.Gson;
+
 /**
  * A description of an XNAT experiment.
  * <p>
@@ -28,8 +30,8 @@ public class XNATExperiment
 {
 	public final String project, xsiType, id, insert_date, label, date, uri;
 
-	public XNATExperiment(String project, String xsiType, String id, String insert_date, String label,
-			String date, String uri)
+	public XNATExperiment(String project, String xsiType, String id, String insert_date, String label, String date,
+			String uri)
 	{
 		this.project = project;
 		this.xsiType = xsiType;
@@ -38,5 +40,12 @@ public class XNATExperiment
 		this.label = label;
 		this.date = date;
 		this.uri = uri;
+	}
+
+	public String toJSON()
+	{
+		Gson gson = new Gson();
+
+		return gson.toJson(this);
 	}
 }

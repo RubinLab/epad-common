@@ -1,5 +1,7 @@
 package edu.stanford.isis.epad.common.query;
 
+import com.google.gson.Gson;
+
 /**
  * Represents an image in the result from aa query to the ePAD database.
  * 
@@ -31,5 +33,12 @@ public class EPADImage
 		}
 		uidPart = uidPart.replaceAll("_", ".");
 		return uidPart;
+	}
+
+	public String toJSON()
+	{
+		Gson gson = new Gson();
+
+		return gson.toJson(this);
 	}
 }

@@ -1,7 +1,9 @@
 package edu.stanford.isis.epad.common.query;
 
+import com.google.gson.Gson;
+
 /**
- * A description of an XNAT project.
+ * A description of an XNAT project. This is the default structure returned from an XNAT project query.
  * <p>
  * Example query:
  * <p>
@@ -37,5 +39,12 @@ public class XNATProject
 		this.id = id;
 		this.piFirstName = piFirstName;
 		this.uri = uri;
+	}
+
+	public String toJSON()
+	{
+		Gson gson = new Gson();
+
+		return gson.toJson(this);
 	}
 }

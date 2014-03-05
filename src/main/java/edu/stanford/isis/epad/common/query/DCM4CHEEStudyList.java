@@ -1,6 +1,5 @@
 package edu.stanford.isis.epad.common.query;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,26 +12,44 @@ import com.google.gson.Gson;
  */
 public class DCM4CHEEStudyList
 {
-	public final List<DCM4CHEEStudy> ResultSet; // TODO Move to lower case but sync with front end call first
+	public final DCM4CHEEStudyResultSet ResultSet; // TODO Move to lower case but sync with front end call first
 
 	public DCM4CHEEStudyList()
 	{
-		this.ResultSet = new ArrayList<DCM4CHEEStudy>();
+		this.ResultSet = new DCM4CHEEStudyResultSet();
 	}
 
-	public DCM4CHEEStudyList(List<DCM4CHEEStudy> resultSet)
+	public DCM4CHEEStudyList(List<DCM4CHEEStudy> Result)
 	{
-		this.ResultSet = Collections.unmodifiableList(resultSet);
+		this.ResultSet = new DCM4CHEEStudyResultSet(Result);
 	}
 
 	public void addDICOMStudyDescription(DCM4CHEEStudy dicomStudyDescription)
 	{
-		ResultSet.add(dicomStudyDescription);
+		ResultSet.Result.add(dicomStudyDescription);
 	}
 
 	public int getNumberOfStudies()
 	{
-		return this.ResultSet.size();
+		return this.ResultSet.totalRecords;
+	}
+
+	public class DCM4CHEEStudyResultSet
+	{
+		public final List<DCM4CHEEStudy> Result;
+		public final int totalRecords;
+
+		public DCM4CHEEStudyResultSet(List<DCM4CHEEStudy> Result)
+		{
+			this.Result = Collections.unmodifiableList(Result);
+			this.totalRecords = Result.size();
+		}
+
+		public DCM4CHEEStudyResultSet()
+		{
+			this.Result = Collections.emptyList();
+			this.totalRecords = 0;
+		}
 	}
 
 	public String toJSON()

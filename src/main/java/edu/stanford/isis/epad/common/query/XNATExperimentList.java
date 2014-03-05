@@ -3,6 +3,8 @@ package edu.stanford.isis.epad.common.query;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.gson.Gson;
+
 /**
  * A result from XNAT listing a set of experiments.
  * <p>
@@ -60,5 +62,12 @@ public class XNATExperimentList
 			this.Result = Collections.emptyList();
 			this.totalRecords = 0;
 		}
+	}
+
+	public String toJSON()
+	{
+		Gson gson = new Gson();
+
+		return gson.toJson(this);
 	}
 }

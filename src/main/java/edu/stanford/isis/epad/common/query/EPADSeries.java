@@ -14,25 +14,43 @@ import com.google.gson.Gson;
  */
 public class EPADSeries
 {
-	public final List<EPADImage> ResultSet; // TODO Move to lower case but sync with front end first
+	public final EPADSeriesResultSet ResultSet; // TODO Move to lower case but sync with front end first
 
-	public EPADSeries(List<EPADImage> resultSet)
+	public EPADSeries(List<EPADImage> Result)
 	{
-		this.ResultSet = Collections.unmodifiableList(resultSet);
+		this.ResultSet = new EPADSeriesResultSet(Result);
 	}
 
 	public int getNumberOfImagesInSeries()
 	{
-		return this.ResultSet.size();
+		return this.ResultSet.Result.size();
 	}
 
 	public List<String> getImageUIDs()
 	{
 		List<String> result = new ArrayList<String>();
-		for (EPADImage imageDescription : ResultSet) {
+		for (EPADImage imageDescription : ResultSet.Result) {
 			result.add(imageDescription.getImageUID());
 		}
 		return result;
+	}
+
+	public class EPADSeriesResultSet
+	{
+		public final List<EPADImage> Result;
+		public final int totalRecords;
+
+		public EPADSeriesResultSet(List<EPADImage> Result)
+		{
+			this.Result = Collections.unmodifiableList(Result);
+			this.totalRecords = Result.size();
+		}
+
+		public EPADSeriesResultSet()
+		{
+			this.Result = Collections.emptyList();
+			this.totalRecords = 0;
+		}
 	}
 
 	/**
@@ -42,9 +60,9 @@ public class EPADSeries
 	 */
 	public int getImageIndex(String imageUID)
 	{
-		for (EPADImage imageDescription : ResultSet) {
-			if (imageDescription.getImageUID().equals(imageUID)) {
-				return imageDescription.instanceNumber;
+		for (EPADImage epadImage : ResultSet.Result) {
+			if (epadImage.getImageUID().equals(imageUID)) {
+				return epadImage.instanceNumber;
 			}
 		}
 		return -1;
@@ -56,5 +74,4 @@ public class EPADSeries
 
 		return gson.toJson(this);
 	}
-
 }
