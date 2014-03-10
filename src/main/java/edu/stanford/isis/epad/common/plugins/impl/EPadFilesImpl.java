@@ -12,7 +12,6 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import edu.stanford.isis.epad.common.dicom.DicomFormatUtil;
 import edu.stanford.isis.epad.common.plugins.EPadFiles;
@@ -53,12 +52,6 @@ public class EPadFilesImpl implements EPadFiles
 	}
 
 	@Override
-	public Map<String, String> getStudyInfo(String s)
-	{
-		throw new UnsupportedOperationException("not implemented yet.");
-	}
-
-	@Override
 	public boolean hasSeries(String parentStudyUID, String series)
 	{
 		List<String> allSeries = getSeries(parentStudyUID);
@@ -79,12 +72,6 @@ public class EPadFilesImpl implements EPadFiles
 			}
 		}
 		return retVal;
-	}
-
-	@Override
-	public Map<String, String> getSeriesInfo(String s)
-	{
-		throw new UnsupportedOperationException("not implemented yet.");
 	}
 
 	@Override

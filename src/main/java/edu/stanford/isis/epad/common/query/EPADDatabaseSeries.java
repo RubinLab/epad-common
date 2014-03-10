@@ -48,7 +48,7 @@ public class EPADDatabaseSeries
 
 		public EPADDatabaseSeriesResultSet()
 		{
-			this.Result = Collections.emptyList();
+			this.Result = new ArrayList<EPADDatabaseImage>();
 			this.totalRecords = 0;
 		}
 	}

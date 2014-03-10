@@ -2,7 +2,6 @@ package edu.stanford.isis.epad.common.plugins;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This is the interface for getting files from the ePAD.
@@ -25,14 +24,6 @@ public interface EPadFiles
 	public List<String> getStudies();
 
 	/**
-	 * Get the study info as a map of key value pairs.
-	 * 
-	 * @param studyUID String studyUID in the format 1.23.456
-	 * @return Map of String (keys) to String (values)
-	 */
-	public Map<String, String> getStudyInfo(String studyUID);
-
-	/**
 	 * Does the DicomProxy have this series?
 	 * 
 	 * @param parentStudyUID study
@@ -48,14 +39,6 @@ public interface EPadFiles
 	 * @return List of Strings
 	 */
 	public List<String> getSeries(String parentStudyUID);
-
-	/**
-	 * Get the series info as a map of key value pairs.
-	 * 
-	 * @param seriesUID String seriesID in the format 1.23.456
-	 * @return Map of String (keys) to String (values)
-	 */
-	public Map<String, String> getSeriesInfo(String seriesUID);
 
 	/**
 	 * Get the number of files

@@ -1,5 +1,6 @@
 package edu.stanford.isis.epad.common.query;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class DCM4CHEEStudyList
 
 		public DCM4CHEEStudyResultSet()
 		{
-			this.Result = Collections.emptyList();
+			this.Result = new ArrayList<DCM4CHEEStudy>();
 			this.totalRecords = 0;
 		}
 	}

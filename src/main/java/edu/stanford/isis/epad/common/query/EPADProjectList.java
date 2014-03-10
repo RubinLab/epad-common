@@ -1,5 +1,6 @@
 package edu.stanford.isis.epad.common.query;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class EPADProjectList
 
 		public EPADProjectResultSet()
 		{
-			this.Result = Collections.emptyList();
+			this.Result = new ArrayList<EPADProject>();
 			this.totalRecords = 0;
 		}
 	}

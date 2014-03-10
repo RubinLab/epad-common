@@ -24,6 +24,17 @@ public class EPADTools
 	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
 	public static final String eXistUsername = EPADConfig.getInstance().getStringPropertyValue("username");
 	public static final String eXistPassword = EPADConfig.getInstance().getStringPropertyValue("password");
+	public static final String epadDatabaseUsername = EPADConfig.getInstance().getStringPropertyValue(
+			"epadDatabaseUsername");
+	public static final String epadDatabasePassword = EPADConfig.getInstance().getStringPropertyValue(
+			"epadDatabasePassword");
+	public static final String epadDatabaseURL = EPADConfig.getInstance().getStringPropertyValue("epadDatabaseURL");
+	public static final String dcm4CheeDatabaseUsername = EPADConfig.getInstance().getStringPropertyValue(
+			"dcm4CheeDatabaseUsername");
+	public static final String dcm4CheeDatabasePassword = EPADConfig.getInstance().getStringPropertyValue(
+			"dcm4CheeDatabasePassword");
+	public static final String dcm4CheeDatabaseURL = EPADConfig.getInstance().getStringPropertyValue(
+			"dcm4CheeDatabaseURL");
 	public static final String collection = EPADConfig.getInstance().getStringPropertyValue("collection"); // "defaultcontainer";
 	public static final String aim3Namespace = EPADConfig.getInstance().getStringPropertyValue("namespace");
 	public static final String eXistURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
