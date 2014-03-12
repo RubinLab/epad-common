@@ -16,36 +16,6 @@ import java.util.Set;
 
 /**
  * Read the "etc/proxy-config.properties" file on start-up and provides method to look up values.
- * <ul>
- * <li>
- * ePadClientPort - port number on which Jetty server is listening.</li>
- * <li>
- * ListenIP - IP address or domain name where DICOM server will be listening as a C-STORE SCP.</li>
- * <li>
- * ListenPort - Port number where DICOM server will be listening as a C-STORE SCP.</li>
- * <li>
- * ListenAETitle - This value is not present in the file, but would represent the application entity title for the DICOM
- * server that will be listening as a C-STORE SCP. It will be necessary to set up an application entity title to allow
- * the process to accept DICOM instances.</li>
- * <li>
- * DicomServerAETitle - Application entity title for DICOM server from which DicomProxy will retrieve information and
- * instances.</li>
- * <li>
- * DicomServerIP - IP address or domain name for DICOM server from which DicomProxy will retrieve information and
- * instances.</li>
- * <li>
- * DicomServerPort - Port number for DICOM server from which ePAD will retrieve information and instances.</li>
- * <li>
- * DicomServerWadoPort</li>
- * <li>
- * WadoUrlExtension</li>
- * <li>
- * MaxImagesInSeries</li>
- * <li>
- * LoggerDebugOn</li>
- * </ul>
- * 
- * @author amsnyder
  */
 public class EPADConfig
 {

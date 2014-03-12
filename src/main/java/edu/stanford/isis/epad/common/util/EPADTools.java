@@ -57,11 +57,11 @@ public class EPADTools
 	public static int downloadDICOMFileFromWADO(File temp, String studyID, String seriesID, String imageID)
 			throws IOException
 	{
-		String host = config.getStringPropertyValue("NameServer");
-		int port = config.getIntegerPropertyValue("DicomServerWadoPort");
-		String base = config.getStringPropertyValue("WadoUrlExtension");
+		String wadoHost = config.getStringPropertyValue("NameServer");
+		int wadoPort = config.getIntegerPropertyValue("DicomServerWadoPort");
+		String wadoBaseURL = config.getStringPropertyValue("WadoUrlExtension");
 
-		WadoUrlBuilder wadoUrlBuilder = new WadoUrlBuilder(host, port, base, WadoUrlBuilder.ContentType.FILE);
+		WadoUrlBuilder wadoUrlBuilder = new WadoUrlBuilder(wadoHost, wadoPort, wadoBaseURL, WadoUrlBuilder.ContentType.FILE);
 
 		wadoUrlBuilder.setStudyUID(studyID);
 		wadoUrlBuilder.setSeriesUID(seriesID);
