@@ -28,6 +28,12 @@
       <version>${aim3api.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>edu.stanford.epad</groupId>
+      <artifactId>epad-dto</artifactId>
+      <version>${project.version}</version> 
+    </dependency>
+
     <!-- Start of DCM4CHEE dependencies -->
 
     <dependency>
