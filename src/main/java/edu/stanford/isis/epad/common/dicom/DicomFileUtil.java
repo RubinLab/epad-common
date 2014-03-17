@@ -56,16 +56,16 @@ public class DicomFileUtil
 	/**
 	 * Add DICOM extension to file.
 	 * 
-	 * @param f File
+	 * @param file File
 	 * @return File
 	 */
-	public static File addDcmExtensionToFile(File f)
+	public static File addDcmExtensionToFile(File file)
 	{
-		File newName = new File(f.getAbsolutePath() + ".dcm");
+		File newName = new File(file.getAbsolutePath() + ".dcm");
 		try {
-			EPADFileUtils.checkAndMoveFile(f, newName);
+			EPADFileUtils.checkAndMoveFile(file, newName);
 		} catch (IOException ioe) {
-			log.warning("Failed to rename file: " + f.getAbsolutePath(), ioe);
+			log.warning("Failed to rename file: " + file.getAbsolutePath(), ioe);
 		}
 		return newName;
 	}

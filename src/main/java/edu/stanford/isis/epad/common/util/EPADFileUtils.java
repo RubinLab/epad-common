@@ -89,7 +89,6 @@ public class EPADFileUtils
 	 */
 	public static String read(File file) throws IOException
 	{
-
 		FileInputStream fstream = new FileInputStream(file);
 		DataInputStream in = new DataInputStream(fstream);
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));

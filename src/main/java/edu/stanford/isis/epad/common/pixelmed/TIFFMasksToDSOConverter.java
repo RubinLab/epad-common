@@ -103,7 +103,14 @@ public class TIFFMasksToDSOConverter
 
 		// Get common attributes from the first input file.
 		dicomInputFile = dicomFilenames.get(0);
-		dicomInputStream = new DicomInputStream(new FileInputStream(dicomInputFile));
+		try {
+			dicomInputStream = new DicomInputStream(new FileInputStream(dicomInputFile));
+		} finally {
+			if (dicomInputStream != null) {
+				dicomInputStream.close();
+				dicomInputStream = null;
+			}
+		}
 		localAttributeList.read(dicomInputStream);
 		this.attributeList = (AttributeList)localAttributeList.clone();
 
@@ -123,7 +130,7 @@ public class TIFFMasksToDSOConverter
 		}
 
 		// Get position of each frame.
-		{ // Get sequence format.
+		try { // Get sequence format.
 			positions = new double[imageFrames][3];
 			for (int i = 0; i < dicomFilenames.size(); i++) {
 				dicomInputFile = dicomFilenames.get(i);
@@ -133,6 +140,9 @@ public class TIFFMasksToDSOConverter
 				Attribute attribute = localAttributeList.get(TagFromName.ImagePositionPatient);
 				this.positions[i] = attribute.getDoubleValues();
 			}
+		} finally {
+			if (dicomInputStream != null)
+				dicomInputStream.close();
 		}
 	}
 

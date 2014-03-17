@@ -19,16 +19,18 @@ public class PixelMedUtils
 	{
 	}
 
-	private static DicomInputStream getDicomInputStream(String dicomFilePath) throws IOException
-	{
-		return new DicomInputStream(new FileInputStream(dicomFilePath));
-	}
-
 	public static AttributeList readAttributeListFromDicomFile(String dicomFilePath) throws IOException, DicomException
 	{
-		DicomInputStream dis = getDicomInputStream(dicomFilePath);
+		DicomInputStream dis = null;
 		AttributeList attributeList = new AttributeList();
-		attributeList.read(dis);
+
+		try {
+			dis = new DicomInputStream(new FileInputStream(dicomFilePath));
+			attributeList.read(dis);
+		} finally {
+			if (dis != null)
+				dis.close();
+		}
 		return attributeList;
 	}
 

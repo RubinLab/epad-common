@@ -870,9 +870,14 @@ public class SegmentationObjectsFileWriter
 	 */
 	private void save_pixeldata_to_temp_file(byte[] pixels, String pixel_file, boolean append) throws IOException
 	{
-		OutputStream temp = new FileOutputStream(pixel_file, append);
-		temp.write(pixels);
-		temp.close();
+		OutputStream outputStream = null;
+
+		try {
+			outputStream = new FileOutputStream(pixel_file, append);
+			outputStream.write(pixels);
+		} finally {
+			outputStream.close();
+		}
 	}
 
 	/**
@@ -884,33 +889,53 @@ public class SegmentationObjectsFileWriter
 	 * @throws IOException
 	 * @throws DicomException
 	 */
-	private void append_pixeldata_attribute(String pixel_file, String output_file) throws FileNotFoundException,
+	private void append_pixeldata_attribute(String pixel_file_name, String output_file) throws FileNotFoundException,
 			IOException, DicomException
 	{
-		String tmp_tag_file = "TAG_" + pixel_file; // File with tag.
+		String tmp_tag_file_name = "TAG_" + pixel_file_name; // File with tag.
 
 		{ // Copy raw pixel data to a tagged file.
-			File i = new File(pixel_file);
-			DicomOutputStream o = new DicomOutputStream(new FileOutputStream(tmp_tag_file),
-					TransferSyntax.ExplicitVRLittleEndian, TransferSyntax.ExplicitVRLittleEndian);
-			OtherByteAttributeOnDisk data = new OtherByteAttributeOnDisk(TagFromName.PixelData, i.length(),
-					new DicomInputStream(i, TransferSyntax.ExplicitVRLittleEndian, false), 0);
-			data.write(o);
-			o.close();
-			i.delete(); // Delete the temporary raw data file.
+			File pixelFile = new File(pixel_file_name);
+			DicomOutputStream dicomOutputStream = null;
+			DicomInputStream dicomInputStream = null;
+			OutputStream tagOutputStream = null;
+
+			try {
+				tagOutputStream = new FileOutputStream(tmp_tag_file_name);
+				dicomOutputStream = new DicomOutputStream(tagOutputStream, TransferSyntax.ExplicitVRLittleEndian,
+						TransferSyntax.ExplicitVRLittleEndian);
+				dicomInputStream = new DicomInputStream(pixelFile, TransferSyntax.ExplicitVRLittleEndian, false);
+				OtherByteAttributeOnDisk data = new OtherByteAttributeOnDisk(TagFromName.PixelData, pixelFile.length(),
+						dicomInputStream, 0);
+				data.write(dicomOutputStream);
+			} finally {
+				if (tagOutputStream != null)
+					dicomOutputStream.close();
+				if (dicomInputStream != null)
+					dicomOutputStream.close();
+				if (dicomOutputStream != null)
+					dicomOutputStream.close();
+				pixelFile.delete(); // Delete the temporary raw data file.
+			}
 		}
 
 		{ // Append the tagged file to the output.
-			File i = new File(tmp_tag_file);
-			DataInputStream pixels = new DataInputStream((new FileInputStream(i)));
-			FileOutputStream o = new FileOutputStream(output_file, true);
-			// Skip the 132-byte DICOM header.
-			CopyStream.skipInsistently(pixels, 132);
-			CopyStream.copy(pixels, o);
-
-			o.close();
-			pixels.close();
-			i.delete(); // Delete the temporary file.
+			File tagFile = new File(tmp_tag_file_name);
+			DataInputStream dicomInputStream = null;
+			FileOutputStream dicomOutputStream = null;
+			try {
+				dicomInputStream = new DataInputStream((new FileInputStream(tagFile)));
+				dicomOutputStream = new FileOutputStream(output_file, true);
+				// Skip the 132-byte DICOM header.
+				CopyStream.skipInsistently(dicomInputStream, 132);
+				CopyStream.copy(dicomInputStream, dicomOutputStream);
+			} finally {
+				if (dicomOutputStream != null)
+					dicomOutputStream.close();
+				if (dicomInputStream != null)
+					dicomInputStream.close();
+				tagFile.delete(); // Delete the temporary file.
+			}
 		}
 	}
 

@@ -258,7 +258,6 @@ public class DicomTagFileUtils
 				logger.warning("Error closing streams for tag file " + tagFile.getAbsolutePath(), e);
 			}
 		}
-
 		return tagMap;
 	}
 

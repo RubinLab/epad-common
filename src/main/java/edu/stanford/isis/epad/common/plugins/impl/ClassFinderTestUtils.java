@@ -32,7 +32,6 @@ public class ClassFinderTestUtils
 	 */
 	public static String readJarManifestForClass(Class<?> clazz)
 	{
-
 		StringBuilder sb = new StringBuilder();
 		try {
 
@@ -60,7 +59,6 @@ public class ClassFinderTestUtils
 		} catch (Exception e) {
 			logger.warning("Failed to read manifest for " + clazz.getSimpleName(), e);
 		}
-
 		return sb.toString();
 
 	}
