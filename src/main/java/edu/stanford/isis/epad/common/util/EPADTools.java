@@ -68,7 +68,7 @@ public class EPADTools
 
 		String wadoUrl = wadoUrlBuilder.build();
 
-		logger.info("WADO query: " + wadoUrl);
+		// logger.info("WADO query: " + wadoUrl);
 
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(wadoUrl);
