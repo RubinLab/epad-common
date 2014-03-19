@@ -54,20 +54,21 @@ public class EPADTools
 		return downloadDICOMFileFromWADO(file, studyIDKey, seriesIDKey, imageIDKey);
 	}
 
-	public static int downloadDICOMFileFromWADO(File temp, String studyID, String seriesID, String imageID)
+	public static int downloadDICOMFileFromWADO(File dicomFile, String studyUID, String seriesUID, String imageUID)
 			throws IOException
 	{
 		String wadoHost = config.getStringPropertyValue("NameServer");
 		int wadoPort = config.getIntegerPropertyValue("DicomServerWadoPort");
 		String wadoBaseURL = config.getStringPropertyValue("WadoUrlExtension");
-
 		WadoUrlBuilder wadoUrlBuilder = new WadoUrlBuilder(wadoHost, wadoPort, wadoBaseURL, WadoUrlBuilder.ContentType.FILE);
 
-		wadoUrlBuilder.setStudyUID(studyID);
-		wadoUrlBuilder.setSeriesUID(seriesID);
-		wadoUrlBuilder.setObjectUID(imageID);
+		wadoUrlBuilder.setStudyUID(studyUID);
+		wadoUrlBuilder.setSeriesUID(seriesUID);
+		wadoUrlBuilder.setObjectUID(imageUID);
 
 		String wadoUrl = wadoUrlBuilder.build();
+
+		logger.info("WADO query: " + wadoUrl);
 
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(wadoUrl);
@@ -78,15 +79,13 @@ public class EPADTools
 			OutputStream outputStream = null;
 			try {
 				wadoResponseStream = method.getResponseBodyAsStream();
-				outputStream = new FileOutputStream(temp);
+				outputStream = new FileOutputStream(dicomFile);
 				int read = 0;
 				byte[] bytes = new byte[4096];
 				while ((read = wadoResponseStream.read(bytes)) != -1) {
 					outputStream.write(bytes, 0, read);
 				}
 			} finally {
-				if (wadoResponseStream != null)
-					wadoResponseStream.close();
 				if (outputStream != null) {
 					outputStream.flush();
 					outputStream.close();
