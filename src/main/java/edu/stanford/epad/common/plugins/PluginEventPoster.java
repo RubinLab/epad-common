@@ -12,7 +12,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.epad.common.util.EPADTools;
 
-public class PluginEventUtil
+public class PluginEventPoster
 {
 	private static final EPADLogger logger = EPADLogger.getInstance();
 
@@ -39,12 +39,12 @@ public class PluginEventUtil
 
 			if (statusCode != HttpServletResponse.SC_OK)
 				logger.warning("Unexpected status code returned from event service " + statusCode);
-		} catch (UnsupportedEncodingException e1) {
-			logger.warning("event: UnsupportedEncodingException", e1);
+		} catch (UnsupportedEncodingException e) {
+			logger.warning("UnsupportedEncodingException on plugin event call", e);
 		} catch (HttpException e) {
-			logger.warning("event: HttpException", e);
+			logger.warning("HttpException on plugin event call", e);
 		} catch (IOException e) {
-			logger.warning("event: IOException", e);
+			logger.warning("IOException on plugin event call", e);
 		}
 	}
 }
