@@ -28,7 +28,7 @@ public interface PluginServletHandler
 	 * @param req HttpServletRequest
 	 * @param res HttpServletResponse
 	 */
-	void doGet(HttpServletRequest req, HttpServletResponse res);
+	int doGet(HttpServletRequest req, HttpServletResponse res);
 
 	/**
 	 * Standard J2EE doPost handler that is forwarded from the DicomProxy
@@ -36,7 +36,7 @@ public interface PluginServletHandler
 	 * @param req HttpServletRequest
 	 * @param res HttpServletResponse
 	 */
-	void doPost(HttpServletRequest req, HttpServletResponse res);
+	int doPost(HttpServletRequest req, HttpServletResponse res);
 
 	/**
 	 * Very short string to identify this version of the release.

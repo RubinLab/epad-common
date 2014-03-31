@@ -33,7 +33,7 @@ public abstract class AbstractPluginServletHandler implements PluginServletHandl
 	 * @param res HttpServletResponse
 	 */
 	@Override
-	public abstract void doGet(HttpServletRequest req, HttpServletResponse res);
+	public abstract int doGet(HttpServletRequest req, HttpServletResponse res);
 
 	/**
 	 * Standard J2EE doPost handler that is forwarded from the DicomProxy
@@ -42,7 +42,7 @@ public abstract class AbstractPluginServletHandler implements PluginServletHandl
 	 * @param res HttpServletResponse
 	 */
 	@Override
-	public abstract void doPost(HttpServletRequest req, HttpServletResponse res);
+	public abstract int doPost(HttpServletRequest req, HttpServletResponse res);
 
 	/**
 	 * Very short string to identify this version of the release.
