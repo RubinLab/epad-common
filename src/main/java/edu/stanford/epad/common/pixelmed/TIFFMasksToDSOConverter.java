@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.IOUtils;
+
 import com.pixelmed.anatproc.CodedConcept;
 import com.pixelmed.dicom.Attribute;
 import com.pixelmed.dicom.AttributeList;
@@ -98,18 +100,13 @@ public class TIFFMasksToDSOConverter
 			DicomException
 	{
 		AttributeList localAttributeList = new AttributeList();
-		String dicomInputFile = null;
+		String dicomInputFile = dicomFilenames.get(0);
 		DicomInputStream dicomInputStream = null;
 
-		// Get common attributes from the first input file.
-		dicomInputFile = dicomFilenames.get(0);
 		try {
 			dicomInputStream = new DicomInputStream(new FileInputStream(dicomInputFile));
 		} finally {
-			if (dicomInputStream != null) {
-				dicomInputStream.close();
-				dicomInputStream = null;
-			}
+			IOUtils.closeQuietly(dicomInputStream);
 		}
 		localAttributeList.read(dicomInputStream);
 		this.attributeList = (AttributeList)localAttributeList.clone();
@@ -141,8 +138,7 @@ public class TIFFMasksToDSOConverter
 				this.positions[i] = attribute.getDoubleValues();
 			}
 		} finally {
-			if (dicomInputStream != null)
-				dicomInputStream.close();
+			IOUtils.closeQuietly(dicomInputStream);
 		}
 	}
 

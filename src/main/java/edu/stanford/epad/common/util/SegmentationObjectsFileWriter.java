@@ -2,6 +2,9 @@ package edu.stanford.epad.common.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
 
 import com.pixelmed.dicom.Attribute;
 import com.pixelmed.dicom.AttributeList;
@@ -701,9 +704,11 @@ public class SegmentationObjectsFileWriter
 		short image_width = 0, image_height = 0, image_frames = 0;
 		boolean one_bit_per_pixel = true; // Choose 1 bit/pixel or 1 byte/pixel.
 
+		InputStream fis = null;
 		try {
 			System.out.println("Input DICOM file is " + input_file + ".");
-			DicomInputStream i_stream = new DicomInputStream(new FileInputStream(input_file));
+			fis = new FileInputStream(input_file);
+			DicomInputStream i_stream = new DicomInputStream(fis);
 			AttributeList list = new AttributeList();
 			list.read(i_stream);
 
@@ -735,6 +740,8 @@ public class SegmentationObjectsFileWriter
 			System.err.println(e);
 			e.printStackTrace(System.err);
 			System.exit(0);
+		} finally {
+			IOUtils.closeQuietly(fis);
 		}
 		System.out.println("DICOM file is generated.");
 	}

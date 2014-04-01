@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+
 import edu.stanford.epad.common.util.EPADFileUtils;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.epad.common.util.EPADResources;
@@ -99,6 +101,8 @@ public class DicomTagFileUtils
 		} else {
 			BufferedReader br = null;
 			FileWriter tagFileWriter = null;
+			InputStream is = null;
+			InputStreamReader isr = null;
 
 			try {
 				String[] command = { "./dcm2txt", "-w", "120", dicomFile.getAbsolutePath() };
@@ -108,8 +112,8 @@ public class DicomTagFileUtils
 
 				Process process = processBuilder.start();
 				process.getOutputStream();
-				InputStream is = process.getInputStream();
-				InputStreamReader isr = new InputStreamReader(is);
+				is = process.getInputStream();
+				isr = new InputStreamReader(is);
 
 				br = new BufferedReader(isr);
 				String line;
@@ -136,19 +140,10 @@ public class DicomTagFileUtils
 			} catch (IOException e) {
 				logger.warning("Error generating tag file for DICOM file " + dicomFile.getAbsolutePath(), e);
 			} finally {
-				if (tagFileWriter != null)
-					try {
-						tagFileWriter.close();
-					} catch (IOException e) {
-						logger.warning("Error closing tag file writer for DICOM file " + dicomFile.getAbsolutePath(), e);
-					}
-				if (br != null) {
-					try {
-						br.close();
-					} catch (IOException e) {
-						logger.warning("Error buffered reader for DICOM file " + dicomFile.getAbsolutePath(), e);
-					}
-				}
+				IOUtils.closeQuietly(br);
+				IOUtils.closeQuietly(tagFileWriter);
+				IOUtils.closeQuietly(is);
+				IOUtils.closeQuietly(isr);
 			}
 		}
 		return tagFile;
@@ -247,16 +242,9 @@ public class DicomTagFileUtils
 		} catch (IOException e) {
 			logger.warning("Error reading tag file" + tagFile.getAbsolutePath(), e);
 		} finally {
-			try {
-				if (br != null)
-					br.close();
-				if (in != null)
-					in.close();
-				if (fstream != null)
-					fstream.close();
-			} catch (IOException e) {
-				logger.warning("Error closing streams for tag file " + tagFile.getAbsolutePath(), e);
-			}
+			IOUtils.closeQuietly(fstream);
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(br);
 		}
 		return tagMap;
 	}

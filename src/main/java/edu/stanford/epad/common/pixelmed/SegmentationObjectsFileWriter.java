@@ -12,6 +12,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+
 import com.pixelmed.anatproc.CodedConcept;
 import com.pixelmed.dicom.Attribute;
 import com.pixelmed.dicom.AttributeList;
@@ -876,7 +878,7 @@ public class SegmentationObjectsFileWriter
 			outputStream = new FileOutputStream(pixel_file, append);
 			outputStream.write(pixels);
 		} finally {
-			outputStream.close();
+			IOUtils.closeQuietly(outputStream);
 		}
 	}
 
@@ -896,9 +898,9 @@ public class SegmentationObjectsFileWriter
 
 		{ // Copy raw pixel data to a tagged file.
 			File pixelFile = new File(pixel_file_name);
+			OutputStream tagOutputStream = null;
 			DicomOutputStream dicomOutputStream = null;
 			DicomInputStream dicomInputStream = null;
-			OutputStream tagOutputStream = null;
 
 			try {
 				tagOutputStream = new FileOutputStream(tmp_tag_file_name);
@@ -909,12 +911,9 @@ public class SegmentationObjectsFileWriter
 						dicomInputStream, 0);
 				data.write(dicomOutputStream);
 			} finally {
-				if (tagOutputStream != null)
-					dicomOutputStream.close();
-				if (dicomInputStream != null)
-					dicomOutputStream.close();
-				if (dicomOutputStream != null)
-					dicomOutputStream.close();
+				IOUtils.closeQuietly(tagOutputStream);
+				IOUtils.closeQuietly(dicomOutputStream);
+				IOUtils.closeQuietly(dicomInputStream);
 				pixelFile.delete(); // Delete the temporary raw data file.
 			}
 		}
@@ -930,10 +929,8 @@ public class SegmentationObjectsFileWriter
 				CopyStream.skipInsistently(dicomInputStream, 132);
 				CopyStream.copy(dicomInputStream, dicomOutputStream);
 			} finally {
-				if (dicomOutputStream != null)
-					dicomOutputStream.close();
-				if (dicomInputStream != null)
-					dicomInputStream.close();
+				IOUtils.closeQuietly(dicomInputStream);
+				IOUtils.closeQuietly(dicomOutputStream);
 				tagFile.delete(); // Delete the temporary file.
 			}
 		}
@@ -1205,14 +1202,16 @@ public class SegmentationObjectsFileWriter
 
 		// Read pixel array from the map_file.
 		File file = new File(map_file);
+		DataInputStream dis = null;
 		pixels = new byte[(int)file.length()];
 		try {
-			DataInputStream dis;
 			dis = new DataInputStream((new FileInputStream(file)));
 			dis.readFully(pixels);
 			dis.close();
 		} catch (Exception e1) {
 			e1.printStackTrace();
+		} finally {
+			IOUtils.closeQuietly(dis);
 		}
 
 		try {

@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Utility for writing generic files with text data.
@@ -89,18 +91,25 @@ public class EPADFileUtils
 	 */
 	public static String read(File file) throws IOException
 	{
-		FileInputStream fstream = new FileInputStream(file);
-		DataInputStream in = new DataInputStream(fstream);
-		BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
 		StringBuilder sb = new StringBuilder();
-		String line;
-		while ((line = br.readLine()) != null) {
-			sb.append(line).append("\n");
+		FileInputStream fstream = null;
+		DataInputStream in = null;
+		BufferedReader br = null;
+
+		try {
+			fstream = new FileInputStream(file);
+			in = new DataInputStream(fstream);
+			br = new BufferedReader(new InputStreamReader(in));
+
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line).append("\n");
+			}
+		} finally {
+			IOUtils.closeQuietly(fstream);
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(br);
 		}
-		br.close();
-		in.close();
-		fstream.close();
 		return sb.toString();
 	}
 
@@ -562,37 +571,37 @@ public class EPADFileUtils
 				// create the parent directory structure if needed
 				makeDirs(destinationParent);
 
-				if (!entry.isDirectory()) {
-					BufferedInputStream is = new BufferedInputStream(zip.getInputStream(entry));
-					int currentByte;
-					// establish buffer for writing file
-					byte data[] = new byte[BUFFER];
+				InputStream is = null;
+				BufferedInputStream bis = null;
+				FileOutputStream fos = null;
+				BufferedOutputStream bos = null;
 
-					// write the current file to disk
-					FileOutputStream fos = new FileOutputStream(destFile);
-					BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER);
+				try {
+					if (!entry.isDirectory()) {
+						int currentByte;
+						byte data[] = new byte[BUFFER];
+						is = zip.getInputStream(entry);
+						bis = new BufferedInputStream(is);
+						fos = new FileOutputStream(destFile);
+						bos = new BufferedOutputStream(fos, BUFFER);
 
-					// read and write until last byte is encountered
-					while ((currentByte = is.read(data, 0, BUFFER)) != -1) {
-						dest.write(data, 0, currentByte);
+						while ((currentByte = bis.read(data, 0, BUFFER)) != -1) {
+							bos.write(data, 0, currentByte);
+						}
+						bos.flush();
 					}
-					dest.flush();
-					dest.close();
-					is.close();
+				} finally {
+					IOUtils.closeQuietly(is);
+					IOUtils.closeQuietly(bis);
+					IOUtils.closeQuietly(fos);
+					IOUtils.closeQuietly(bos);
 				}
 
 				if (currentEntry.endsWith(".zip")) {
-					// found a zip file, try to open
 					extractFolder(destFile.getAbsolutePath());
 				}
-				// if(currentEntry.endsWith(".gz")){
-				// // found a gz file, try to decompress it.
-				// FileUtils.
-				// }
-			}// while
-
+			}
 		} catch (Exception e) {
-			// Catch and throw this exception to log some information about it.
 			log.warning("Failed to unzip: " + zipFile, e);
 			throw new IllegalStateException(e);
 		}

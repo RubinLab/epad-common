@@ -1,7 +1,6 @@
 package edu.stanford.epad.common.plugins;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.IOUtils;
 
 import com.google.gson.Gson;
 
@@ -29,16 +29,16 @@ public class PluginDicomUtil
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(url);
 		InputStreamReader streamReader = null;
-		BufferedReader reader = null;
+		BufferedReader bufferedReader = null;
 
 		try {
 			int statusCode = client.executeMethod(method);
 
 			if (statusCode != -1) {
 				streamReader = new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8");
-				reader = new BufferedReader(streamReader);
+				bufferedReader = new BufferedReader(streamReader);
 				String line;
-				while ((line = reader.readLine()) != null) {
+				while ((line = bufferedReader.readLine()) != null) {
 					String[] cols = line.split(",");
 					if (cols != null && cols.length > 1) {
 						String seriesUID = cols[1];
@@ -54,18 +54,8 @@ public class PluginDicomUtil
 			log.warning("Error getting seriesUID for imageUID " + imageUID, e);
 			return "";
 		} finally {
-			if (streamReader != null)
-				try {
-					streamReader.close();
-				} catch (IOException e) {
-					log.warning("Error closing segmentation path stream", e);
-				}
-			if (reader != null)
-				try {
-					reader.close();
-				} catch (IOException e) {
-					log.warning("Error closing segmentation path reader", e);
-				}
+			IOUtils.closeQuietly(streamReader);
+			IOUtils.closeQuietly(bufferedReader);
 		}
 	}
 
@@ -75,34 +65,24 @@ public class PluginDicomUtil
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(url);
 		InputStreamReader streamReader = null;
-		BufferedReader reader = null;
+		BufferedReader bufferedReader = null;
 
 		try {
 			method.setRequestHeader("Cookie", "JSESSIONID=" + sessionID);
 			int statusCode = client.executeMethod(method);
 			if (statusCode == HttpServletResponse.SC_OK) { // Get the result as stream
 				streamReader = new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8");
-				reader = new BufferedReader(streamReader);
+				bufferedReader = new BufferedReader(streamReader);
 				Gson gson = new Gson();
-				EPADDatabaseSeries dicomSeriesDescriptionSearchResult = gson.fromJson(reader, EPADDatabaseSeries.class);
+				EPADDatabaseSeries dicomSeriesDescriptionSearchResult = gson.fromJson(bufferedReader, EPADDatabaseSeries.class);
 				return dicomSeriesDescriptionSearchResult.getImageUIDs();
 			} else {
 				log.warning("Error calling image search; statusCode=" + statusCode);
 				return new ArrayList<String>();
 			}
 		} finally {
-			if (streamReader != null)
-				try {
-					streamReader.close();
-				} catch (IOException e) {
-					log.warning("Error closing segmentation path stream", e);
-				}
-			if (reader != null)
-				try {
-					reader.close();
-				} catch (IOException e) {
-					log.warning("Error closing segmentation path reader", e);
-				}
+			IOUtils.closeQuietly(streamReader);
+			IOUtils.closeQuietly(bufferedReader);
 		}
 	}
 
@@ -113,7 +93,7 @@ public class PluginDicomUtil
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(url);
 		InputStreamReader streamReader = null;
-		BufferedReader reader = null;
+		BufferedReader bufferedReader = null;
 
 		method.setRequestHeader("Cookie", "JSESSIONID=" + sessionID);
 
@@ -123,9 +103,9 @@ public class PluginDicomUtil
 		try {
 			if (statusCode == HttpServletResponse.SC_OK) {
 				streamReader = new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8");
-				reader = new BufferedReader(streamReader);
+				bufferedReader = new BufferedReader(streamReader);
 				Gson gson = new Gson();
-				EPADDatabaseSeries dicomSeriesDescriptionSearchResult = gson.fromJson(reader, EPADDatabaseSeries.class);
+				EPADDatabaseSeries dicomSeriesDescriptionSearchResult = gson.fromJson(bufferedReader, EPADDatabaseSeries.class);
 				positionOfImageInSeries = dicomSeriesDescriptionSearchResult.getImageIndex(imageUID);
 				if (positionOfImageInSeries > dicomSeriesDescriptionSearchResult.getNumberOfImagesInSeries())
 					positionOfImageInSeries = 1;
@@ -133,18 +113,8 @@ public class PluginDicomUtil
 				log.warning("Error calling series order route; statusCode =" + statusCode);
 			}
 		} finally {
-			if (streamReader != null)
-				try {
-					streamReader.close();
-				} catch (IOException e) {
-					log.warning("Error closing segmentation path stream", e);
-				}
-			if (reader != null)
-				try {
-					reader.close();
-				} catch (IOException e) {
-					log.warning("Error closing segmentation path reader", e);
-				}
+			IOUtils.closeQuietly(streamReader);
+			IOUtils.closeQuietly(bufferedReader);
 		}
 		return positionOfImageInSeries;
 	}

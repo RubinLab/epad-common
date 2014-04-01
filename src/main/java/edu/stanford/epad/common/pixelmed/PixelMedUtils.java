@@ -3,6 +3,8 @@ package edu.stanford.epad.common.pixelmed;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
+
 import com.pixelmed.dicom.Attribute;
 import com.pixelmed.dicom.AttributeList;
 import com.pixelmed.dicom.DicomException;
@@ -21,15 +23,14 @@ public class PixelMedUtils
 
 	public static AttributeList readAttributeListFromDicomFile(String dicomFilePath) throws IOException, DicomException
 	{
-		DicomInputStream dis = null;
 		AttributeList attributeList = new AttributeList();
+		DicomInputStream dis = null;
 
 		try {
 			dis = new DicomInputStream(new FileInputStream(dicomFilePath));
 			attributeList.read(dis);
 		} finally {
-			if (dis != null)
-				dis.close();
+			IOUtils.closeQuietly(dis);
 		}
 		return attributeList;
 	}

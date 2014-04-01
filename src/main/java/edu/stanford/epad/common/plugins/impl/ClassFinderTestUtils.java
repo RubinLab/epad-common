@@ -2,6 +2,7 @@ package edu.stanford.epad.common.plugins.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+
+import org.apache.commons.io.IOUtils;
 
 import edu.stanford.epad.common.plugins.PluginHandler;
 import edu.stanford.epad.common.util.EPADLogger;
@@ -33,6 +36,8 @@ public class ClassFinderTestUtils
 	public static String readJarManifestForClass(Class<?> clazz)
 	{
 		StringBuilder sb = new StringBuilder();
+		InputStream manifestInputStream = null;
+
 		try {
 
 			String className = clazz.getSimpleName() + ".class";
@@ -43,7 +48,8 @@ public class ClassFinderTestUtils
 			}
 
 			String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
-			Manifest manifest = new Manifest(new URL(manifestPath).openStream());
+			manifestInputStream = new URL(manifestPath).openStream();
+			Manifest manifest = new Manifest(manifestInputStream);
 			Attributes attr = manifest.getMainAttributes();
 			// String value = attr.getValue("Manifest-Version");
 
@@ -58,9 +64,10 @@ public class ClassFinderTestUtils
 			}
 		} catch (Exception e) {
 			logger.warning("Failed to read manifest for " + clazz.getSimpleName(), e);
+		} finally {
+			IOUtils.closeQuietly(manifestInputStream);
 		}
 		return sb.toString();
-
 	}
 
 	/**

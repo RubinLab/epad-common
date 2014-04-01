@@ -2,18 +2,19 @@ package edu.stanford.epad.common.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.IOUtils;
 
 public class EPADTools
 {
@@ -86,10 +87,7 @@ public class EPADTools
 					outputStream.write(bytes, 0, read);
 				}
 			} finally {
-				if (outputStream != null) {
-					outputStream.flush();
-					outputStream.close();
-				}
+				IOUtils.closeQuietly(outputStream);
 			}
 		}
 		return statusCode;
@@ -113,9 +111,10 @@ public class EPADTools
 			Process process = pb.start();
 			process.getOutputStream();// get the output stream.
 			is = process.getInputStream();
-			isr = new InputStreamReader(is);
 
+			isr = new InputStreamReader(is);
 			br = new BufferedReader(isr);
+
 			String line;
 			StringBuilder sb = new StringBuilder();
 			while ((line = br.readLine()) != null) {
@@ -148,72 +147,35 @@ public class EPADTools
 				throw new IllegalStateException("DicomHeadersTask OutOfMemoryError: ", oome);
 			}
 		} finally {
-			close(br);
-			close(isr);
-			close(is);
+			IOUtils.closeQuietly(isr);
+			IOUtils.closeQuietly(br);
 		}
 	}
 
 	public static boolean copyFile(File source, File destination)
 	{
-		boolean resultat = false;
+		boolean result = false;
 
-		// Declaration des flux
-		java.io.FileInputStream sourceFile = null;
-		java.io.FileOutputStream destinationFile = null;
+		FileInputStream sourceStream = null;
+		FileOutputStream destinationStream = null;
 		try {
-			// Création du fichier :
 			destination.createNewFile();
-			// Ouverture des flux
-			sourceFile = new java.io.FileInputStream(source);
-			destinationFile = new java.io.FileOutputStream(destination);
-			// Lecture par segment de 0.5Mo
+			sourceStream = new java.io.FileInputStream(source);
+			destinationStream = new java.io.FileOutputStream(destination);
 			byte buffer[] = new byte[512 * 1024];
 			int nbLecture;
-			while ((nbLecture = sourceFile.read(buffer)) != -1) {
-				destinationFile.write(buffer, 0, nbLecture);
+			while ((nbLecture = sourceStream.read(buffer)) != -1) {
+				destinationStream.write(buffer, 0, nbLecture);
 			}
-			resultat = true; // Copie réussie
+			result = true;
 		} catch (java.io.FileNotFoundException f) {
-			logger.info("FileTools.copyFile() = FileNotFoundException");
+			logger.warning("FileTools.copyFile() = FileNotFoundException");
 		} catch (java.io.IOException e) {
-			logger.info("FileTools.copyFile() = IOException");
+			logger.warning("FileTools.copyFile() = IOException");
 		} finally {
-			// Quoi qu'il arrive, on ferme les flux
-			try {
-				sourceFile.close();
-			} catch (Exception e) {
-			}
-			try {
-				destinationFile.close();
-			} catch (Exception e) {
-			}
+			IOUtils.closeQuietly(destinationStream);
+			IOUtils.closeQuietly(sourceStream);
 		}
-		return (resultat);
+		return (result);
 	}
-
-	private static void close(Reader reader)
-	{
-		try {
-			if (reader != null) {
-				reader.close();
-				reader = null;
-			}
-		} catch (Exception e) {
-			logger.info("Failed to close reader");
-		}
-	}
-
-	private static void close(InputStream stream)
-	{
-		try {
-			if (stream != null) {
-				stream.close();
-				stream = null;
-			}
-		} catch (Exception e) {
-			logger.info("Failed to close stream");
-		}
-	}
-
 }

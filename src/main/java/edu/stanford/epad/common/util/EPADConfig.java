@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+
 /**
  * Read the "etc/proxy-config.properties" file on start-up and provides method to look up values.
  */
@@ -42,7 +44,7 @@ public class EPADConfig
 				properties.load(fis);
 				log.info("Using ePAD configuration file " + configFile.getAbsolutePath());
 			} finally {
-				fis.close();
+				IOUtils.closeQuietly(fis);
 			}
 			readProxyLoggerDebugState();
 		} catch (Exception e) {
