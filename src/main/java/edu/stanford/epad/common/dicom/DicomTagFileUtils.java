@@ -99,10 +99,10 @@ public class DicomTagFileUtils
 			logger.info(dicomFile + " is NOT a DICOM file.");
 			return null;
 		} else {
-			BufferedReader br = null;
 			FileWriter tagFileWriter = null;
 			InputStream is = null;
 			InputStreamReader isr = null;
+			BufferedReader br = null;
 
 			try {
 				String[] command = { "./dcm2txt", "-w", "120", dicomFile.getAbsolutePath() };
@@ -114,7 +114,6 @@ public class DicomTagFileUtils
 				process.getOutputStream();
 				is = process.getInputStream();
 				isr = new InputStreamReader(is);
-
 				br = new BufferedReader(isr);
 				String line;
 				StringBuilder sb = new StringBuilder();
@@ -140,10 +139,10 @@ public class DicomTagFileUtils
 			} catch (IOException e) {
 				logger.warning("Error generating tag file for DICOM file " + dicomFile.getAbsolutePath(), e);
 			} finally {
-				IOUtils.closeQuietly(br);
 				IOUtils.closeQuietly(tagFileWriter);
-				IOUtils.closeQuietly(is);
+				IOUtils.closeQuietly(br);
 				IOUtils.closeQuietly(isr);
+				IOUtils.closeQuietly(is);
 			}
 		}
 		return tagFile;
@@ -243,8 +242,8 @@ public class DicomTagFileUtils
 			logger.warning("Error reading tag file" + tagFile.getAbsolutePath(), e);
 		} finally {
 			IOUtils.closeQuietly(fstream);
-			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(br);
+			IOUtils.closeQuietly(in);
 		}
 		return tagMap;
 	}

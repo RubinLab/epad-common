@@ -911,8 +911,8 @@ public class SegmentationObjectsFileWriter
 						dicomInputStream, 0);
 				data.write(dicomOutputStream);
 			} finally {
-				IOUtils.closeQuietly(tagOutputStream);
 				IOUtils.closeQuietly(dicomOutputStream);
+				IOUtils.closeQuietly(tagOutputStream);
 				IOUtils.closeQuietly(dicomInputStream);
 				pixelFile.delete(); // Delete the temporary raw data file.
 			}

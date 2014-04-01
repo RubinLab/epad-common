@@ -54,8 +54,8 @@ public class PluginDicomUtil
 			log.warning("Error getting seriesUID for imageUID " + imageUID, e);
 			return "";
 		} finally {
-			IOUtils.closeQuietly(streamReader);
 			IOUtils.closeQuietly(bufferedReader);
+			IOUtils.closeQuietly(streamReader);
 		}
 	}
 
@@ -81,8 +81,8 @@ public class PluginDicomUtil
 				return new ArrayList<String>();
 			}
 		} finally {
-			IOUtils.closeQuietly(streamReader);
 			IOUtils.closeQuietly(bufferedReader);
+			IOUtils.closeQuietly(streamReader);
 		}
 	}
 

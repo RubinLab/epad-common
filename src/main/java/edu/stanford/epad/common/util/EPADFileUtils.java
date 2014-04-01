@@ -107,8 +107,8 @@ public class EPADFileUtils
 			}
 		} finally {
 			IOUtils.closeQuietly(fstream);
-			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(br);
+			IOUtils.closeQuietly(in);
 		}
 		return sb.toString();
 	}
@@ -591,10 +591,10 @@ public class EPADFileUtils
 						bos.flush();
 					}
 				} finally {
-					IOUtils.closeQuietly(is);
 					IOUtils.closeQuietly(bis);
-					IOUtils.closeQuietly(fos);
+					IOUtils.closeQuietly(is);
 					IOUtils.closeQuietly(bos);
+					IOUtils.closeQuietly(fos);
 				}
 
 				if (currentEntry.endsWith(".zip")) {

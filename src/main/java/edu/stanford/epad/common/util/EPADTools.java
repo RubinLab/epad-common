@@ -147,8 +147,8 @@ public class EPADTools
 				throw new IllegalStateException("DicomHeadersTask OutOfMemoryError: ", oome);
 			}
 		} finally {
-			IOUtils.closeQuietly(isr);
 			IOUtils.closeQuietly(br);
+			IOUtils.closeQuietly(isr);
 		}
 	}
 
