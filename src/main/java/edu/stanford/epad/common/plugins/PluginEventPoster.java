@@ -33,12 +33,17 @@ public class PluginEventPoster
 			HttpClient client = new HttpClient();
 			PostMethod method = new PostMethod(urlEncoded);
 			method.setRequestHeader("Cookie", "JSESSIONID=" + sessionID);
-			int statusCode = client.executeMethod(method);
 
-			logger.info("EVENT: " + urlEncoded);
+			try {
+				int statusCode = client.executeMethod(method);
+				logger.info("EVENT: " + urlEncoded);
 
-			if (statusCode != HttpServletResponse.SC_OK)
-				logger.warning("Unexpected status code returned from event service " + statusCode);
+				if (statusCode != HttpServletResponse.SC_OK)
+					logger.warning("Unexpected status code returned from event service " + statusCode);
+			} finally {
+				method.releaseConnection();
+			}
+
 		} catch (UnsupportedEncodingException e) {
 			logger.warning("UnsupportedEncodingException on plugin event call", e);
 		} catch (HttpException e) {

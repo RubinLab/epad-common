@@ -28,17 +28,17 @@ public class PluginDicomUtil
 		String url = "http://localhost:8080/epad/segmentationpath/" + "?image_iuid=" + imageUID;
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(url);
-		InputStreamReader streamReader = null;
-		BufferedReader bufferedReader = null;
+		InputStreamReader isr = null;
+		BufferedReader br = null;
 
 		try {
 			int statusCode = client.executeMethod(method);
 
 			if (statusCode != -1) {
-				streamReader = new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8");
-				bufferedReader = new BufferedReader(streamReader);
+				isr = new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8");
+				br = new BufferedReader(isr);
 				String line;
-				while ((line = bufferedReader.readLine()) != null) {
+				while ((line = br.readLine()) != null) {
 					String[] cols = line.split(",");
 					if (cols != null && cols.length > 1) {
 						String seriesUID = cols[1];
@@ -54,8 +54,9 @@ public class PluginDicomUtil
 			log.warning("Error getting seriesUID for imageUID " + imageUID, e);
 			return "";
 		} finally {
-			IOUtils.closeQuietly(bufferedReader);
-			IOUtils.closeQuietly(streamReader);
+			IOUtils.closeQuietly(br);
+			IOUtils.closeQuietly(isr);
+			method.releaseConnection();
 		}
 	}
 
@@ -83,6 +84,7 @@ public class PluginDicomUtil
 		} finally {
 			IOUtils.closeQuietly(bufferedReader);
 			IOUtils.closeQuietly(streamReader);
+			method.releaseConnection();
 		}
 	}
 
@@ -115,6 +117,7 @@ public class PluginDicomUtil
 		} finally {
 			IOUtils.closeQuietly(streamReader);
 			IOUtils.closeQuietly(bufferedReader);
+			method.releaseConnection();
 		}
 		return positionOfImageInSeries;
 	}
