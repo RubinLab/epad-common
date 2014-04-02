@@ -46,7 +46,6 @@ public class EPADConfig
 			} finally {
 				IOUtils.closeQuietly(fis);
 			}
-			readProxyLoggerDebugState();
 		} catch (Exception e) {
 			log.severe("Error reading configuration file", e);
 		}
@@ -137,16 +136,5 @@ public class EPADConfig
 			retVal.put(key, properties.getProperty(key));
 		}
 		return retVal;
-	}
-
-	/**
-	 * Read <code>LoggerDebugOn</code> to set the ProxyLogger debug state.
-	 */
-	private void readProxyLoggerDebugState()
-	{
-		String debugOn = getParam("LoggerDebugOn");
-		if ("true".equalsIgnoreCase(debugOn)) {
-			log.setDebug(true);
-		}
 	}
 }

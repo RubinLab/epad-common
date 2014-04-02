@@ -7,20 +7,14 @@
  */
 package edu.stanford.epad.common.util;
 
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
- * Use this class as the logger for the ePAD web server, which logs the data in the ./log/dicom-proxy.log file.
- * 
- * @author amsnyder
+ * Use this class as the logger for the ePAD web server, which logs the data in the ./log/epad-ws.log file.
  */
 public class EPADLogger
 {
 	private final static EPADLogger ourInstance = new EPADLogger();
-	private final Logger log;
-	private boolean useDebug = false;
+
+	private final org.apache.log4j.Logger log;
 
 	public static EPADLogger getInstance()
 	{
@@ -29,83 +23,31 @@ public class EPADLogger
 
 	private EPADLogger()
 	{
-		log = Logger.getAnonymousLogger();
-
-		try {
-			FileHandler fh = new FileHandler(getLogFilePath());
-			fh.setFormatter(new LogFormatter());
-			log.addHandler(fh);
-		} catch (Exception e) {
-			System.err.println("Failed to setup logging!" + e.getMessage());
-		}
+		log = org.apache.log4j.Logger.getLogger(EPADLogger.class);
 	}
 
-	private String getLogFilePath()
-	{
-		String logFilePath = EPADResources.getEPADWebServerLogFilePath();
-		log.info("ePAD web service log file: " + logFilePath);
-
-		return logFilePath;
-	}
-
-	/**
-	 * Log a debug string.
-	 * 
-	 * @param message
-	 */
 	public void debug(String message)
 	{
-		if (useDebug)
-			info(message);
+		debug(message);
 	}
 
-	/**
-	 * To turn debugging on, set to true.
-	 * 
-	 * @param value true to turn on debug logging.
-	 */
-	public void setDebug(boolean value)
-	{
-		useDebug = value;
-	}
-
-	/**
-	 * Log a standard INFO level message.
-	 * 
-	 * @param message
-	 */
 	public void info(String message)
 	{
 		log.info(message);
 	}
 
-	/**
-	 * Log a warning with a message and the exception
-	 * 
-	 * @param message String to write to the log file.
-	 * @param t Throwable
-	 */
 	public void warning(String message, Throwable t)
 	{
-		log.log(Level.WARNING, message + ":" + t.getClass().getCanonicalName() + ":" + t.getMessage(), t);
-		// TODO See why getMessage is necessary. Configuration issue?
+		log.warn(message + ":" + t.getClass().getCanonicalName() + ":" + t.getMessage(), t);
 	}
 
 	public void warning(String message)
 	{
-		log.log(Level.WARNING, message);
+		log.warn(message);
 	}
 
-	/**
-	 * Log a sever error with a message and a stack trace
-	 * 
-	 * @param message String to write to the log
-	 * @param t Throwable exception with Stack Trace.
-	 */
 	public void severe(String message, Throwable t)
 	{
-		log.info("message " + t.getMessage());
-
-		log.log(Level.SEVERE, message, t);
+		log.fatal(message, t);
 	}
 }
