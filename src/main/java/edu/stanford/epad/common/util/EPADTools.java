@@ -42,20 +42,20 @@ public class EPADTools
 	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");
 	public static final String seriesOrderURI = EPADConfig.getInstance().getStringPropertyValue("seriesOrderURI");
 
-	private static final EPADLogger logger = EPADLogger.getInstance();
+	private static final EPADLogger log = EPADLogger.getInstance();
 	private static final EPADConfig config = EPADConfig.getInstance();
 
-	public static int feedFileWithDICOMFromWADO(File file, Map<String, String> dicomImageFileDescription)
+	public static int feedFileWithDICOMFromWADO(File outputDICOMFile, Map<String, String> dicomImageFileDescription)
 			throws IOException
 	{
-		String studyIDKey = dicomImageFileDescription.get("study_iuid");
-		String seriesIDKey = dicomImageFileDescription.get("series_iuid");
-		String imageIDKey = dicomImageFileDescription.get("sop_iuid");
+		String studyUID = dicomImageFileDescription.get("study_iuid");
+		String seriesUID = dicomImageFileDescription.get("series_iuid");
+		String imageUID = dicomImageFileDescription.get("sop_iuid");
 
-		return downloadDICOMFileFromWADO(file, studyIDKey, seriesIDKey, imageIDKey);
+		return downloadDICOMFileFromWADO(studyUID, seriesUID, imageUID, outputDICOMFile);
 	}
 
-	public static int downloadDICOMFileFromWADO(File dicomFile, String studyUID, String seriesUID, String imageUID)
+	public static int downloadDICOMFileFromWADO(String studyUID, String seriesUID, String imageUID, File outputDicomFile)
 			throws IOException
 	{
 		String wadoHost = config.getStringPropertyValue("NameServer");
@@ -69,21 +69,20 @@ public class EPADTools
 
 		String wadoUrl = wadoUrlBuilder.build();
 
-		// logger.info("WADO query: " + wadoUrl);
+		log.info("WADO query: " + wadoUrl);
 
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(wadoUrl);
 		int statusCode = client.executeMethod(method);
 
 		if (statusCode == HttpServletResponse.SC_OK) {
-			InputStream wadoResponseStream = null;
 			OutputStream outputStream = null;
 			try {
-				wadoResponseStream = method.getResponseBodyAsStream();
-				outputStream = new FileOutputStream(dicomFile);
+				outputStream = new FileOutputStream(outputDicomFile);
+				InputStream is = method.getResponseBodyAsStream();
 				int read = 0;
 				byte[] bytes = new byte[4096];
-				while ((read = wadoResponseStream.read(bytes)) != -1) {
+				while ((read = is.read(bytes)) != -1) {
 					outputStream.write(bytes, 0, read);
 				}
 			} finally {
@@ -102,11 +101,11 @@ public class EPADTools
 		try {
 			String dcmServerTitlePort = aeTitle + "@localhost:" + dicomServerPort;
 			dcmServerTitlePort = dcmServerTitlePort.trim();
-			logger.info("Sending file - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
+			log.info("Sending file - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
 			String[] command = { "./dcmsnd", dcmServerTitlePort, inputPathFile };
 			ProcessBuilder pb = new ProcessBuilder(command);
 			String dicomBinDirectoryPath = EPADResources.getEPADWebServerDICOMBinDir();
-			logger.info("DICOM binary directory: " + dicomBinDirectoryPath);
+			log.info("DICOM binary directory: " + dicomBinDirectoryPath);
 			pb.directory(new File(dicomBinDirectoryPath));
 			Process process = pb.start();
 			process.getOutputStream();// get the output stream.
@@ -119,14 +118,14 @@ public class EPADTools
 			StringBuilder sb = new StringBuilder();
 			while ((line = br.readLine()) != null) {
 				sb.append(line).append("\n");
-				logger.info("./dcmsend output: " + line);
+				log.info("./dcmsend output: " + line);
 			}
 
 			try {
 				int exitValue = process.waitFor();
-				logger.info("dcmsend exit value is: " + exitValue);
+				log.info("dcmsend exit value is: " + exitValue);
 			} catch (InterruptedException e) {
-				logger.warning("Error sending DICOM files in: " + inputPathFile, e);
+				log.warning("Error sending DICOM files in: " + inputPathFile, e);
 			}
 			String cmdLineOutput = sb.toString();
 
@@ -137,12 +136,12 @@ public class EPADTools
 			if (e instanceof IllegalStateException && throwException) {
 				throw e;
 			}
-			logger.warning("DicomHeadersTask failed to create DICOM tags file: " + e.getMessage());
+			log.warning("DicomHeadersTask failed to create DICOM tags file: " + e.getMessage());
 			if (throwException) {
 				throw new IllegalStateException("DicomHeadersTask failed to create DICcom tags file.", e);
 			}
 		} catch (OutOfMemoryError oome) {
-			logger.warning("DicomHeadersTask OutOfMemoryError: ");
+			log.warning("DicomHeadersTask OutOfMemoryError: ");
 			if (throwException) {
 				throw new IllegalStateException("DicomHeadersTask OutOfMemoryError: ", oome);
 			}
@@ -169,9 +168,9 @@ public class EPADTools
 			}
 			result = true;
 		} catch (java.io.FileNotFoundException f) {
-			logger.warning("FileTools.copyFile() = FileNotFoundException");
+			log.warning("FileTools.copyFile() = FileNotFoundException");
 		} catch (java.io.IOException e) {
-			logger.warning("FileTools.copyFile() = IOException");
+			log.warning("FileTools.copyFile() = IOException");
 		} finally {
 			IOUtils.closeQuietly(destinationStream);
 			IOUtils.closeQuietly(sourceStream);

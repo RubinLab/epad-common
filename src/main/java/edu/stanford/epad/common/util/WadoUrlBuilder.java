@@ -186,7 +186,6 @@ public class WadoUrlBuilder
 			sb.append("?");
 		}
 
-		// TODO Constants for these literals
 		sb.append("requestType=WADO");
 		sb.append("&studyUID=").append(studyUID);
 		sb.append("&seriesUID=").append(seriesUID);
