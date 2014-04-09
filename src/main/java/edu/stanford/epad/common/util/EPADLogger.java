@@ -28,7 +28,7 @@ public class EPADLogger
 
 	public void debug(String message)
 	{
-		debug(message);
+		log.debug(message);
 	}
 
 	public void info(String message)
