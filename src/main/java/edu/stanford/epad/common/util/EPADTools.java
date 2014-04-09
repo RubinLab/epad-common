@@ -36,7 +36,7 @@ public class EPADTools
 			"dcm4CheeDatabasePassword");
 	public static final String dcm4CheeDatabaseURL = EPADConfig.getInstance().getStringPropertyValue(
 			"dcm4CheeDatabaseURL");
-	public static final String collection = EPADConfig.getInstance().getStringPropertyValue("collection"); // "defaultcontainer";
+	public static final String eXistCollection = EPADConfig.getInstance().getStringPropertyValue("collection");
 	public static final String aim3Namespace = EPADConfig.getInstance().getStringPropertyValue("namespace");
 	public static final String eXistURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
 	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");

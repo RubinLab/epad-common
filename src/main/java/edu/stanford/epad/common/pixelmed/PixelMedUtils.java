@@ -12,11 +12,15 @@ import com.pixelmed.dicom.DicomInputStream;
 import com.pixelmed.dicom.SOPClass;
 import com.pixelmed.dicom.TagFromName;
 
+import edu.stanford.epad.common.util.EPADLogger;
+
 /**
  * @author alansnyder
  */
 public class PixelMedUtils
 {
+	private static final EPADLogger log = EPADLogger.getInstance();
+
 	private PixelMedUtils()
 	{
 	}
@@ -38,11 +42,15 @@ public class PixelMedUtils
 	public static boolean isDicomSegmentationObject(String filePath)
 	{
 		try {
-			AttributeList list = readAttributeListFromDicomFile(filePath);
-			String sopClassUID = Attribute.getSingleStringValueOrEmptyString(list, TagFromName.SOPClassUID);
+			AttributeList attributeList = readAttributeListFromDicomFile(filePath);
+			String sopClassUID = Attribute.getSingleStringValueOrEmptyString(attributeList, TagFromName.SOPClassUID);
+
+			log.info("SOP " + sopClassUID);
+			log.info("CON " + SOPClass.SegmentationStorage);
 
 			return sopClassUID.equals(SOPClass.SegmentationStorage);
 		} catch (Exception e) {
+			log.warning("Error reading DICOM attribute list", e);
 			return false;
 		}
 	}

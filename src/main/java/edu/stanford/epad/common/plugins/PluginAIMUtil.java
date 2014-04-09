@@ -69,7 +69,7 @@ public class PluginAIMUtil
 		String namespace = EPADTools.aim3Namespace;
 		String eXistServerUrl = EPADTools.eXistURI;
 		String password = EPADTools.eXistPassword;
-		String eXistCollection = EPADTools.collection;
+		String eXistCollection = EPADTools.eXistCollection;
 		String username = EPADTools.eXistUsername;
 		String aim3XSDFilePath = EPADResources.getEPADWebServerAIM3XSDFilePath();
 		String validAIMFileName = aimID.toLowerCase();
@@ -96,7 +96,7 @@ public class PluginAIMUtil
 		String serverUrl = EPADTools.eXistURI;
 		String password = EPADTools.eXistPassword;
 		String xsdFilePath = EPADResources.getEPADWebServerAIM3XSDFilePath();
-		String collection = EPADTools.collection;
+		String collection = EPADTools.eXistCollection;
 		String username = EPADTools.eXistUsername;
 
 		AnnotationBuilder.saveToServer(imageAnnotation, serverUrl, namespace, collection, xsdFilePath, username, password);
