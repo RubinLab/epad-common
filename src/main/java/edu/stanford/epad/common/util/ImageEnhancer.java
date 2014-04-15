@@ -1192,7 +1192,6 @@ public class ImageEnhancer
 
 	public void findVisuParametersImage()
 	{
-
 		int useSrcImageIndex = 0;
 		BufferedImage useSrcImage = sImg.getBufferedImage(useSrcImageIndex);
 
@@ -1211,9 +1210,5 @@ public class ImageEnhancer
 			windowWidth = voiTransform.getWidth(useSrcImageIndex, currentVOITransformInUse);
 			windowCenter = voiTransform.getCenter(useSrcImageIndex, currentVOITransformInUse);
 		}
-
-		System.out.println("windowWidth = " + windowWidth);
-		System.out.println("windowCenter = " + windowCenter);
 	}
-
 }

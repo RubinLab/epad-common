@@ -45,9 +45,6 @@ public class PixelMedUtils
 			AttributeList attributeList = readAttributeListFromDicomFile(filePath);
 			String sopClassUID = Attribute.getSingleStringValueOrEmptyString(attributeList, TagFromName.SOPClassUID);
 
-			log.info("SOP " + sopClassUID);
-			log.info("CON " + SOPClass.SegmentationStorage);
-
 			return sopClassUID.equals(SOPClass.SegmentationStorage);
 		} catch (Exception e) {
 			log.warning("Error reading DICOM attribute list", e);

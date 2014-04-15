@@ -8,6 +8,7 @@ import java.io.IOException;
 // import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.FileImageInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.dcm4che2.data.DicomObject;
 import org.dcm4che2.data.Tag;
 import org.dcm4che2.imageio.plugins.dcm.DicomImageReadParam;
@@ -100,8 +101,7 @@ public class DicomReader
 			Raster raster = codec.readRaster(frameValue, param);
 			packedImage = rasterProcessor.buildPng(raster);
 		} finally {
-			if (dis != null)
-				dis.close();
+			IOUtils.closeQuietly(dis);
 			if (fis != null)
 				fis.close();
 		}
@@ -119,8 +119,7 @@ public class DicomReader
 			DicomObject dicomObject = dis.readDicomObject();
 			patientName = dicomObject.getString(Tag.PatientName);
 		} finally {
-			if (dis != null)
-				dis.close();
+			IOUtils.closeQuietly(dis);
 		}
 		return patientName;
 	}
@@ -135,8 +134,7 @@ public class DicomReader
 			DicomObject dicomObject = dis.readDicomObject();
 			patientID = dicomObject.getString(Tag.PatientID);
 		} finally {
-			if (dis != null)
-				dis.close();
+			IOUtils.closeQuietly(dis);
 		}
 		return patientID;
 	}
@@ -152,7 +150,7 @@ public class DicomReader
 			DicomObject dicomObject = dis.readDicomObject();
 			studyIUID = dicomObject.getString(Tag.StudyInstanceUID);
 		} finally {
-			dis.close();
+			IOUtils.closeQuietly(dis);
 		}
 		return studyIUID;
 	}
