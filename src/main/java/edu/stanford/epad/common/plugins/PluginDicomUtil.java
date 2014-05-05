@@ -112,7 +112,7 @@ public class PluginDicomUtil
 				if (positionOfImageInSeries > dicomSeriesDescriptionSearchResult.getNumberOfImagesInSeries())
 					positionOfImageInSeries = 1;
 			} else {
-				log.warning("Error calling series order route; statusCode =" + statusCode);
+				log.warning("Error calling series order route " + url + "; statusCode =" + statusCode);
 			}
 		} finally {
 			IOUtils.closeQuietly(streamReader);
