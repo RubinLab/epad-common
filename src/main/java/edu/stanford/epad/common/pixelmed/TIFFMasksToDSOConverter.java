@@ -21,6 +21,8 @@ import com.pixelmed.dicom.DicomException;
 import com.pixelmed.dicom.DicomInputStream;
 import com.pixelmed.dicom.TagFromName;
 
+import edu.stanford.epad.common.util.EPADLogger;
+
 /**
  * <p>
  * A class for converting segmentation results in TIFF files to DICOM segmentation objects.
@@ -37,6 +39,8 @@ public class TIFFMasksToDSOConverter
 	private double[][] positions = null;
 	private byte[] pixels = null;
 	private short imageWidth = 0, imageHeight = 0, imageFrames = 0;
+
+	private static final EPADLogger log = EPADLogger.getInstance();
 
 	/**
 	 * @param maskFiles: Array of the TIFF files which save the masks.
@@ -105,15 +109,16 @@ public class TIFFMasksToDSOConverter
 
 		try {
 			dicomInputStream = new DicomInputStream(new FileInputStream(dicomInputFile));
+			localAttributeList.read(dicomInputStream);
 		} finally {
 			IOUtils.closeQuietly(dicomInputStream);
 		}
-		localAttributeList.read(dicomInputStream);
-		this.attributeList = (AttributeList)localAttributeList.clone();
 
+		this.attributeList = (AttributeList)localAttributeList.clone();
 		this.imageWidth = (short)Attribute.getSingleIntegerValueOrDefault(localAttributeList, TagFromName.Columns, 1);
 		this.imageHeight = (short)Attribute.getSingleIntegerValueOrDefault(localAttributeList, TagFromName.Rows, 1);
 		this.imageFrames = (short)dicomFilenames.size();
+
 		// Get geometric info.
 		{
 			Attribute attribute = localAttributeList.get(TagFromName.SliceThickness);
