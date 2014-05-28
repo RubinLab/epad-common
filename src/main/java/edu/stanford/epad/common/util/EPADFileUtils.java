@@ -545,20 +545,20 @@ public class EPADFileUtils
 	/**
 	 * Unzip the specified file.
 	 * 
-	 * @param zipFile String path to zip file.
+	 * @param zipFilePath String path to zip file.
 	 * @throws IOException during zip or read process.
 	 */
-	public static void extractFolder(String zipFile) throws IOException
+	public static void extractFolder(String zipFilePath) throws IOException
 	{
 		try {
 			int BUFFER = 2048;
-			File file = new File(zipFile);
+			File file = new File(zipFilePath);
 
-			ZipFile zip = new ZipFile(file);
-			String newPath = zipFile.substring(0, zipFile.length() - 4);
+			ZipFile zipFile = new ZipFile(file);
+			String newPath = zipFilePath.substring(0, zipFilePath.length() - 4);
 
 			makeDirs(new File(newPath));
-			Enumeration<?> zipFileEntries = zip.entries();
+			Enumeration<?> zipFileEntries = zipFile.entries();
 
 			// Process each entry
 			while (zipFileEntries.hasMoreElements()) {
@@ -580,7 +580,7 @@ public class EPADFileUtils
 					if (!entry.isDirectory()) {
 						int currentByte;
 						byte data[] = new byte[BUFFER];
-						is = zip.getInputStream(entry);
+						is = zipFile.getInputStream(entry);
 						bis = new BufferedInputStream(is);
 						fos = new FileOutputStream(destFile);
 						bos = new BufferedOutputStream(fos, BUFFER);
@@ -595,6 +595,7 @@ public class EPADFileUtils
 					IOUtils.closeQuietly(is);
 					IOUtils.closeQuietly(bos);
 					IOUtils.closeQuietly(fos);
+					zipFile.close();
 				}
 
 				if (currentEntry.endsWith(".zip")) {
@@ -602,7 +603,7 @@ public class EPADFileUtils
 				}
 			}
 		} catch (Exception e) {
-			log.warning("Failed to unzip: " + zipFile, e);
+			log.warning("Failed to unzip: " + zipFilePath, e);
 			throw new IllegalStateException(e);
 		}
 	}
