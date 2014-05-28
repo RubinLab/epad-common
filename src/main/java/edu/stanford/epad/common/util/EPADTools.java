@@ -66,7 +66,6 @@ public class EPADTools
 		wadoUrlBuilder.setStudyUID(studyUID);
 		wadoUrlBuilder.setSeriesUID(seriesUID);
 		wadoUrlBuilder.setObjectUID(imageUID);
-
 		String wadoUrl = wadoUrlBuilder.build();
 
 		// log.info("WADO download query: " + wadoUrl);
@@ -87,6 +86,7 @@ public class EPADTools
 				}
 			} finally {
 				IOUtils.closeQuietly(outputStream);
+				method.releaseConnection();
 			}
 		}
 		return statusCode;
@@ -110,7 +110,6 @@ public class EPADTools
 			Process process = pb.start();
 			process.getOutputStream();// get the output stream.
 			is = process.getInputStream();
-
 			isr = new InputStreamReader(is);
 			br = new BufferedReader(isr);
 

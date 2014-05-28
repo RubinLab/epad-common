@@ -1,12 +1,16 @@
 package edu.stanford.epad.common.pixelmed;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 
 import com.pixelmed.dicom.Attribute;
 import com.pixelmed.dicom.AttributeList;
+import com.pixelmed.dicom.AttributeTag;
+import com.pixelmed.dicom.DicomDictionary;
 import com.pixelmed.dicom.DicomException;
 import com.pixelmed.dicom.DicomInputStream;
 import com.pixelmed.dicom.SOPClass;
@@ -23,6 +27,35 @@ public class PixelMedUtils
 
 	private PixelMedUtils()
 	{
+	}
+
+	public static AttributeList readDICOMAttributeList(File dicomFile)
+	{
+		AttributeList attributeList = new AttributeList();
+		DicomInputStream dicomInputStream = null;
+
+		try {
+			dicomInputStream = new DicomInputStream(new FileInputStream(dicomFile.getAbsolutePath()));
+			attributeList.read(dicomInputStream);
+		} catch (FileNotFoundException e) {
+			log.warning("Could not find DICOM tag file " + dicomFile.getAbsolutePath());
+		} catch (IOException e) {
+			log.warning("Exception reading DICOM tag file " + dicomFile.getAbsolutePath(), e);
+		} catch (DicomException e) {
+			log.warning("DICOM exception reading DICOM tag file " + dicomFile.getAbsolutePath(), e);
+		} finally {
+			IOUtils.closeQuietly(dicomInputStream);
+		}
+
+		return attributeList;
+	}
+
+	public static void logAttributesList(AttributeList attributeList)
+	{
+		DicomDictionary dd = new DicomDictionary();
+		for (AttributeTag key : attributeList.keySet()) {
+			log.info("key " + dd.getNameFromTag(key) + ", value " + attributeList.get(key));
+		}
 	}
 
 	public static AttributeList readAttributeListFromDicomFile(String dicomFilePath) throws IOException, DicomException

@@ -27,6 +27,8 @@ import edu.stanford.epad.common.util.EPADFileUtils;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.epad.common.util.EPADResources;
 
+// TODO See is we can get red of this and replace with PixelMedUtils.readDICOMAttributeList
+
 public class DicomTagFileUtils
 {
 	private static final EPADLogger logger = EPADLogger.getInstance();

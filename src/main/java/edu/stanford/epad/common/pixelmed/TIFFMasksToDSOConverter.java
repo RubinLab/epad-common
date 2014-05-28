@@ -32,7 +32,7 @@ import edu.stanford.epad.common.util.EPADLogger;
  */
 public class TIFFMasksToDSOConverter
 {
-	private AttributeList attributeList = new AttributeList();
+	private AttributeList dicomAttributes = new AttributeList();
 	private final short[] orientation = new short[] { 1, 0, 0, 0, 0, 1 };
 	private double[] spacing = new double[] { 0.65, 0.8 };
 	private double thickness = 0.5;
@@ -57,10 +57,10 @@ public class TIFFMasksToDSOConverter
 			getAttributesFromDICOMFiles(dicomFiles);
 			getPixelsFromMaskFiles(maskFiles);
 		} catch (Exception e) {
-			throw (new DicomException("Error reading dicom files: " + e.getMessage()));
+			throw (new DicomException("Error reading DICOM files: " + e.getMessage()));
 		}
 
-		SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(attributeList, orientation, spacing,
+		SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(dicomAttributes, orientation, spacing,
 				thickness);
 		CodedConcept category = new CodedConcept("260787004" /* conceptUniqueIdentifier */,
 				"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
@@ -114,7 +114,8 @@ public class TIFFMasksToDSOConverter
 			IOUtils.closeQuietly(dicomInputStream);
 		}
 
-		this.attributeList = (AttributeList)localAttributeList.clone();
+		this.dicomAttributes = (AttributeList)localAttributeList.clone();
+
 		this.imageWidth = (short)Attribute.getSingleIntegerValueOrDefault(localAttributeList, TagFromName.Columns, 1);
 		this.imageHeight = (short)Attribute.getSingleIntegerValueOrDefault(localAttributeList, TagFromName.Rows, 1);
 		this.imageFrames = (short)dicomFilenames.size();

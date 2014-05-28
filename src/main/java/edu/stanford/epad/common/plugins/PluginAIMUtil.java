@@ -6,9 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import edu.stanford.epad.common.dicom.DicomTagFileUtils;
+import com.pixelmed.dicom.Attribute;
+import com.pixelmed.dicom.AttributeList;
+import com.pixelmed.dicom.TagFromName;
+
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.epad.common.util.EPADResources;
 import edu.stanford.epad.common.util.EPADTools;
@@ -30,38 +32,39 @@ public class PluginAIMUtil
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
 
-	public static ImageAnnotation generateDSOImageAnnotation(ImageAnnotation templateImageAnnotation,
-			Map<String, String> dicomHeaders) throws AimException
+	/**
+	 * Currently called by plugins after generating DSO.
+	 * 
+	 * {@link DicomSegmentationObjectPNGMaskGeneratorTask#generateAIMFileForDSO} for DSO AIM generation.
+	 */
+	public static ImageAnnotation generateAIMFileForDSO(ImageAnnotation templateImageAnnotation,
+			AttributeList dsoDICOMAttributes, String sourceStudyUID, String sourceSeriesUID, String sourceImageUID)
+			throws AimException
 	{
-		String username = PluginAIMUtil.getOwnerFromImageAnnotation(templateImageAnnotation);
-		Person person = PluginAIMUtil.getPersonFromImageAnnotation(templateImageAnnotation);
-		String sopClassUID = dicomHeaders.get(DicomTagFileUtils.SOP_CLASS_UID);
-		String dsoStudyInstanceUID = dicomHeaders.get(DicomTagFileUtils.STUDY_UID);
-		String dsoSeriesInstanceUID = dicomHeaders.get(DicomTagFileUtils.SERIES_UID);
-		String dsoSOPInstanceUID = dicomHeaders.get(DicomTagFileUtils.SOP_INST_UID);
-		String sourceSOPInstanceUID = dicomHeaders.get(DicomTagFileUtils.REFERENCED_SOP_INSTANCE_UID);
-		String sourceSeriesInstanceUID = PluginDicomUtil.getDicomSeriesUIDFromImageUID(sourceSOPInstanceUID);
-		String sourceStudyInstanceUID = dsoStudyInstanceUID; // Will be same study as DSO
+		String patientID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientID);
+		String patientName = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientName);
+		String sopClassUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPClassUID);
+		String dsoStudyUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.StudyInstanceUID);
+		String dsoSeriesUID = Attribute
+				.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SeriesInstanceUID);
+		String dsoImageUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPInstanceUID);
 
-		// TODO Do header integrity checking here
+		String username = getOwnerFromImageAnnotation(templateImageAnnotation);
+		// Person person = getPersonFromImageAnnotation(templateImageAnnotation);
 
-		ImageAnnotation dsoImageAnnotation = new ImageAnnotation(0, "", "2000-10-17T10:22:40", "segmentation", "SEG",
-				"SEG Only", "", "", "");
+		log.info("template AIM ID " + templateImageAnnotation.getUniqueIdentifier());
 
-		PluginAIMUtil.setImageAnnotationUser(dsoImageAnnotation, username);
+		log.info("patientID " + patientID);
+		log.info("patientName " + patientName);
+		log.info("DSO Study " + dsoStudyUID);
+		log.info("DSO Series " + dsoSeriesUID);
+		log.info("DSO Image " + dsoImageUID);
+		log.info("User " + username);
 
-		PluginAIMUtil.addSegmentToImageAnnotation(sopClassUID, dsoSOPInstanceUID, dsoImageAnnotation);
+		addSegmentToImageAnnotation(sopClassUID, dsoImageUID, templateImageAnnotation);
+		addDICOMImageReferenceToImageAnnotation(dsoStudyUID, dsoSeriesUID, dsoImageUID, templateImageAnnotation);
 
-		PluginAIMUtil.addDICOMImageReferenceToImageAnnotation(dsoStudyInstanceUID, dsoSeriesInstanceUID, dsoSOPInstanceUID,
-				dsoImageAnnotation);
-		PluginAIMUtil.addDICOMImageReferenceToImageAnnotation(sourceStudyInstanceUID, sourceSeriesInstanceUID,
-				sourceSOPInstanceUID, dsoImageAnnotation);
-
-		dsoImageAnnotation.addPerson(person);
-
-		PluginAIMUtil.addPolylineToImageAnnotation(templateImageAnnotation);
-
-		return dsoImageAnnotation;
+		return templateImageAnnotation;
 	}
 
 	public static ImageAnnotation getImageAnnotationFromServer(String aimID) throws AimException
@@ -82,9 +85,7 @@ public class PluginAIMUtil
 		ImageAnnotation aim = AnnotationGetter.getImageAnnotationFromServerByUniqueIdentifier(eXistServerUrl, namespace,
 				eXistCollection, username, password, validAIMFileName, aim3XSDFilePath);
 
-		if (aim != null)
-			log.info("Found AIM annotation on server with ID " + aimID);
-		else
+		if (aim == null)
 			log.warning("Could not find AIM annotation on server with ID " + aimID);
 
 		return aim;
@@ -102,7 +103,7 @@ public class PluginAIMUtil
 		AnnotationBuilder.saveToServer(imageAnnotation, serverUrl, namespace, collection, xsdFilePath, username, password);
 
 		String result = AnnotationBuilder.getAimXMLsaveResult();
-		log.info("AnnotationBuilder.saveToServer result: " + result);
+		log.info("AIM file aith ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
 	}
 
 	public static String getOwnerFromImageAnnotation(ImageAnnotation aim) throws AimException
@@ -129,36 +130,6 @@ public class PluginAIMUtil
 		User user = new User();
 		user.setLoginName(username);
 		imageAnnotation.setListUser(userList);
-	}
-
-	public static void addSegmentToImageAnnotation(String sopClassUID, String dsoSOPInstanceUID,
-			ImageAnnotation dsoImageAnnotation)
-	{
-		SegmentationCollection sc = new SegmentationCollection();
-		sc.AddSegmentation(new Segmentation(0, "", sopClassUID, dsoSOPInstanceUID, 1));
-		dsoImageAnnotation.setSegmentationCollection(sc);
-	}
-
-	public static void addDICOMImageReferenceToImageAnnotation(String studyInstanceUID, String seriesInstanceUID,
-			String sopInstanceUID, ImageAnnotation imageAnnotation)
-	{
-		DICOMImageReference dicomImageReference = createDICOMImageReference(studyInstanceUID, seriesInstanceUID,
-				sopInstanceUID);
-		imageAnnotation.addImageReference(dicomImageReference);
-	}
-
-	public static void addPolylineToImageAnnotation(ImageAnnotation templateImageAnnotation)
-	{
-		Polyline polyline = new Polyline();
-		polyline.setCagridId(0);
-		polyline.setIncludeFlag(false);
-		polyline.setShapeIdentifier(0);
-		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 0, "0", 0, 2693.0, 1821.0));
-		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 1, "0", 0, 3236.0, 1821.0));
-		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 2, "0", 0, 3236.0, 2412.0));
-		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 3, "0", 0, 2693.0, 2412.0));
-		polyline.setLineStyle("lineStyle");
-		templateImageAnnotation.addGeometricShape(polyline);
 	}
 
 	public static DICOMImageReference createDICOMImageReference(String dsoStudyInstanceUID, String dsoSeriesInstanceUID,
@@ -190,7 +161,7 @@ public class PluginAIMUtil
 	}
 
 	/**
-	 * Get the concurrent path if possible, otherwise get the absolute path.
+	 * Get the canonical path if possible, otherwise get the absolute path.
 	 * 
 	 * @param file File
 	 * @return String path of file. Concurrent path if possible.
@@ -244,7 +215,7 @@ public class PluginAIMUtil
 		return getUIDFromAIM("Image", "sopInstanceUID", aimFileContents);
 	}
 
-	public static String getUIDFromAIM(String tag, String attribute, String aimFileContents)
+	private static String getUIDFromAIM(String tag, String attribute, String aimFileContents)
 			throws PluginServletException
 	{
 
@@ -272,4 +243,33 @@ public class PluginAIMUtil
 		}
 	}
 
+	private static void addPolylineToImageAnnotation(ImageAnnotation templateImageAnnotation)
+	{
+		Polyline polyline = new Polyline();
+		polyline.setCagridId(0);
+		polyline.setIncludeFlag(false);
+		polyline.setShapeIdentifier(0);
+		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 0, "0", 0, 2693.0, 1821.0));
+		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 1, "0", 0, 3236.0, 1821.0));
+		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 2, "0", 0, 3236.0, 2412.0));
+		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 3, "0", 0, 2693.0, 2412.0));
+		polyline.setLineStyle("lineStyle");
+		templateImageAnnotation.addGeometricShape(polyline);
+	}
+
+	private static void addSegmentToImageAnnotation(String sopClassUID, String dsoSOPInstanceUID,
+			ImageAnnotation dsoImageAnnotation)
+	{
+		SegmentationCollection sc = new SegmentationCollection();
+		sc.AddSegmentation(new Segmentation(0, "", sopClassUID, dsoSOPInstanceUID, 1));
+		dsoImageAnnotation.setSegmentationCollection(sc);
+	}
+
+	private static void addDICOMImageReferenceToImageAnnotation(String studyInstanceUID, String seriesInstanceUID,
+			String sopInstanceUID, ImageAnnotation imageAnnotation)
+	{
+		DICOMImageReference dicomImageReference = createDICOMImageReference(studyInstanceUID, seriesInstanceUID,
+				sopInstanceUID);
+		imageAnnotation.addImageReference(dicomImageReference);
+	}
 }

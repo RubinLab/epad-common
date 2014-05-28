@@ -22,7 +22,9 @@ public class PluginDicomUtil
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
 
-	public static String getDicomSeriesUIDFromImageUID(String imageUID)
+	// TODO Remove this
+	@SuppressWarnings("unused")
+	private static String getDicomSeriesUIDFromImageUID(String imageUID)
 	{
 		// TODO Get from config file via EPADTools
 		String url = "http://localhost:8080/epad/segmentationpath/" + "?image_iuid=" + imageUID;
