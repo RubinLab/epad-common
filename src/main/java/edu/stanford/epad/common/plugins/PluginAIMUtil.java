@@ -20,10 +20,8 @@ import edu.stanford.hakan.aim3api.base.ImageAnnotation;
 import edu.stanford.hakan.aim3api.base.ImageSeries;
 import edu.stanford.hakan.aim3api.base.ImageStudy;
 import edu.stanford.hakan.aim3api.base.Person;
-import edu.stanford.hakan.aim3api.base.Polyline;
 import edu.stanford.hakan.aim3api.base.Segmentation;
 import edu.stanford.hakan.aim3api.base.SegmentationCollection;
-import edu.stanford.hakan.aim3api.base.TwoDimensionSpatialCoordinate;
 import edu.stanford.hakan.aim3api.base.User;
 import edu.stanford.hakan.aim3api.usage.AnnotationBuilder;
 import edu.stanford.hakan.aim3api.usage.AnnotationGetter;
@@ -241,20 +239,6 @@ public class PluginAIMUtil
 		} else {
 			throw new PluginServletException("input error", "Didn't find attribute: " + attribute);
 		}
-	}
-
-	private static void addPolylineToImageAnnotation(ImageAnnotation templateImageAnnotation)
-	{
-		Polyline polyline = new Polyline();
-		polyline.setCagridId(0);
-		polyline.setIncludeFlag(false);
-		polyline.setShapeIdentifier(0);
-		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 0, "0", 0, 2693.0, 1821.0));
-		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 1, "0", 0, 3236.0, 1821.0));
-		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 2, "0", 0, 3236.0, 2412.0));
-		polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, 3, "0", 0, 2693.0, 2412.0));
-		polyline.setLineStyle("lineStyle");
-		templateImageAnnotation.addGeometricShape(polyline);
 	}
 
 	private static void addSegmentToImageAnnotation(String sopClassUID, String dsoSOPInstanceUID,
