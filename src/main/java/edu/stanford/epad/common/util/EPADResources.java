@@ -65,8 +65,8 @@ public class EPADResources
 	/**
 	 * Get the base directory for the ePAD web server.
 	 * <p>
-	 * For the moment, we use ~/DicomProxy as the base directory for compatibility with pre-Restlet calls. Ultimately we
-	 * will change location to something more general.
+	 * For the moment, we use ~/DicomProxy as the base directory for compatibility with older calls. Ultimately we will
+	 * change location to something more general.
 	 * 
 	 * @return File Base directory for ePAD web server.
 	 */
