@@ -82,6 +82,7 @@ public class SegmentationObjectsFileWriter
 	 * @param slice_thickness
 	 * @throws DicomException
 	 */
+	@SuppressWarnings("deprecation")
 	public SegmentationObjectsFileWriter(AttributeList original_attrs, short[] patient_orientation,
 			double[] pixel_spacing, double slice_thickness) throws DicomException
 	{
@@ -1231,13 +1232,14 @@ public class SegmentationObjectsFileWriter
 
 			obj = new SegmentationObjectsFileWriter(list, orientation, spacing, thickness);
 
-			CodedConcept category = new CodedConcept("260787004" /* conceptUniqueIdentifier */,
+			CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
 					"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
 					null /* codingSchemeVersion */, "A-00004" /* codeValue */, "Physical Object" /* codeMeaning */,
 					null /* codeStringEquivalent */, null /* synonynms */);
-			CodedConcept type = new CodedConcept(null /* conceptUniqueIdentifier */, "SRT" /* codingSchemeDesignator */,
-					null /* legacyCodingSchemeDesignator */, null /* codingSchemeVersion */, "T-32000" /* codeValue */,
-					"Heart" /* codeMeaning */, null /* codeStringEquivalent */, null /* synonynms */);
+			CodedConcept type = new CodedConcept("C0018787" /* conceptUniqueIdentifier */, "80891009" /* SNOMED CID */,
+					"SRT" /* codingSchemeDesignator */, null /* legacyCodingSchemeDesignator */,
+					null /* codingSchemeVersion */, "T-32000" /* codeValue */, "Heart" /* codeMeaning */,
+					null /* codeStringEquivalent */, null /* synonynms */);
 			double[][] positions = new double[image_frames][3];
 			/*
 			 * void AddAllFrames(byte [] frames, int frame_num, int image_width, int image_height, String type, double [][]

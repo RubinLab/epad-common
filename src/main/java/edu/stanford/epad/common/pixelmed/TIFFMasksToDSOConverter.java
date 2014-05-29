@@ -21,8 +21,6 @@ import com.pixelmed.dicom.DicomException;
 import com.pixelmed.dicom.DicomInputStream;
 import com.pixelmed.dicom.TagFromName;
 
-import edu.stanford.epad.common.util.EPADLogger;
-
 /**
  * <p>
  * A class for converting segmentation results in TIFF files to DICOM segmentation objects.
@@ -39,8 +37,6 @@ public class TIFFMasksToDSOConverter
 	private double[][] positions = null;
 	private byte[] pixels = null;
 	private short imageWidth = 0, imageHeight = 0, imageFrames = 0;
-
-	private static final EPADLogger log = EPADLogger.getInstance();
 
 	/**
 	 * @param maskFiles: Array of the TIFF files which save the masks.
@@ -60,23 +56,34 @@ public class TIFFMasksToDSOConverter
 			throw (new DicomException("Error reading DICOM files: " + e.getMessage()));
 		}
 
+		/**
+		 * The latest version of Pixelmed has an extra parameter.
+		 * <p>
+		 * <code>
+		 * A-00004 are C0085089 (CUI) and 260787004 (SNOMED CID)
+		 * T-32000 are C0018787 (CUI) and 80891009 (SNOMED CID)
+		 * </code>
+		 */
 		SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(dicomAttributes, orientation, spacing,
 				thickness);
-		CodedConcept category = new CodedConcept("260787004" /* conceptUniqueIdentifier */,
+		CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
 				"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
 				null /* codingSchemeVersion */, "A-00004" /* codeValue */, "Physical Object" /* codeMeaning */,
 				null /* codeStringEquivalent */, null /* synonynms */);
-		CodedConcept type = new CodedConcept(null /* conceptUniqueIdentifier */, "SRT" /* codingSchemeDesignator */,
-				null /* legacyCodingSchemeDesignator */, null /* codingSchemeVersion */, "T-32000" /* codeValue */,
-				"Heart" /* codeMeaning */, null /* codeStringEquivalent */, null /* synonynms */);
+		CodedConcept type = new CodedConcept("C0018787" /* conceptUniqueIdentifier */, "80891009" /* SNOMED CID */,
+				"SRT" /* codingSchemeDesignator */, null /* legacyCodingSchemeDesignator */, null /* codingSchemeVersion */,
+				"T-32000" /* codeValue */, "Heart" /* codeMeaning */, null /* codeStringEquivalent */, null /* synonynms */);
 
 		dsoWriter.addOneSegment("Segment No.1 is for ...", category, type);
-
 		dsoWriter.addAllFrames(pixels, imageFrames, imageWidth, imageHeight, "binary", (short)0, positions);
-
 		dsoWriter.saveDicomFile(outputFile);
 	}
 
+	/**
+	 * <code>
+	 * 
+	 * </code>
+	 */
 	/**
 	 * List the files in the assigned path and sort the filenames in alphabetic order.
 	 * 
