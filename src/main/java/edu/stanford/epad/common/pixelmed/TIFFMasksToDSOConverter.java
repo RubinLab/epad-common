@@ -21,6 +21,8 @@ import com.pixelmed.dicom.DicomException;
 import com.pixelmed.dicom.DicomInputStream;
 import com.pixelmed.dicom.TagFromName;
 
+import edu.stanford.epad.common.util.EPADLogger;
+
 /**
  * <p>
  * A class for converting segmentation results in TIFF files to DICOM segmentation objects.
@@ -35,48 +37,44 @@ public class TIFFMasksToDSOConverter
 	private double[] spacing = new double[] { 0.65, 0.8 };
 	private double thickness = 0.5;
 	private double[][] positions = null;
-	private byte[] pixels = null;
-	private short imageWidth = 0, imageHeight = 0, imageFrames = 0;
+	private short imageWidth = 0, imageHeight = 0, numberOfFrames = 0;
+
+	private static final EPADLogger log = EPADLogger.getInstance();
 
 	/**
-	 * @param maskFiles: Array of the TIFF files which save the masks.
+	 * @param maskFiles: Array of the TIFF files which contain the masks.
 	 * @param dicomFiles: Array of the original DICOM files.
 	 * @param outputFile: Name of the output segmentation objects file.
 	 * @throws DicomException
-	 * @throws IOException
 	 */
-	public void convert(List<String> maskFiles, List<String> dicomFiles, String outputFile) throws DicomException,
-			IOException
+	public void convert(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath)
+			throws DicomException
 	{
 		try {
-			// Fills in: attributeList, orientation, spacing, thickness, positions, pixels
-			getAttributesFromDICOMFiles(dicomFiles);
-			getPixelsFromMaskFiles(maskFiles);
+			// Following call fills in: dicomAttributes, orientation, spacing, thickness, positions, pixels, imageWidth,
+			// imageHeight, imageFrames
+			getAttributesFromDICOMFiles(dicomFilePaths);
+
+			byte[] pixels = getPixelsFromMaskFiles(maskFilePaths);
+
+			SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(dicomAttributes, orientation,
+					spacing, thickness);
+			CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
+					"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
+					null /* codingSchemeVersion */, "A-00004" /* codeValue */, "Physical Object" /* codeMeaning */,
+					null /* codeStringEquivalent */, null /* synonynms */);
+			CodedConcept type = new CodedConcept("C0018787" /* conceptUniqueIdentifier */, "80891009" /* SNOMED CID */,
+					"SRT" /* codingSchemeDesignator */, null /* legacyCodingSchemeDesignator */,
+					null /* codingSchemeVersion */, "T-32000" /* codeValue */, "Heart" /* codeMeaning */,
+					null /* codeStringEquivalent */, null /* synonynms */);
+
+			dsoWriter.addOneSegment("Segment No.1 is for ...", category, type);
+			dsoWriter.addAllFrames(pixels, numberOfFrames, imageWidth, imageHeight, "binary", (short)0, positions);
+			dsoWriter.saveDicomFile(outputFilePath);
 		} catch (Exception e) {
-			throw (new DicomException("Error reading DICOM files: " + e.getMessage()));
+			log.warning("Error generating DSO: " + e.getMessage());
+			throw (new DicomException("Error generating DSO: " + e.getMessage()));
 		}
-
-		/**
-		 * The latest version of Pixelmed has an extra parameter.
-		 * <p>
-		 * <code>
-		 * A-00004 are C0085089 (CUI) and 260787004 (SNOMED CID)
-		 * T-32000 are C0018787 (CUI) and 80891009 (SNOMED CID)
-		 * </code>
-		 */
-		SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(dicomAttributes, orientation, spacing,
-				thickness);
-		CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
-				"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
-				null /* codingSchemeVersion */, "A-00004" /* codeValue */, "Physical Object" /* codeMeaning */,
-				null /* codeStringEquivalent */, null /* synonynms */);
-		CodedConcept type = new CodedConcept("C0018787" /* conceptUniqueIdentifier */, "80891009" /* SNOMED CID */,
-				"SRT" /* codingSchemeDesignator */, null /* legacyCodingSchemeDesignator */, null /* codingSchemeVersion */,
-				"T-32000" /* codeValue */, "Heart" /* codeMeaning */, null /* codeStringEquivalent */, null /* synonynms */);
-
-		dsoWriter.addOneSegment("Segment No.1 is for ...", category, type);
-		dsoWriter.addAllFrames(pixels, imageFrames, imageWidth, imageHeight, "binary", (short)0, positions);
-		dsoWriter.saveDicomFile(outputFile);
 	}
 
 	/**
@@ -90,7 +88,7 @@ public class TIFFMasksToDSOConverter
 	 * @param folderPath
 	 * @return Names of the files.
 	 */
-	public static List<String> listFilesInAlphabeticOrder(String folderPath)
+	private static List<String> listFilesInAlphabeticOrder(String folderPath)
 	{
 		final File folderFile = new File(folderPath);
 		File[] listOfFiles = folderFile.listFiles();
@@ -107,47 +105,44 @@ public class TIFFMasksToDSOConverter
 		return fileList;
 	}
 
-	private void getAttributesFromDICOMFiles(List<String> dicomFilenames) throws FileNotFoundException, IOException,
+	private void getAttributesFromDICOMFiles(List<String> dicomFilePaths) throws FileNotFoundException, IOException,
 			DicomException
 	{
-		AttributeList localAttributeList = new AttributeList();
-		String dicomInputFile = dicomFilenames.get(0);
-		DicomInputStream dicomInputStream = null;
+		AttributeList localDICOMAttributes = new AttributeList();
+		String dicomInputFile = dicomFilePaths.get(0);
 
+		DicomInputStream dicomInputStream = null;
 		try {
 			dicomInputStream = new DicomInputStream(new FileInputStream(dicomInputFile));
-			localAttributeList.read(dicomInputStream);
+			localDICOMAttributes.read(dicomInputStream);
 		} finally {
 			IOUtils.closeQuietly(dicomInputStream);
 		}
 
-		this.dicomAttributes = (AttributeList)localAttributeList.clone();
+		this.dicomAttributes = (AttributeList)localDICOMAttributes.clone();
+		this.imageWidth = (short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Columns, 1);
+		this.imageHeight = (short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Rows, 1);
+		this.numberOfFrames = (short)dicomFilePaths.size();
 
-		this.imageWidth = (short)Attribute.getSingleIntegerValueOrDefault(localAttributeList, TagFromName.Columns, 1);
-		this.imageHeight = (short)Attribute.getSingleIntegerValueOrDefault(localAttributeList, TagFromName.Rows, 1);
-		this.imageFrames = (short)dicomFilenames.size();
-
-		// Get geometric info.
-		{
-			Attribute attribute = localAttributeList.get(TagFromName.SliceThickness);
-			this.thickness = attribute.getSingleDoubleValueOrDefault(0.1);
-			attribute = localAttributeList.get(TagFromName.PixelSpacing);
-			this.spacing = attribute.getDoubleValues();
-			attribute = localAttributeList.get(TagFromName.ImageOrientationPatient);
-			String[] s = attribute.getStringValues();
+		{ // Get geometric info.
+			Attribute dicomAttribute = localDICOMAttributes.get(TagFromName.SliceThickness);
+			this.thickness = dicomAttribute.getSingleDoubleValueOrDefault(0.1);
+			dicomAttribute = localDICOMAttributes.get(TagFromName.PixelSpacing);
+			this.spacing = dicomAttribute.getDoubleValues();
+			dicomAttribute = localDICOMAttributes.get(TagFromName.ImageOrientationPatient);
+			String[] s = dicomAttribute.getStringValues();
 			for (int i = 0; i < s.length; i++)
 				this.orientation[i] = (short)Float.parseFloat(s[i]);
 		}
 
-		// Get position of each frame.
-		try { // Get sequence format.
-			positions = new double[imageFrames][3];
-			for (int i = 0; i < dicomFilenames.size(); i++) {
-				dicomInputFile = dicomFilenames.get(i);
+		try { // Get sequence format. Get position of each frame.
+			positions = new double[numberOfFrames][3];
+			for (int i = 0; i < dicomFilePaths.size(); i++) {
+				dicomInputFile = dicomFilePaths.get(i);
 				dicomInputStream = new DicomInputStream(new FileInputStream(dicomInputFile));
-				localAttributeList.clear();
-				localAttributeList.read(dicomInputStream);
-				Attribute attribute = localAttributeList.get(TagFromName.ImagePositionPatient);
+				localDICOMAttributes.clear();
+				localDICOMAttributes.read(dicomInputStream);
+				Attribute attribute = localDICOMAttributes.get(TagFromName.ImagePositionPatient);
 				this.positions[i] = attribute.getDoubleValues();
 			}
 		} finally {
@@ -155,24 +150,27 @@ public class TIFFMasksToDSOConverter
 		}
 	}
 
-	private void getPixelsFromMaskFiles(List<String> maskFileNames) throws FileNotFoundException, IOException,
+	private byte[] getPixelsFromMaskFiles(List<String> maskFilePaths) throws FileNotFoundException, IOException,
 			DicomException
 	{
-		for (int i = 0; i < maskFileNames.size(); i++) {
-			File maskFile = new File(maskFileNames.get(i));
+		byte[] pixels = null;
+
+		for (int i = 0; i < maskFilePaths.size(); i++) {
+			File maskFile = new File(maskFilePaths.get(i));
 			BufferedImage maskImage = ImageIO.read(maskFile);
 			// BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(),
 			// BufferedImage.TYPE_BYTE_BINARY);
 			byte[] new_frame = ((DataBufferByte)maskImage.getRaster().getDataBuffer()).getData();
-			if (this.pixels == null) {
-				this.pixels = new_frame.clone();
+			if (pixels == null) {
+				pixels = new_frame.clone();
 			} else {
 				byte[] temp = new byte[pixels.length + new_frame.length];
-				System.arraycopy(pixels, 0, temp, 0, this.pixels.length);
-				System.arraycopy(new_frame, 0, temp, this.pixels.length, new_frame.length);
-				this.pixels = temp.clone();
+				System.arraycopy(pixels, 0, temp, 0, pixels.length);
+				System.arraycopy(new_frame, 0, temp, pixels.length, new_frame.length);
+				pixels = temp.clone();
 			}
 		}
+		return pixels;
 	}
 
 	/**
@@ -184,17 +182,17 @@ public class TIFFMasksToDSOConverter
 		String dicomFilesDirectory = args[1];
 		String outputFileName = args[2];
 
-		List<String> dicomFileNames = listFilesInAlphabeticOrder(dicomFilesDirectory);
-		List<String> maskFileNames = listFilesInAlphabeticOrder(maskFilesDirectory);
+		List<String> dicomFilePaths = listFilesInAlphabeticOrder(dicomFilesDirectory);
+		List<String> maskFilePaths = listFilesInAlphabeticOrder(maskFilesDirectory);
 
-		if (dicomFileNames.size() > maskFileNames.size())
-			dicomFileNames = dicomFileNames.subList(0, maskFileNames.size());
-		else if (maskFileNames.size() > dicomFileNames.size())
-			maskFileNames = maskFileNames.subList(0, dicomFileNames.size());
+		if (dicomFilePaths.size() > maskFilePaths.size())
+			dicomFilePaths = dicomFilePaths.subList(0, maskFilePaths.size());
+		else if (maskFilePaths.size() > dicomFilePaths.size())
+			maskFilePaths = maskFilePaths.subList(0, dicomFilePaths.size());
 
 		try {
 			TIFFMasksToDSOConverter converter = new TIFFMasksToDSOConverter();
-			converter.convert(maskFileNames, dicomFileNames, outputFileName);
+			converter.convert(maskFilePaths, dicomFilePaths, outputFileName);
 		} catch (Exception e) {
 			System.err.println(e);
 			e.printStackTrace(System.err);

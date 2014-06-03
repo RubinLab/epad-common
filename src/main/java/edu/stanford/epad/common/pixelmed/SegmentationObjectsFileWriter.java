@@ -617,14 +617,11 @@ public class SegmentationObjectsFileWriter
 	public void addAllFrames(byte[] frames, int frame_num, int image_width, int image_height, String type,
 			short stack_id, double[][] positions) throws DicomException, IOException
 	{
-		// Validate the input data and parameter.
-		if (frames == null) {
+		if (frames == null)
 			throw (new DicomException("There is no pixel data!"));
-		}
 
-		if (frame_num <= 0 || image_width <= 0 || image_height <= 0) {
+		if (frame_num <= 0 || image_width <= 0 || image_height <= 0)
 			throw (new DicomException("Image size is not correct!"));
-		}
 
 		if (type == null)
 			type = "BINARY";

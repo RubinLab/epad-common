@@ -1,6 +1,7 @@
 package edu.stanford.epad.common.plugins;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class PluginDicomUtil
 		}
 	}
 
-	public static List<String> getDicomImageUIDsInSeries(String seriesUID, String sessionID) throws Exception
+	public static List<String> getDicomImageUIDsInSeries(String seriesUID, String sessionID) throws IOException
 	{
 		String url = EPADTools.seriesOrderURI + "?series_iuid=" + seriesUID;
 		HttpClient client = new HttpClient();
