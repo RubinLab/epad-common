@@ -15,15 +15,15 @@ public class DicomSegmentationObject
 {
 	private static final EPADLogger logger = EPADLogger.getInstance();
 
-	public SourceImage convert(String name)
+	public SourceImage convert(String filePath)
 	{
 		SourceImage source = null;
 		try {
-			source = new SourceImage(name);
+			source = new SourceImage(filePath);
 		} catch (IOException e) {
-			logger.warning("SourceImage failed: " + name, e);
+			logger.warning("SourceImage failed: " + filePath, e);
 		} catch (DicomException e) {
-			logger.warning("SourceImage failed: " + name, e);
+			logger.warning("SourceImage failed: " + filePath, e);
 		}
 		return source;
 	}

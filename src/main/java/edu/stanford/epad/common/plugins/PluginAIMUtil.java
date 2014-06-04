@@ -30,41 +30,6 @@ public class PluginAIMUtil
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
 
-	/**
-	 * Currently called by plugins after generating DSO.
-	 * 
-	 * {@link DicomSegmentationObjectPNGMaskGeneratorTask#generateAIMFileForDSO} for DSO AIM generation.
-	 */
-	public static ImageAnnotation generateAIMFileForDSO(ImageAnnotation templateImageAnnotation,
-			AttributeList dsoDICOMAttributes, String sourceStudyUID, String sourceSeriesUID, String sourceImageUID)
-			throws AimException
-	{
-		String patientID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientID);
-		String patientName = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientName);
-		String sopClassUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPClassUID);
-		String dsoStudyUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.StudyInstanceUID);
-		String dsoSeriesUID = Attribute
-				.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SeriesInstanceUID);
-		String dsoImageUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPInstanceUID);
-
-		String username = getOwnerFromImageAnnotation(templateImageAnnotation);
-		// Person person = getPersonFromImageAnnotation(templateImageAnnotation);
-
-		log.info("template AIM ID " + templateImageAnnotation.getUniqueIdentifier());
-
-		log.info("patientID " + patientID);
-		log.info("patientName " + patientName);
-		log.info("DSO Study " + dsoStudyUID);
-		log.info("DSO Series " + dsoSeriesUID);
-		log.info("DSO Image " + dsoImageUID);
-		log.info("User " + username);
-
-		addSegmentToImageAnnotation(sopClassUID, dsoImageUID, templateImageAnnotation);
-		addDICOMImageReferenceToImageAnnotation(dsoStudyUID, dsoSeriesUID, dsoImageUID, templateImageAnnotation);
-
-		return templateImageAnnotation;
-	}
-
 	public static ImageAnnotation getImageAnnotationFromServer(String aimID) throws AimException
 	{
 		String namespace = EPADTools.aim3Namespace;
@@ -101,16 +66,7 @@ public class PluginAIMUtil
 		AnnotationBuilder.saveToServer(imageAnnotation, serverUrl, namespace, collection, xsdFilePath, username, password);
 
 		String result = AnnotationBuilder.getAimXMLsaveResult();
-		log.info("AIM file aith ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
-	}
-
-	public static String getOwnerFromImageAnnotation(ImageAnnotation aim) throws AimException
-	{
-		if (aim.getListUser() != null) {
-			if (!aim.getListUser().isEmpty())
-				return aim.getListUser().get(0).getLoginName();
-		}
-		throw new AimException("No User in image annotation");
+		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
 	}
 
 	public static Person getPersonFromImageAnnotation(ImageAnnotation aim) throws AimException
@@ -130,32 +86,39 @@ public class PluginAIMUtil
 		imageAnnotation.setListUser(userList);
 	}
 
-	public static DICOMImageReference createDICOMImageReference(String dsoStudyInstanceUID, String dsoSeriesInstanceUID,
-			String dsoSOPInstanceUID)
+	/**
+	 * Currently called by plugins after generating DSO.
+	 * <p>
+	 * Also see {@link AIMUtil#generateAIMFileForDSO} for DSO AIM generation when not invoked from plugin.
+	 */
+	public static ImageAnnotation generateAIMFileForDSO(ImageAnnotation templateImageAnnotation,
+			AttributeList dsoDICOMAttributes, String sourceStudyUID, String sourceSeriesUID, String sourceImageUID)
+			throws AimException
 	{
-		DICOMImageReference dicomImageReference = new DICOMImageReference();
-		dicomImageReference.setCagridId(0);
+		String patientID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientID);
+		String patientName = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientName);
+		String sopClassUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPClassUID);
+		String dsoStudyUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.StudyInstanceUID);
+		String dsoSeriesUID = Attribute
+				.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SeriesInstanceUID);
+		String dsoImageUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPInstanceUID);
 
-		ImageStudy imageStudy = new ImageStudy();
-		imageStudy.setCagridId(0);
-		imageStudy.setInstanceUID(dsoStudyInstanceUID);
-		imageStudy.setStartDate("2012-01-01T01:01:01"); // TODO
-		imageStudy.setStartTime("12:00:00"); // TODO
+		String username = getOwnerFromImageAnnotation(templateImageAnnotation);
+		// Person person = getPersonFromImageAnnotation(templateImageAnnotation);
 
-		ImageSeries imageSeries = new ImageSeries();
-		imageSeries.setCagridId(0);
-		imageSeries.setInstanceUID(dsoSeriesInstanceUID);
+		log.info("template AIM ID " + templateImageAnnotation.getUniqueIdentifier());
 
-		edu.stanford.hakan.aim3api.base.Image image = new edu.stanford.hakan.aim3api.base.Image();
-		image.setCagridId(0);
-		image.setSopClassUID(""); // TODO
-		image.setSopInstanceUID(dsoSOPInstanceUID);
+		log.info("patientID " + patientID);
+		log.info("patientName " + patientName);
+		log.info("DSO Study " + dsoStudyUID);
+		log.info("DSO Series " + dsoSeriesUID);
+		log.info("DSO Image " + dsoImageUID);
+		log.info("User " + username);
 
-		imageSeries.addImage(image); // Add Image to ImageSeries
-		imageStudy.setImageSeries(imageSeries); // Add ImageSeries to ImageStudy
-		dicomImageReference.setImageStudy(imageStudy); // Add ImageStudy to ImageReference
+		addSegmentToImageAnnotation(sopClassUID, dsoImageUID, sourceImageUID, templateImageAnnotation);
+		addDICOMImageReferenceToImageAnnotation(dsoStudyUID, dsoSeriesUID, dsoImageUID, templateImageAnnotation);
 
-		return dicomImageReference;
+		return templateImageAnnotation;
 	}
 
 	/**
@@ -213,6 +176,34 @@ public class PluginAIMUtil
 		return getUIDFromAIM("Image", "sopInstanceUID", aimFileContents);
 	}
 
+	public static DICOMImageReference createDICOMImageReference(String dsoStudyInstanceUID, String dsoSeriesInstanceUID,
+			String dsoSOPInstanceUID)
+	{
+		DICOMImageReference dicomImageReference = new DICOMImageReference();
+		dicomImageReference.setCagridId(0);
+
+		ImageStudy imageStudy = new ImageStudy();
+		imageStudy.setCagridId(0);
+		imageStudy.setInstanceUID(dsoStudyInstanceUID);
+		imageStudy.setStartDate("2012-01-01T01:01:01"); // TODO
+		imageStudy.setStartTime("12:00:00"); // TODO
+
+		ImageSeries imageSeries = new ImageSeries();
+		imageSeries.setCagridId(0);
+		imageSeries.setInstanceUID(dsoSeriesInstanceUID);
+
+		edu.stanford.hakan.aim3api.base.Image image = new edu.stanford.hakan.aim3api.base.Image();
+		image.setCagridId(0);
+		image.setSopClassUID(""); // TODO
+		image.setSopInstanceUID(dsoSOPInstanceUID);
+
+		imageSeries.addImage(image); // Add Image to ImageSeries
+		imageStudy.setImageSeries(imageSeries); // Add ImageSeries to ImageStudy
+		dicomImageReference.setImageStudy(imageStudy); // Add ImageStudy to ImageReference
+
+		return dicomImageReference;
+	}
+
 	private static String getUIDFromAIM(String tag, String attribute, String aimFileContents)
 			throws PluginServletException
 	{
@@ -241,11 +232,11 @@ public class PluginAIMUtil
 		}
 	}
 
-	private static void addSegmentToImageAnnotation(String sopClassUID, String dsoSOPInstanceUID,
+	private static void addSegmentToImageAnnotation(String sopClassUID, String dsoSOPInstanceUID, String sourceImageUID,
 			ImageAnnotation dsoImageAnnotation)
 	{
 		SegmentationCollection sc = new SegmentationCollection();
-		sc.AddSegmentation(new Segmentation(0, "", sopClassUID, dsoSOPInstanceUID, 1));
+		sc.AddSegmentation(new Segmentation(0, sourceImageUID, sopClassUID, dsoSOPInstanceUID, 1));
 		dsoImageAnnotation.setSegmentationCollection(sc);
 	}
 
@@ -256,4 +247,14 @@ public class PluginAIMUtil
 				sopInstanceUID);
 		imageAnnotation.addImageReference(dicomImageReference);
 	}
+
+	private static String getOwnerFromImageAnnotation(ImageAnnotation aim) throws AimException
+	{
+		if (aim.getListUser() != null) {
+			if (!aim.getListUser().isEmpty())
+				return aim.getListUser().get(0).getLoginName();
+		}
+		throw new AimException("No User in image annotation");
+	}
+
 }

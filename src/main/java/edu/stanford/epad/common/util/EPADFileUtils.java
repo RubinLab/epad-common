@@ -550,19 +550,19 @@ public class EPADFileUtils
 	 */
 	public static void extractFolder(String zipFilePath) throws IOException
 	{
+		ZipFile zipFile = null;
+
 		try {
 			int BUFFER = 2048;
 			File file = new File(zipFilePath);
 
-			ZipFile zipFile = new ZipFile(file);
+			zipFile = new ZipFile(file);
 			String newPath = zipFilePath.substring(0, zipFilePath.length() - 4);
 
 			makeDirs(new File(newPath));
 			Enumeration<?> zipFileEntries = zipFile.entries();
 
-			// Process each entry
 			while (zipFileEntries.hasMoreElements()) {
-				// grab a zip file entry
 				ZipEntry entry = (ZipEntry)zipFileEntries.nextElement();
 				String currentEntry = entry.getName();
 				File destFile = new File(newPath, currentEntry);
@@ -595,7 +595,6 @@ public class EPADFileUtils
 					IOUtils.closeQuietly(is);
 					IOUtils.closeQuietly(bos);
 					IOUtils.closeQuietly(fos);
-					zipFile.close();
 				}
 
 				if (currentEntry.endsWith(".zip")) {
@@ -605,6 +604,9 @@ public class EPADFileUtils
 		} catch (Exception e) {
 			log.warning("Failed to unzip: " + zipFilePath, e);
 			throw new IllegalStateException(e);
+		} finally {
+			if (zipFile != null)
+				zipFile.close();
 		}
 	}
 
