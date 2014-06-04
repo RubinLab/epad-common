@@ -14,7 +14,6 @@ import org.apache.commons.io.IOUtils;
 
 import com.google.gson.Gson;
 
-import edu.stanford.epad.common.dicom.DicomFileUtil;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.epad.common.util.EPADTools;
 import edu.stanford.epad.dtos.EPADDatabaseSeries;
@@ -22,46 +21,6 @@ import edu.stanford.epad.dtos.EPADDatabaseSeries;
 public class PluginDicomUtil
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
-
-	// TODO Remove this
-	@SuppressWarnings("unused")
-	private static String getDicomSeriesUIDFromImageUID(String imageUID)
-	{
-		// TODO Get from config file via EPADTools
-		String url = "http://localhost:8080/epad/segmentationpath/" + "?image_iuid=" + imageUID;
-		HttpClient client = new HttpClient();
-		GetMethod method = new GetMethod(url);
-		InputStreamReader isr = null;
-		BufferedReader br = null;
-
-		try {
-			int statusCode = client.executeMethod(method);
-
-			if (statusCode != -1) {
-				isr = new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8");
-				br = new BufferedReader(isr);
-				String line;
-				while ((line = br.readLine()) != null) {
-					String[] cols = line.split(",");
-					if (cols != null && cols.length > 1) {
-						String seriesUID = cols[1];
-						if (!seriesUID.equals("SeriesUID")) {
-							return DicomFileUtil.convertDicomFileNameToImageUID(seriesUID);
-						}
-					}
-				}
-			}
-			log.warning("Could not find seriesUID for imageUID " + imageUID);
-			return "";
-		} catch (Exception e) {
-			log.warning("Error getting seriesUID for imageUID " + imageUID, e);
-			return "";
-		} finally {
-			IOUtils.closeQuietly(br);
-			IOUtils.closeQuietly(isr);
-			method.releaseConnection();
-		}
-	}
 
 	public static List<String> getDicomImageUIDsInSeries(String seriesUID, String sessionID) throws IOException
 	{
