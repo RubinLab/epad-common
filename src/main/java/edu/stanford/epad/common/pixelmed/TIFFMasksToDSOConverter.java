@@ -57,7 +57,7 @@ public class TIFFMasksToDSOConverter
 
 			byte[] pixels = getPixelsFromMaskFiles(maskFilePaths);
 
-			SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(dicomAttributes, orientation,
+			SegmentationObjectsFileWriter2 dsoWriter = new SegmentationObjectsFileWriter2(dicomAttributes, orientation,
 					spacing, thickness);
 			CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
 					"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,

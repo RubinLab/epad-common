@@ -53,7 +53,7 @@ import com.pixelmed.utils.CopyStream;
  * @author Wei Lu (luwei@tju.edu.cn)
  * @date 2012-12
  */
-public class SegmentationObjectsFileWriter
+public class SegmentationObjectsFileWriter2
 {
 	public static final String Manufacturer = "Stanford University";
 	public static final String ManufacturerModelName = "ePAD";
@@ -83,7 +83,7 @@ public class SegmentationObjectsFileWriter
 	 * @throws DicomException
 	 */
 	@SuppressWarnings("deprecation")
-	public SegmentationObjectsFileWriter(AttributeList original_attrs, short[] patient_orientation,
+	public SegmentationObjectsFileWriter2(AttributeList original_attrs, short[] patient_orientation,
 			double[] pixel_spacing, double slice_thickness) throws DicomException
 	{
 		/*********************************************************************
@@ -1195,7 +1195,7 @@ public class SegmentationObjectsFileWriter
 		// String mode = args[3]; //"BINARY";
 
 		byte[] pixels = null;
-		SegmentationObjectsFileWriter obj = null;
+		SegmentationObjectsFileWriter2 obj = null;
 		short image_width = 0, image_height = 0, image_frames = 0;
 
 		// Read pixel array from the map_file.
@@ -1227,7 +1227,7 @@ public class SegmentationObjectsFileWriter
 			double[] spacing = new double[] { 0.65, 0.8 };
 			double thickness = 0.5;
 
-			obj = new SegmentationObjectsFileWriter(list, orientation, spacing, thickness);
+			obj = new SegmentationObjectsFileWriter2(list, orientation, spacing, thickness);
 
 			CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
 					"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,

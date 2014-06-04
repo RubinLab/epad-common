@@ -1,4 +1,4 @@
-package edu.stanford.epad.common.util;
+package edu.stanford.epad.common.pixelmed;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,10 +28,7 @@ import com.pixelmed.dicom.UniqueIdentifierAttribute;
 import com.pixelmed.dicom.UnsignedShortAttribute;
 import com.pixelmed.dicom.VersionAndConstants;
 
-import edu.stanford.epad.common.pixelmed.SegmentationPropertyCategories;
-import edu.stanford.epad.common.pixelmed.SegmentationPropertyTypes;
-
-public class SegmentationObjectsFileWriter
+public class SegmentationObjectsFileWriter1
 {
 	public static final String Manufacturer = "Stanford University";
 	public static final String ManufacturerModelName = "ePAD";
@@ -52,7 +49,7 @@ public class SegmentationObjectsFileWriter
 	 *          "OCCUPANCY" for fractional type, or null for binary type. reference is the whole attributes list.
 	 * @throws DicomException
 	 */
-	public SegmentationObjectsFileWriter(String seg_type, String fractional_type, AttributeList original_attrs)
+	public SegmentationObjectsFileWriter1(String seg_type, String fractional_type, AttributeList original_attrs)
 			throws DicomException
 	{
 		/*********************************************************************
@@ -700,7 +697,7 @@ public class SegmentationObjectsFileWriter
 		String input_file = "CT0011";
 		String output_file = "segmentation_test_out.dcm";
 		byte[] pixels = null;
-		SegmentationObjectsFileWriter obj = null;
+		SegmentationObjectsFileWriter1 obj = null;
 		short image_width = 0, image_height = 0, image_frames = 0;
 		boolean one_bit_per_pixel = true; // Choose 1 bit/pixel or 1 byte/pixel.
 
@@ -719,10 +716,10 @@ public class SegmentationObjectsFileWriter
 			}
 			if (one_bit_per_pixel) {
 				pixels = new byte[image_width * image_height * image_frames / 8];
-				obj = new SegmentationObjectsFileWriter("BINARY", null, list);
+				obj = new SegmentationObjectsFileWriter1("BINARY", null, list);
 			} else {
 				pixels = new byte[image_width * image_height * image_frames];
-				obj = new SegmentationObjectsFileWriter("FRACTIONAL", "OCCUPANCY", list);
+				obj = new SegmentationObjectsFileWriter1("FRACTIONAL", "OCCUPANCY", list);
 			}
 
 			// Segment 1
