@@ -1,4 +1,4 @@
-package edu.stanford.epad.common.util;
+package edu.stanford.epad.common.pixelmed;
 
 import java.awt.Color;
 import java.awt.Font;
