@@ -37,7 +37,7 @@ public class EPADConfig
 			properties = new Properties();
 			File configFile = getConfigurationFile();
 			if (!configFile.exists())
-				throw new IllegalStateException("Could not find configuration file: " + configFile.getAbsolutePath());
+				throw new IllegalStateException("Could not find ePAD configuration file " + configFile.getAbsolutePath());
 
 			FileInputStream fis = new FileInputStream(configFile);
 			try {
@@ -47,14 +47,14 @@ public class EPADConfig
 				IOUtils.closeQuietly(fis);
 			}
 		} catch (Exception e) {
-			log.severe("Error reading configuration file", e);
+			log.severe("Error reading ePAD configuration file", e);
 		}
 	}
 
 	private File getConfigurationFile()
 	{
 		File configFile = new File(EPADResources.getEPADWebServerConfigFilePath());
-		log.info("Configuration file: " + configFile.getAbsolutePath());
+		log.info("Found configuration file " + configFile.getAbsolutePath());
 
 		return configFile;
 	}
@@ -83,7 +83,7 @@ public class EPADConfig
 		try {
 			return Integer.parseInt(s);
 		} catch (NumberFormatException nfe) {
-			throw new IllegalArgumentException("The parameter in : " + name + " needs to be an integer. It was: " + s);
+			throw new IllegalArgumentException("The " + name + " parameter value needs to be an integer. Its value was " + s);
 		}
 	}
 
@@ -98,7 +98,7 @@ public class EPADConfig
 		String parameterValue = getParam(propertyName);
 
 		if (parameterValue == null || parameterValue.length() == 0) {
-			String errorMessage = "no value for parameter " + propertyName + " in configuration file";
+			String errorMessage = "No value for parameter " + propertyName + " in configuration file";
 			log.warning(errorMessage);
 			throw new IllegalArgumentException(errorMessage);
 		}
@@ -117,8 +117,8 @@ public class EPADConfig
 		try {
 			return Integer.parseInt(parameterValue);
 		} catch (NumberFormatException nfe) {
-			throw new IllegalArgumentException("The parameter in : " + propertyName + " needs to be an integer. It was: "
-					+ parameterValue);
+			throw new IllegalArgumentException("The parameter value for property " + propertyName
+					+ " needs to be an integer. It value was " + parameterValue);
 		}
 	}
 
