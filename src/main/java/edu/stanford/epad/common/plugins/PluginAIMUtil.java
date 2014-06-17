@@ -16,14 +16,18 @@ import edu.stanford.epad.common.util.EPADResources;
 import edu.stanford.epad.common.util.EPADTools;
 import edu.stanford.hakan.aim3api.base.AimException;
 import edu.stanford.hakan.aim3api.base.DICOMImageReference;
+import edu.stanford.hakan.aim3api.base.GeometricShape;
+import edu.stanford.hakan.aim3api.base.GeometricShapeCollection;
 import edu.stanford.hakan.aim3api.base.ImageAnnotation;
 import edu.stanford.hakan.aim3api.base.ImageSeries;
 import edu.stanford.hakan.aim3api.base.ImageStudy;
 import edu.stanford.hakan.aim3api.base.Person;
 import edu.stanford.hakan.aim3api.base.Segmentation;
 import edu.stanford.hakan.aim3api.base.SegmentationCollection;
-import edu.stanford.hakan.aim3api.base.User;
+import edu.stanford.hakan.aim3api.base.SpatialCoordinate;
+import edu.stanford.hakan.aim3api.base.TwoDimensionSpatialCoordinate;
 import edu.stanford.hakan.aim3api.usage.AnnotationBuilder;
+import edu.stanford.hakan.aim3api.usage.AnnotationExtender;
 import edu.stanford.hakan.aim3api.usage.AnnotationGetter;
 
 public class PluginAIMUtil
@@ -69,23 +73,6 @@ public class PluginAIMUtil
 		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
 	}
 
-	public static Person getPersonFromImageAnnotation(ImageAnnotation aim) throws AimException
-	{
-		if (aim.getListPerson() != null) {
-			if (!aim.getListPerson().isEmpty())
-				return aim.getListPerson().get(0);
-		}
-		throw new AimException("No Person in image annotation");
-	}
-
-	public static void setImageAnnotationUser(ImageAnnotation imageAnnotation, String username)
-	{
-		List<User> userList = new ArrayList<User>();
-		User user = new User();
-		user.setLoginName(username);
-		imageAnnotation.setListUser(userList);
-	}
-
 	/**
 	 * Currently called by plugins after generating DSO.
 	 * <p>
@@ -121,19 +108,16 @@ public class PluginAIMUtil
 		return templateImageAnnotation;
 	}
 
-	/**
-	 * Get the canonical path if possible, otherwise get the absolute path.
-	 * 
-	 * @param file File
-	 * @return String path of file. Concurrent path if possible.
-	 */
-	public static String getRealPath(File file)
+	public static void saveAnnotationToAnnotationsDirectory(ImageAnnotation imageAnnotation) throws AimException
 	{
-		try {
-			return file.getCanonicalPath();
-		} catch (IOException ioe) {
-			return file.getAbsolutePath();
-		}
+		AnnotationBuilder.saveToFile(imageAnnotation,
+				EPADResources.getEPADWebServerAnnotationsDir() + imageAnnotation.getUniqueIdentifier() + ".xml",
+				EPADResources.getEPADWebServerAIM3XSDFilePath());
+	}
+
+	public static ImageAnnotation getImageAnnotationFromFile(File file) throws AimException
+	{
+		return AnnotationGetter.getImageAnnotationFromFile(getRealPath(file));
 	}
 
 	public static String getAimFileContents(File aimFile) throws AimException
@@ -202,6 +186,132 @@ public class PluginAIMUtil
 		dicomImageReference.setImageStudy(imageStudy); // Add ImageStudy to ImageReference
 
 		return dicomImageReference;
+	}
+
+	public static class ROIData
+	{
+		public final double[] xData;
+		public final double[] yData;
+
+		public ROIData(double[] xData, double yData[])
+		{
+			this.xData = xData;
+			this.yData = yData;
+		}
+	}
+
+	public static ImageAnnotation addFeature(ImageAnnotation imageAnnotation, double[] featureValue,
+			String[] featureString, double featureVersion) throws AimException
+	{
+		return AnnotationExtender.addFeature(imageAnnotation, featureValue, featureString, featureVersion);
+	}
+
+	public static List<String> getPersonNames(ImageAnnotation imageAnnotation)
+	{
+		List<String> personNames = new ArrayList<>();
+		List<Person> persons = imageAnnotation.getListPerson();
+
+		for (Person person : persons)
+			personNames.add(person.getName());
+
+		return personNames;
+	}
+
+	public static ROIData extractROIData(ImageAnnotation imageAnnotation)
+	{
+		int numROI;
+		double[] roixData = null;
+		double[] roiyData = null;
+
+		GeometricShapeCollection geometricShapeCollection = imageAnnotation.getGeometricShapeCollection();
+		GeometricShape geometricShape = null;
+		for (int i = 0; i < geometricShapeCollection.getGeometricShapeList().size(); i++) {
+			geometricShape = geometricShapeCollection.getGeometricShapeList().get(i);
+			if (geometricShape.getXsiType().equals("Polyline")) {
+				numROI = geometricShape.getSpatialCoordinateCollection().getSpatialCoordinateList().size();
+				roixData = new double[numROI];
+				roiyData = new double[numROI];
+				for (int j = 0; j < numROI; j++) {
+					SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
+							.getSpatialCoordinateList().get(j);
+					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
+						TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
+						int idx = twoDimensionSpatialCoordinate.getCoordinateIndex();
+						roixData[idx] = twoDimensionSpatialCoordinate.getX();
+						roiyData[idx] = twoDimensionSpatialCoordinate.getY();
+					}
+				}
+			}
+		}
+		return new ROIData(roixData, roiyData);
+	}
+
+	public static double[] extractCoordinateFromAIMFile(File aimFile, int positionOfImageInSeries) throws Exception
+	{
+		double[] roixData = null;
+		double[] roiyData = null;
+
+		try { // Fill in roixData, roiyData
+			ImageAnnotation fileImageAnnotation = AnnotationGetter.getImageAnnotationFromFile(PluginAIMUtil
+					.getRealPath(aimFile));
+			List<Person> listPerson = fileImageAnnotation.getListPerson();
+			if (listPerson.size() > 0) {
+				listPerson.get(0);
+			}
+
+			GeometricShapeCollection geometricShapeCollection = fileImageAnnotation.getGeometricShapeCollection();
+			for (int i = 0; i < geometricShapeCollection.getGeometricShapeList().size(); i++) {
+				GeometricShape geometricShape = geometricShapeCollection.getGeometricShapeList().get(i);
+				if (geometricShape.getXsiType().equals("MultiPoint")) {
+					int numberOfROIs = geometricShape.getSpatialCoordinateCollection().getSpatialCoordinateList().size();
+					roixData = new double[numberOfROIs];
+					roiyData = new double[numberOfROIs];
+					for (int j = 0; j < numberOfROIs; j++) {
+						SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
+								.getSpatialCoordinateList().get(j);
+						if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
+							TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
+							int idx = twoDimensionSpatialCoordinate.getCoordinateIndex();
+							roixData[idx] = twoDimensionSpatialCoordinate.getX();
+							roiyData[idx] = twoDimensionSpatialCoordinate.getY();
+						}
+					}
+				}
+			}
+		} catch (Throwable t) {
+			log.warning("tedseg: Plugin failed to get ROI or person in AIM file", t);
+			throw new Exception("tedseg: Plugin failed to get ROI or person in AIM file", t);
+		}
+
+		if (roixData == null && roiyData == null) {
+			log.warning("tedseg: Plugin failed to get ROI in AIM file");
+			throw new Exception("tedseg: Plugin failed to get ROI in AIM file");
+		}
+
+		int x_pos = (int)(((roixData[roixData.length - 1] + roixData[0]) / 2.0)); // Compute the median point
+		int y_pos = (int)(((roiyData[roiyData.length - 1] + roiyData[0]) / 2.0));
+		int z_pos = positionOfImageInSeries;
+		double[] point = new double[3]; // log.info("Seed (x,y,z) = (" + x_pos + "," + y_pos + "," + z_pos + ")");
+		point[0] = y_pos;
+		point[1] = x_pos;
+		point[2] = z_pos;
+
+		return point;
+	}
+
+	/**
+	 * Get the canonical path if possible, otherwise get the absolute path.
+	 * 
+	 * @param file File
+	 * @return String path of file. Concurrent path if possible.
+	 */
+	private static String getRealPath(File file)
+	{
+		try {
+			return file.getCanonicalPath();
+		} catch (IOException ioe) {
+			return file.getAbsolutePath();
+		}
 	}
 
 	private static String getUIDFromAIM(String tag, String attribute, String aimFileContents)
