@@ -1,8 +1,6 @@
 package edu.stanford.epad.common.plugins;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +32,16 @@ public class PluginAIMUtil
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
 
+	private static final String aim3Namespace = EPADTools.aim3Namespace;
+	private static final String eXistServerUrl = EPADTools.eXistURI;
+	private static final String eXistPassword = EPADTools.eXistPassword;
+	private static final String eXistCollection = EPADTools.eXistCollection;
+	private static final String eXistUsername = EPADTools.eXistUsername;
+	private static final String aim3XSDFilePath = EPADResources.getEPADWebServerAIM3XSDFilePath();
+	private static final String eXistURI = EPADTools.eXistURI;
+
 	public static ImageAnnotation getImageAnnotationFromServer(String aimID) throws AimException
 	{
-		String namespace = EPADTools.aim3Namespace;
-		String eXistServerUrl = EPADTools.eXistURI;
-		String password = EPADTools.eXistPassword;
-		String eXistCollection = EPADTools.eXistCollection;
-		String username = EPADTools.eXistUsername;
-		String aim3XSDFilePath = EPADResources.getEPADWebServerAIM3XSDFilePath();
 		String validAIMFileName = aimID.toLowerCase();
 
 		if (validAIMFileName.endsWith(".xml") || validAIMFileName.endsWith(".aim"))
@@ -49,8 +49,8 @@ public class PluginAIMUtil
 		if (validAIMFileName.startsWith("aim_"))
 			validAIMFileName = validAIMFileName.substring(validAIMFileName.lastIndexOf('_') + 1, validAIMFileName.length());
 
-		ImageAnnotation aim = AnnotationGetter.getImageAnnotationFromServerByUniqueIdentifier(eXistServerUrl, namespace,
-				eXistCollection, username, password, validAIMFileName, aim3XSDFilePath);
+		ImageAnnotation aim = AnnotationGetter.getImageAnnotationFromServerByUniqueIdentifier(eXistServerUrl,
+				aim3Namespace, eXistCollection, eXistUsername, eXistPassword, validAIMFileName, aim3XSDFilePath);
 
 		if (aim == null)
 			log.warning("Could not find AIM annotation on server with ID " + aimID);
@@ -60,16 +60,11 @@ public class PluginAIMUtil
 
 	public static void sendImageAnnotationToServer(ImageAnnotation imageAnnotation) throws AimException
 	{
-		String namespace = EPADTools.aim3Namespace;
-		String serverUrl = EPADTools.eXistURI;
-		String password = EPADTools.eXistPassword;
-		String xsdFilePath = EPADResources.getEPADWebServerAIM3XSDFilePath();
-		String collection = EPADTools.eXistCollection;
-		String username = EPADTools.eXistUsername;
-
-		AnnotationBuilder.saveToServer(imageAnnotation, serverUrl, namespace, collection, xsdFilePath, username, password);
+		AnnotationBuilder.saveToServer(imageAnnotation, eXistURI, aim3Namespace, eXistCollection, aim3XSDFilePath,
+				eXistUsername, eXistPassword);
 
 		String result = AnnotationBuilder.getAimXMLsaveResult();
+
 		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
 	}
 
@@ -118,46 +113,6 @@ public class PluginAIMUtil
 	public static ImageAnnotation getImageAnnotationFromFile(File file) throws AimException
 	{
 		return AnnotationGetter.getImageAnnotationFromFile(getRealPath(file));
-	}
-
-	public static String getAimFileContents(File aimFile) throws AimException
-	{
-		if (aimFile.exists()) {
-			StringBuilder sb = new StringBuilder();
-			try {
-				BufferedReader in = new BufferedReader(new FileReader(aimFile));
-				try {
-					String line = null;
-					while ((line = in.readLine()) != null) {
-						sb.append(line);
-						sb.append(System.getProperty("line.separator"));
-					}
-				} finally {
-					in.close();
-				}
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-			}
-			return sb.toString();
-		} else {
-			log.warning("AIM file " + aimFile.getAbsolutePath() + "does not exist");
-			throw new AimException("input error - AIM.xml does not exist. file: " + aimFile.getAbsolutePath());
-		}
-	}
-
-	public static String getStudyUIDFromAIM(String aimFileContents) throws PluginServletException
-	{
-		return getUIDFromAIM("Study", "instanceUID", aimFileContents);
-	}
-
-	public static String getSeriesUIDFromAIM(String aimFileContents) throws PluginServletException
-	{
-		return getUIDFromAIM("Series", "instanceUID", aimFileContents);
-	}
-
-	public static String getSOPInstanceUIDFromAIM(String aimFileContents) throws PluginServletException
-	{
-		return getUIDFromAIM("Image", "sopInstanceUID", aimFileContents);
 	}
 
 	public static DICOMImageReference createDICOMImageReference(String dsoStudyInstanceUID, String dsoSeriesInstanceUID,
@@ -314,34 +269,6 @@ public class PluginAIMUtil
 		}
 	}
 
-	private static String getUIDFromAIM(String tag, String attribute, String aimFileContents)
-			throws PluginServletException
-	{
-
-		tag = tag.toLowerCase();
-		attribute = attribute.toLowerCase();
-		aimFileContents = aimFileContents.toLowerCase();
-
-		int tagIndex = aimFileContents.indexOf(tag);
-		if (tagIndex > 0) {
-			int attribIndex = aimFileContents.indexOf(attribute, tagIndex);
-
-			if (attribIndex > 0) {
-
-				int start = aimFileContents.indexOf("\"", attribIndex);
-				int end = aimFileContents.indexOf("\"", start + 1);
-
-				String retVal = aimFileContents.substring(start, end + 1);
-				retVal = retVal.replace('"', ' ').trim();
-				return retVal;
-			} else {
-				throw new PluginServletException("input error", "Didn't find tag: " + tag);
-			}
-		} else {
-			throw new PluginServletException("input error", "Didn't find attribute: " + attribute);
-		}
-	}
-
 	private static void addSegmentToImageAnnotation(String sopClassUID, String dsoSOPInstanceUID, String sourceImageUID,
 			ImageAnnotation dsoImageAnnotation)
 	{
@@ -366,5 +293,4 @@ public class PluginAIMUtil
 		}
 		throw new AimException("No User in image annotation");
 	}
-
 }
