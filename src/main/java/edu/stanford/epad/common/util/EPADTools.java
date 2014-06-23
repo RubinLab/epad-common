@@ -20,7 +20,6 @@ public class EPADTools
 {
 	public static String serverProxy = EPADConfig.getInstance().getStringPropertyValue("serverProxy");
 	public static String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
-	public static String wadoProxy = EPADConfig.getInstance().getStringPropertyValue("wadoProxy");
 	public static final String dicomServerPort = EPADConfig.getInstance().getStringPropertyValue("DicomServerPort");
 	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
 	public static final String eXistUsername = EPADConfig.getInstance().getStringPropertyValue("username");
@@ -68,8 +67,6 @@ public class EPADTools
 		wadoUrlBuilder.setObjectUID(imageUID);
 		String wadoUrl = wadoUrlBuilder.build();
 
-		// log.info("WADO download query: " + wadoUrl);
-
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(wadoUrl);
 		int statusCode = client.executeMethod(method);
@@ -78,10 +75,10 @@ public class EPADTools
 			OutputStream outputStream = null;
 			try {
 				outputStream = new FileOutputStream(outputDicomFile);
-				InputStream is = method.getResponseBodyAsStream();
+				InputStream inputStream = method.getResponseBodyAsStream();
 				int read = 0;
 				byte[] bytes = new byte[4096];
-				while ((read = is.read(bytes)) != -1) {
+				while ((read = inputStream.read(bytes)) != -1) {
 					outputStream.write(bytes, 0, read);
 				}
 			} finally {
@@ -108,7 +105,7 @@ public class EPADTools
 			log.info("DICOM binary directory: " + dicomBinDirectoryPath);
 			pb.directory(new File(dicomBinDirectoryPath));
 			Process process = pb.start();
-			process.getOutputStream();// get the output stream.
+			process.getOutputStream();
 			is = process.getInputStream();
 			isr = new InputStreamReader(is);
 			br = new BufferedReader(isr);
@@ -122,7 +119,7 @@ public class EPADTools
 
 			try {
 				int exitValue = process.waitFor();
-				log.info("dcmsend exit value is: " + exitValue);
+				log.info("dcmsnd exit value is: " + exitValue);
 			} catch (InterruptedException e) {
 				log.warning("Error sending DICOM files in: " + inputPathFile, e);
 			}
@@ -135,14 +132,14 @@ public class EPADTools
 			if (e instanceof IllegalStateException && throwException) {
 				throw e;
 			}
-			log.warning("DicomHeadersTask failed to create DICOM tags file: " + e.getMessage());
+			log.warning("dcmsnd failed: " + e.getMessage());
 			if (throwException) {
-				throw new IllegalStateException("DicomHeadersTask failed to create DICcom tags file.", e);
+				throw new IllegalStateException("dcmsnd failed", e);
 			}
 		} catch (OutOfMemoryError oome) {
-			log.warning("DicomHeadersTask OutOfMemoryError: ");
+			log.warning("dcmsnd ran out of memory", oome);
 			if (throwException) {
-				throw new IllegalStateException("DicomHeadersTask OutOfMemoryError: ", oome);
+				throw new IllegalStateException("dcmsnd ran out of memory", oome);
 			}
 		} finally {
 			IOUtils.closeQuietly(br);
