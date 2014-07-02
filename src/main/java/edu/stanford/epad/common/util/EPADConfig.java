@@ -21,6 +21,29 @@ import org.apache.commons.io.IOUtils;
  */
 public class EPADConfig
 {
+	public static final String serverProxy = EPADConfig.getInstance().getStringPropertyValue("serverProxy");
+	public static final String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
+	public static final String dicomServerPort = EPADConfig.getInstance().getStringPropertyValue("DicomServerPort");
+	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
+	public static final String eXistUsername = EPADConfig.getInstance().getStringPropertyValue("username");
+	public static final String eXistPassword = EPADConfig.getInstance().getStringPropertyValue("password");
+	public static final String epadDatabaseUsername = EPADConfig.getInstance().getStringPropertyValue(
+			"epadDatabaseUsername");
+	public static final String epadDatabasePassword = EPADConfig.getInstance().getStringPropertyValue(
+			"epadDatabasePassword");
+	public static final String epadDatabaseURL = EPADConfig.getInstance().getStringPropertyValue("epadDatabaseURL");
+	public static final String dcm4CheeDatabaseUsername = EPADConfig.getInstance().getStringPropertyValue(
+			"dcm4CheeDatabaseUsername");
+	public static final String dcm4CheeDatabasePassword = EPADConfig.getInstance().getStringPropertyValue(
+			"dcm4CheeDatabasePassword");
+	public static final String dcm4CheeDatabaseURL = EPADConfig.getInstance().getStringPropertyValue(
+			"dcm4CheeDatabaseURL");
+	public static final String eXistCollection = EPADConfig.getInstance().getStringPropertyValue("collection");
+	public static final String aim3Namespace = EPADConfig.getInstance().getStringPropertyValue("namespace");
+	public static final String eXistURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
+	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");
+	public static final String seriesOrderURI = EPADConfig.getInstance().getStringPropertyValue("seriesOrderURI");
+
 	private static final EPADLogger log = EPADLogger.getInstance();
 	private static final EPADConfig ourInstance = new EPADConfig();
 
@@ -29,6 +52,139 @@ public class EPADConfig
 	public static EPADConfig getInstance()
 	{
 		return ourInstance;
+	}
+
+	/**
+	 * Get the base directory for the ePAD web server.
+	 * <p>
+	 * For the moment, we use ~/DicomProxy as the base directory for compatibility with older calls. Ultimately we will
+	 * change location to something more general.
+	 * 
+	 * @return File Base directory for ePAD web server.
+	 */
+	public static String getEPADWebServerBaseDir()
+	{
+		return System.getProperty("user.home") + "/DicomProxy/";
+	}
+
+	public static String getEPADWebServerWebappsDir()
+	{
+		return getEPADWebServerBaseDir() + "webapps/";
+	}
+
+	public static String getEPADWebServerResourcesDir()
+	{
+		return getEPADWebServerBaseDir() + "resources/";
+	}
+
+	public static String getEPADWebServerEtcDir()
+	{
+		return getEPADWebServerBaseDir() + "etc/";
+	}
+
+	public static String getEPADWebServerDICOMScriptsDir()
+	{
+		return getEPADWebServerEtcDir() + "scripts/";
+	}
+
+	public static String getEPADWebServerDICOMBinDir()
+	{
+		return getEPADWebServerDICOMScriptsDir() + "tpl/bin/";
+	}
+
+	public static String getEPADWebServerIconsDir()
+	{
+		return getEPADWebServerEtcDir() + "icons/";
+	}
+
+	public static String getEPADWebServerMyScriptsDir()
+	{
+		return getEPADWebServerEtcDir() + "scripts/myscripts/bin/";
+	}
+
+	public static String getEPADWebServerMySQLScriptDir()
+	{
+		return getEPADWebServerEtcDir() + "db/mysql/";
+	}
+
+	public static String getEPADWebServerLoginDir()
+	{
+		return getEPADWebServerEtcDir() + "login/";
+	}
+
+	public static String getEPADWebServerUploadDir()
+	{
+		return getEPADWebServerResourcesDir() + "upload/";
+	}
+
+	public static String getEPADWebServerRSNADir()
+	{
+		return getEPADWebServerResourcesDir() + "rsna/";
+	}
+
+	public static String getEPADWebServerAnnotationsDir()
+	{
+		return getEPADWebServerResourcesDir() + "annotations/";
+	}
+
+	public static String getEPADWebServerAnnotationsUploadDir()
+	{
+		return getEPADWebServerAnnotationsDir() + "upload/";
+	}
+
+	public static String getEPADWebServerSchemaDir()
+	{
+		return getEPADWebServerResourcesDir() + "schema/";
+	}
+
+	public static String getEPADWebServerAIM3XSDFilePath()
+	{
+		return getEPADWebServerSchemaDir() + "AIM_v3.xsd";
+	}
+
+	public static String getEPADWebServerLogDir()
+	{
+		return getEPADWebServerBaseDir() + "log/";
+	}
+
+	public static String getEPADWebServerPNGDir()
+	{
+		return getEPADWebServerResourcesDir() + "dicom/";
+	}
+
+	public static String getEPADWebServerDicomTagDir()
+	{
+		return getEPADWebServerResourcesDir() + "dicom/";
+	}
+
+	public static String getEPADWebServerDicomDir()
+	{
+		return getEPADWebServerResourcesDir() + "dicom/";
+	}
+
+	public static String getEPADWebServerPNGGridDir()
+	{
+		return getEPADWebServerResourcesDir() + "dicom_grid/";
+	}
+
+	public static String getEPADWebServerPluginConfigFilePath()
+	{
+		return getEPADWebServerEtcDir() + "plugin-config.txt";
+	}
+
+	public static String getEPADWebServerConfigFilePath()
+	{
+		return getEPADWebServerEtcDir() + "proxy-config.properties";
+	}
+
+	public static String getEPADWebServerLogFilePath()
+	{
+		return getEPADWebServerLogDir() + "dicom-proxy.log";
+	}
+
+	public static String getEPADWebServerJettyConfigFilePath()
+	{
+		return getEPADWebServerEtcDir() + "jetty-config.xml";
 	}
 
 	private EPADConfig()
@@ -53,7 +209,7 @@ public class EPADConfig
 
 	private File getConfigurationFile()
 	{
-		File configFile = new File(EPADResources.getEPADWebServerConfigFilePath());
+		File configFile = new File(EPADConfig.getEPADWebServerConfigFilePath());
 		log.info("Found configuration file " + configFile.getAbsolutePath());
 
 		return configFile;

@@ -14,8 +14,8 @@ import org.apache.commons.io.IOUtils;
 
 import com.google.gson.Gson;
 
+import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
-import edu.stanford.epad.common.util.EPADTools;
 import edu.stanford.epad.dtos.EPADDatabaseSeries;
 
 public class PluginDicomUtil
@@ -24,7 +24,7 @@ public class PluginDicomUtil
 
 	public static List<String> getDicomImageUIDsInSeries(String seriesUID, String sessionID) throws IOException
 	{
-		String url = EPADTools.seriesOrderURI + "?series_iuid=" + seriesUID;
+		String url = EPADConfig.seriesOrderURI + "?series_iuid=" + seriesUID;
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(url);
 		InputStreamReader streamReader = null;
@@ -53,7 +53,7 @@ public class PluginDicomUtil
 	public static int getPositionOfImageInDicomSeries(String seriesUID, String imageUID, String sessionID)
 			throws Exception
 	{
-		String url = EPADTools.seriesOrderURI + "?series_iuid=" + seriesUID;
+		String url = EPADConfig.seriesOrderURI + "?series_iuid=" + seriesUID;
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(url);
 		InputStreamReader streamReader = null;

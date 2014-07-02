@@ -1,8 +1,7 @@
-package edu.stanford.epad.common.util;
+package edu.stanford.epad.common.dicom;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,32 +14,14 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 
-import edu.stanford.epad.common.dicom.DICOMFileDescription;
+import edu.stanford.epad.common.util.EPADConfig;
+import edu.stanford.epad.common.util.EPADLogger;
+import edu.stanford.epad.common.util.WadoUrlBuilder;
 
-public class EPADTools
+public class DCM4CHEEUtil
 {
-	public static String serverProxy = EPADConfig.getInstance().getStringPropertyValue("serverProxy");
-	public static String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
 	public static final String dicomServerPort = EPADConfig.getInstance().getStringPropertyValue("DicomServerPort");
 	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
-	public static final String eXistUsername = EPADConfig.getInstance().getStringPropertyValue("username");
-	public static final String eXistPassword = EPADConfig.getInstance().getStringPropertyValue("password");
-	public static final String epadDatabaseUsername = EPADConfig.getInstance().getStringPropertyValue(
-			"epadDatabaseUsername");
-	public static final String epadDatabasePassword = EPADConfig.getInstance().getStringPropertyValue(
-			"epadDatabasePassword");
-	public static final String epadDatabaseURL = EPADConfig.getInstance().getStringPropertyValue("epadDatabaseURL");
-	public static final String dcm4CheeDatabaseUsername = EPADConfig.getInstance().getStringPropertyValue(
-			"dcm4CheeDatabaseUsername");
-	public static final String dcm4CheeDatabasePassword = EPADConfig.getInstance().getStringPropertyValue(
-			"dcm4CheeDatabasePassword");
-	public static final String dcm4CheeDatabaseURL = EPADConfig.getInstance().getStringPropertyValue(
-			"dcm4CheeDatabaseURL");
-	public static final String eXistCollection = EPADConfig.getInstance().getStringPropertyValue("collection");
-	public static final String aim3Namespace = EPADConfig.getInstance().getStringPropertyValue("namespace");
-	public static final String eXistURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
-	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");
-	public static final String seriesOrderURI = EPADConfig.getInstance().getStringPropertyValue("seriesOrderURI");
 
 	private static final EPADLogger log = EPADLogger.getInstance();
 	private static final EPADConfig config = EPADConfig.getInstance();
@@ -102,7 +83,7 @@ public class EPADTools
 			log.info("Sending file - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
 			String[] command = { "./dcmsnd", dcmServerTitlePort, inputPathFile };
 			ProcessBuilder pb = new ProcessBuilder(command);
-			String dicomBinDirectoryPath = EPADResources.getEPADWebServerDICOMBinDir();
+			String dicomBinDirectoryPath = EPADConfig.getEPADWebServerDICOMBinDir();
 			log.info("DICOM binary directory: " + dicomBinDirectoryPath);
 			pb.directory(new File(dicomBinDirectoryPath));
 			Process process = pb.start();
@@ -146,32 +127,5 @@ public class EPADTools
 			IOUtils.closeQuietly(br);
 			IOUtils.closeQuietly(isr);
 		}
-	}
-
-	public static boolean copyFile(File source, File destination)
-	{
-		boolean result = false;
-
-		FileInputStream sourceStream = null;
-		FileOutputStream destinationStream = null;
-		try {
-			destination.createNewFile();
-			sourceStream = new java.io.FileInputStream(source);
-			destinationStream = new java.io.FileOutputStream(destination);
-			byte buffer[] = new byte[512 * 1024];
-			int nbLecture;
-			while ((nbLecture = sourceStream.read(buffer)) != -1) {
-				destinationStream.write(buffer, 0, nbLecture);
-			}
-			result = true;
-		} catch (java.io.FileNotFoundException f) {
-			log.warning("FileTools.copyFile() = FileNotFoundException");
-		} catch (java.io.IOException e) {
-			log.warning("FileTools.copyFile() = IOException");
-		} finally {
-			IOUtils.closeQuietly(destinationStream);
-			IOUtils.closeQuietly(sourceStream);
-		}
-		return (result);
 	}
 }

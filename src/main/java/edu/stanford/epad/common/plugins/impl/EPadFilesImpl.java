@@ -15,8 +15,8 @@ import java.util.List;
 
 import edu.stanford.epad.common.dicom.DicomFormatUtil;
 import edu.stanford.epad.common.plugins.EPadFiles;
+import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
-import edu.stanford.epad.common.util.EPADResources;
 
 /**
  * Implements ePAD Files plugin API.
@@ -141,9 +141,9 @@ public class EPadFilesImpl implements EPadFiles
 		// save in a temp file.
 		//
 
-		File dir = new File(EPADResources.getEPADWebServerAnnotationsDir());
+		File dir = new File(EPADConfig.getEPADWebServerAnnotationsDir());
 		if (!dir.exists()) {
-			logger.info("WARNING: Couldn't find annotations dir: " + dir.getAbsolutePath());
+			logger.warning("Could not find annotations directory " + dir.getAbsolutePath());
 			return null;
 		}
 
@@ -153,7 +153,6 @@ public class EPadFilesImpl implements EPadFiles
 				return curr;
 			}
 		}
-
 		return null;
 	}
 
@@ -164,7 +163,7 @@ public class EPadFilesImpl implements EPadFiles
 	 */
 	private File getBaseDicomDir()
 	{
-		return new File(EPADResources.getEPADWebServerDicomDir());
+		return new File(EPADConfig.getEPADWebServerDicomDir());
 	}
 
 	/**

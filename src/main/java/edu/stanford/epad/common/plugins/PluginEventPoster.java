@@ -10,8 +10,8 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import edu.stanford.epad.common.plugins.impl.PluginAIMOptions;
+import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
-import edu.stanford.epad.common.util.EPADTools;
 
 public class PluginEventPoster
 {
@@ -20,7 +20,7 @@ public class PluginEventPoster
 	public static void postPluginEvent(String event_status, PluginAIMOptions pluginAIMOptions)
 	{
 		try {
-			String urlEncoded = EPADTools.eventResourceURI + "?" + "username=" + pluginAIMOptions.sessionID + "&"
+			String urlEncoded = EPADConfig.eventResourceURI + "?" + "username=" + pluginAIMOptions.sessionID + "&"
 					+ "event_status=" + java.net.URLEncoder.encode(event_status, "UTF-8") + "&" + "aim_uid="
 					+ java.net.URLEncoder.encode(pluginAIMOptions.aimUID, "UTF-8") + "&" + "aim_name="
 					+ java.net.URLEncoder.encode(pluginAIMOptions.aimName, "UTF-8") + "&" + "patient_id="

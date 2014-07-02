@@ -7,7 +7,7 @@
  */
 package edu.stanford.epad.common.dicom;
 
-import edu.stanford.epad.common.util.EPADResources;
+import edu.stanford.epad.common.util.EPADConfig;
 
 /**
  * Utility to formatUidToDir UID in directories.
@@ -39,7 +39,7 @@ public class DicomFormatUtil
 	public static String createDicomDirPath(String studyUID)
 	{
 		String studyDir = formatUidToDir(studyUID);
-		return EPADResources.getEPADWebServerDicomDir() + studyDir;
+		return EPADConfig.getEPADWebServerDicomDir() + studyDir;
 	}
 
 	public static String createDicomDirPath(String studyUID, String seriesUID)

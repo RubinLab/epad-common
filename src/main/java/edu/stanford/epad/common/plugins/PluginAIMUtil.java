@@ -9,9 +9,8 @@ import com.pixelmed.dicom.Attribute;
 import com.pixelmed.dicom.AttributeList;
 import com.pixelmed.dicom.TagFromName;
 
+import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
-import edu.stanford.epad.common.util.EPADResources;
-import edu.stanford.epad.common.util.EPADTools;
 import edu.stanford.hakan.aim3api.base.AimException;
 import edu.stanford.hakan.aim3api.base.DICOMImageReference;
 import edu.stanford.hakan.aim3api.base.GeometricShape;
@@ -32,13 +31,13 @@ public class PluginAIMUtil
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
 
-	private static final String aim3Namespace = EPADTools.aim3Namespace;
-	private static final String eXistServerUrl = EPADTools.eXistURI;
-	private static final String eXistPassword = EPADTools.eXistPassword;
-	private static final String eXistCollection = EPADTools.eXistCollection;
-	private static final String eXistUsername = EPADTools.eXistUsername;
-	private static final String aim3XSDFilePath = EPADResources.getEPADWebServerAIM3XSDFilePath();
-	private static final String eXistURI = EPADTools.eXistURI;
+	private static final String aim3Namespace = EPADConfig.aim3Namespace;
+	private static final String eXistServerUrl = EPADConfig.eXistURI;
+	private static final String eXistPassword = EPADConfig.eXistPassword;
+	private static final String eXistCollection = EPADConfig.eXistCollection;
+	private static final String eXistUsername = EPADConfig.eXistUsername;
+	private static final String aim3XSDFilePath = EPADConfig.getEPADWebServerAIM3XSDFilePath();
+	private static final String eXistURI = EPADConfig.eXistURI;
 
 	public static ImageAnnotation getImageAnnotationFromServer(String aimID) throws AimException
 	{
@@ -106,8 +105,8 @@ public class PluginAIMUtil
 	public static void saveAnnotationToAnnotationsDirectory(ImageAnnotation imageAnnotation) throws AimException
 	{
 		AnnotationBuilder.saveToFile(imageAnnotation,
-				EPADResources.getEPADWebServerAnnotationsDir() + imageAnnotation.getUniqueIdentifier() + ".xml",
-				EPADResources.getEPADWebServerAIM3XSDFilePath());
+				EPADConfig.getEPADWebServerAnnotationsDir() + imageAnnotation.getUniqueIdentifier() + ".xml",
+				EPADConfig.getEPADWebServerAIM3XSDFilePath());
 	}
 
 	public static ImageAnnotation getImageAnnotationFromFile(File file) throws AimException
