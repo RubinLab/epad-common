@@ -45,14 +45,14 @@ public class EPADTools
 	private static final EPADLogger log = EPADLogger.getInstance();
 	private static final EPADConfig config = EPADConfig.getInstance();
 
-	public static int feedFileWithDICOMFromWADO(File outputDICOMFile, DICOMFileDescription dicomFileDescription)
+	public static int downloadDICOMFileFromWADO(DICOMFileDescription dicomFileDescription, File outputDicomFile)
 			throws IOException
 	{
 		String studyUID = dicomFileDescription.studyUID;
 		String seriesUID = dicomFileDescription.seriesUID;
 		String imageUID = dicomFileDescription.imageUID;
 
-		return downloadDICOMFileFromWADO(studyUID, seriesUID, imageUID, outputDICOMFile);
+		return downloadDICOMFileFromWADO(studyUID, seriesUID, imageUID, outputDicomFile);
 	}
 
 	public static int downloadDICOMFileFromWADO(String studyUID, String seriesUID, String imageUID, File outputDicomFile)
