@@ -8,13 +8,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
+
+import edu.stanford.epad.common.dicom.DICOMFileDescription;
 
 public class EPADTools
 {
@@ -44,12 +45,12 @@ public class EPADTools
 	private static final EPADLogger log = EPADLogger.getInstance();
 	private static final EPADConfig config = EPADConfig.getInstance();
 
-	public static int feedFileWithDICOMFromWADO(File outputDICOMFile, Map<String, String> dicomFileDescription)
+	public static int feedFileWithDICOMFromWADO(File outputDICOMFile, DICOMFileDescription dicomFileDescription)
 			throws IOException
 	{
-		String studyUID = dicomFileDescription.get("study_iuid");
-		String seriesUID = dicomFileDescription.get("series_iuid");
-		String imageUID = dicomFileDescription.get("sop_iuid");
+		String studyUID = dicomFileDescription.studyUID;
+		String seriesUID = dicomFileDescription.seriesUID;
+		String imageUID = dicomFileDescription.imageUID;
 
 		return downloadDICOMFileFromWADO(studyUID, seriesUID, imageUID, outputDICOMFile);
 	}
