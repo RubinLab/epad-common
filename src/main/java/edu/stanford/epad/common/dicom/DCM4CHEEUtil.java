@@ -20,11 +20,10 @@ import edu.stanford.epad.common.util.WadoUrlBuilder;
 
 public class DCM4CHEEUtil
 {
-	public static final String dicomServerPort = EPADConfig.getInstance().getStringPropertyValue("DicomServerPort");
-	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
+	private static final String dicomServerPort = EPADConfig.dicomServerPort;
+	private static final String aeTitle = EPADConfig.aeTitle;
 
 	private static final EPADLogger log = EPADLogger.getInstance();
-	private static final EPADConfig config = EPADConfig.getInstance();
 
 	public static int downloadDICOMFileFromWADO(DICOMFileDescription dicomFileDescription, File outputDicomFile)
 			throws IOException
@@ -39,9 +38,9 @@ public class DCM4CHEEUtil
 	public static int downloadDICOMFileFromWADO(String studyUID, String seriesUID, String imageUID, File outputDicomFile)
 			throws IOException
 	{
-		String wadoHost = config.getStringPropertyValue("NameServer");
-		int wadoPort = config.getIntegerPropertyValue("DicomServerWadoPort");
-		String wadoBaseURL = config.getStringPropertyValue("WadoUrlExtension");
+		String wadoHost = EPADConfig.nameServer;
+		int wadoPort = EPADConfig.dicomServerWadoPort;
+		String wadoBaseURL = EPADConfig.wadoURLExtension;
 		WadoUrlBuilder wadoUrlBuilder = new WadoUrlBuilder(wadoHost, wadoPort, wadoBaseURL, WadoUrlBuilder.ContentType.FILE);
 
 		wadoUrlBuilder.setStudyUID(studyUID);

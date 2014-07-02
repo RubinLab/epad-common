@@ -18,8 +18,7 @@ public class SearchResultUtils
 
 	public SearchResultUtils()
 	{
-		EPADConfig config = EPADConfig.getInstance();
-		separator = config.getStringPropertyValue("fieldSeparator");
+		this.separator = EPADConfig.fieldSeparator;
 	}
 
 	public String get_STUDY_SEARCH_HEADER()

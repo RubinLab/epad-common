@@ -18,12 +18,19 @@ import org.apache.commons.io.IOUtils;
 
 /**
  * Read the "etc/proxy-config.properties" file on start-up and provides method to look up values.
+ * <p>
+ * All server configuration information is centralized here.
  */
 public class EPADConfig
 {
+	public static final String nameServer = EPADConfig.getInstance().getStringPropertyValue("NameServer");
+	public static final int dicomServerWadoPort = EPADConfig.getInstance().getIntegerPropertyValue("DicomServerWadoPort");
+	public static final String dcm4cheeDirRoot = EPADConfig.getInstance().getStringPropertyValue("dcm4cheeDirRoot");
+	public static final String wadoURLExtension = EPADConfig.getInstance().getStringPropertyValue("WadoUrlExtension");
 	public static final String serverProxy = EPADConfig.getInstance().getStringPropertyValue("serverProxy");
 	public static final String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
 	public static final String dicomServerPort = EPADConfig.getInstance().getStringPropertyValue("DicomServerPort");
+	public static final String dicomServerIP = EPADConfig.getInstance().getStringPropertyValue("DicomServerIP");
 	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
 	public static final String eXistUsername = EPADConfig.getInstance().getStringPropertyValue("username");
 	public static final String eXistPassword = EPADConfig.getInstance().getStringPropertyValue("password");
@@ -38,11 +45,32 @@ public class EPADConfig
 			"dcm4CheeDatabasePassword");
 	public static final String dcm4CheeDatabaseURL = EPADConfig.getInstance().getStringPropertyValue(
 			"dcm4CheeDatabaseURL");
+	public static final String eXistServerUrl = EPADConfig.getInstance().getStringPropertyValue("serverUrl");
 	public static final String eXistCollection = EPADConfig.getInstance().getStringPropertyValue("collection");
 	public static final String aim3Namespace = EPADConfig.getInstance().getStringPropertyValue("namespace");
 	public static final String eXistURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
 	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");
 	public static final String seriesOrderURI = EPADConfig.getInstance().getStringPropertyValue("seriesOrderURI");
+	public static final String xsdFile = EPADConfig.getInstance().getStringPropertyValue("xsdFile");
+	public static final String xsdFilePath = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir") + xsdFile;
+	public static final String useV4 = EPADConfig.getInstance().getStringPropertyValue("useV4");
+	public static final String aim4Namespace = EPADConfig.getInstance().getStringPropertyValue("namespaceV4");
+	public static final String eXistCollectionV4 = EPADConfig.getInstance().getStringPropertyValue("collectionV4");
+	public static final String xsdFileV4 = EPADConfig.getInstance().getStringPropertyValue("xsdFileV4");
+	public static final String xsdFilePathV4 = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir")
+			+ xsdFileV4;
+	public static final String coordinationTermPrefix = EPADConfig.getInstance().getStringPropertyValue(
+			"coordinationTermPrefix");
+	public static final String fieldSeparator = EPADConfig.getInstance().getStringPropertyValue("fieldSeparator");
+
+	public static final String xnatServer = EPADConfig.getInstance().getStringPropertyValue("XNATServer");
+	public static final int xnatPort = EPADConfig.getInstance().getIntegerPropertyValue("XNATPort");
+	public static final String xnatUploadProjectID = EPADConfig.getInstance().getStringPropertyValue(
+			"XNATUploadProjectID");
+	public static final String xnatUploadProjectUser = EPADConfig.getInstance().getStringPropertyValue(
+			"XNATUploadProjectUser");
+	public static final String xnatUploadProjectPassword = EPADConfig.getInstance().getStringPropertyValue(
+			"XNATUploadProjectPassword");
 
 	private static final EPADLogger log = EPADLogger.getInstance();
 	private static final EPADConfig ourInstance = new EPADConfig();
@@ -221,26 +249,9 @@ public class EPADConfig
 	 * @param name key in config file.
 	 * @return the value of that parameter.
 	 */
-	public String getParam(String name)
+	private String getParam(String name)
 	{
 		return properties.getProperty(name);
-	}
-
-	/**
-	 * Returns the value of a parameter in proxy-config.properties as an integer.
-	 * 
-	 * @param name key
-	 * @return the parameter value as an integer
-	 * @throws IllegalArgumentException if the value is not an integer in the config file.
-	 */
-	public int getIntParam(String name)
-	{
-		String s = properties.getProperty(name);
-		try {
-			return Integer.parseInt(s);
-		} catch (NumberFormatException nfe) {
-			throw new IllegalArgumentException("The " + name + " parameter value needs to be an integer. Its value was " + s);
-		}
 	}
 
 	/**
@@ -249,7 +260,7 @@ public class EPADConfig
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
-	public String getStringPropertyValue(String propertyName)
+	private String getStringPropertyValue(String propertyName)
 	{
 		String parameterValue = getParam(propertyName);
 
