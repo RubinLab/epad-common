@@ -23,6 +23,9 @@ import org.apache.commons.io.IOUtils;
  */
 public class EPADConfig
 {
+	private static final EPADLogger log = EPADLogger.getInstance();
+	private static final EPADConfig ourInstance = new EPADConfig();
+
 	// The port that the ePAD server is sitting on
 	public static final int epadPort = EPADConfig.getInstance().getIntegerPropertyValue("ePadClientPort");
 
@@ -52,13 +55,12 @@ public class EPADConfig
 			"dcm4CheeDatabaseURL");
 
 	// AIM-related configuration
-	public static final String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
+	public static final String eXistServerUrl = EPADConfig.getInstance().getStringPropertyValue("serverUrl");
+	public static final String eXistURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
 	public static final String eXistUsername = EPADConfig.getInstance().getStringPropertyValue("username");
 	public static final String eXistPassword = EPADConfig.getInstance().getStringPropertyValue("password");
-	public static final String eXistServerUrl = EPADConfig.getInstance().getStringPropertyValue("serverUrl");
 	public static final String eXistCollection = EPADConfig.getInstance().getStringPropertyValue("collection");
 	public static final String aim3Namespace = EPADConfig.getInstance().getStringPropertyValue("namespace");
-	public static final String eXistURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
 	public static final String xsdFile = EPADConfig.getInstance().getStringPropertyValue("xsdFile");
 	public static final String xsdFilePath = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir") + xsdFile;
 	public static final String useV4 = EPADConfig.getInstance().getStringPropertyValue("useV4");
@@ -67,6 +69,7 @@ public class EPADConfig
 	public static final String xsdFileV4 = EPADConfig.getInstance().getStringPropertyValue("xsdFileV4");
 	public static final String xsdFilePathV4 = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir")
 			+ xsdFileV4;
+	public static final String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
 
 	public static final String fieldSeparator = EPADConfig.getInstance().getStringPropertyValue("fieldSeparator");
 
@@ -85,14 +88,31 @@ public class EPADConfig
 	public static final String xnatUploadProjectPassword = EPADConfig.getInstance().getStringPropertyValue(
 			"XNATUploadProjectPassword");
 
-	private static final EPADLogger log = EPADLogger.getInstance();
-	private static final EPADConfig ourInstance = new EPADConfig();
-
 	private Properties properties;
 
 	private static EPADConfig getInstance()
 	{
 		return ourInstance;
+	}
+
+	private EPADConfig()
+	{
+		try {
+			properties = new Properties();
+			File configFile = getConfigurationFile();
+			if (!configFile.exists())
+				throw new IllegalStateException("Could not find ePAD configuration file " + configFile.getAbsolutePath());
+
+			FileInputStream fis = new FileInputStream(configFile);
+			try {
+				properties.load(fis);
+				log.info("Using ePAD configuration file " + configFile.getAbsolutePath());
+			} finally {
+				IOUtils.closeQuietly(fis);
+			}
+		} catch (Exception e) {
+			log.severe("Error reading ePAD configuration file", e);
+		}
 	}
 
 	/**
@@ -226,26 +246,6 @@ public class EPADConfig
 	public static String getEPADWebServerJettyConfigFilePath()
 	{
 		return getEPADWebServerEtcDir() + "jetty-config.xml";
-	}
-
-	private EPADConfig()
-	{
-		try {
-			properties = new Properties();
-			File configFile = getConfigurationFile();
-			if (!configFile.exists())
-				throw new IllegalStateException("Could not find ePAD configuration file " + configFile.getAbsolutePath());
-
-			FileInputStream fis = new FileInputStream(configFile);
-			try {
-				properties.load(fis);
-				log.info("Using ePAD configuration file " + configFile.getAbsolutePath());
-			} finally {
-				IOUtils.closeQuietly(fis);
-			}
-		} catch (Exception e) {
-			log.severe("Error reading ePAD configuration file", e);
-		}
 	}
 
 	private File getConfigurationFile()
