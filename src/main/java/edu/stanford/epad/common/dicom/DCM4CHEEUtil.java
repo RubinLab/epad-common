@@ -38,8 +38,8 @@ public class DCM4CHEEUtil
 	public static int downloadDICOMFileFromWADO(String studyUID, String seriesUID, String imageUID, File outputDicomFile)
 			throws IOException
 	{
-		String wadoHost = EPADConfig.nameServer;
-		int wadoPort = EPADConfig.dicomServerWadoPort;
+		String wadoHost = EPADConfig.dcm4CheeServer;
+		int wadoPort = EPADConfig.dcm4cheeServerWadoPort;
 		String wadoBaseURL = EPADConfig.wadoURLExtension;
 		WadoUrlBuilder wadoUrlBuilder = new WadoUrlBuilder(wadoHost, wadoPort, wadoBaseURL, WadoUrlBuilder.ContentType.FILE);
 

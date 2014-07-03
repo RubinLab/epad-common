@@ -17,40 +17,48 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Read the "etc/proxy-config.properties" file on start-up and provides method to look up values.
+ * Read the "etc/proxy-config.properties" file on start up read all necessary configuration information.
  * <p>
- * All server configuration information is centralized here.
+ * All server configuration information is centralized here, i.e., the configuration file should not be read elsewhere.
  */
 public class EPADConfig
 {
-	public static final String nameServer = EPADConfig.getInstance().getStringPropertyValue("NameServer");
-	public static final int dicomServerWadoPort = EPADConfig.getInstance().getIntegerPropertyValue("DicomServerWadoPort");
+	// The port that the ePAD server is sitting on
+	public static final int epadPort = EPADConfig.getInstance().getIntegerPropertyValue("ePadClientPort");
+
+	// dcm4chee configuration
+	public static final String dcm4CheeServer = EPADConfig.getInstance().getStringPropertyValue("NameServer");
+	public static final int dcm4cheeServerWadoPort = EPADConfig.getInstance().getIntegerPropertyValue(
+			"DicomServerWadoPort");
 	public static final String dcm4cheeDirRoot = EPADConfig.getInstance().getStringPropertyValue("dcm4cheeDirRoot");
 	public static final String wadoURLExtension = EPADConfig.getInstance().getStringPropertyValue("WadoUrlExtension");
-	public static final String serverProxy = EPADConfig.getInstance().getStringPropertyValue("serverProxy");
-	public static final String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
 	public static final String dicomServerPort = EPADConfig.getInstance().getStringPropertyValue("DicomServerPort");
 	public static final String dicomServerIP = EPADConfig.getInstance().getStringPropertyValue("DicomServerIP");
 	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
-	public static final String eXistUsername = EPADConfig.getInstance().getStringPropertyValue("username");
-	public static final String eXistPassword = EPADConfig.getInstance().getStringPropertyValue("password");
+
+	// ePAD's MySQL database configuration
 	public static final String epadDatabaseUsername = EPADConfig.getInstance().getStringPropertyValue(
 			"epadDatabaseUsername");
 	public static final String epadDatabasePassword = EPADConfig.getInstance().getStringPropertyValue(
 			"epadDatabasePassword");
 	public static final String epadDatabaseURL = EPADConfig.getInstance().getStringPropertyValue("epadDatabaseURL");
+
+	// dcm4chee's MySQL database configuration
 	public static final String dcm4CheeDatabaseUsername = EPADConfig.getInstance().getStringPropertyValue(
 			"dcm4CheeDatabaseUsername");
 	public static final String dcm4CheeDatabasePassword = EPADConfig.getInstance().getStringPropertyValue(
 			"dcm4CheeDatabasePassword");
 	public static final String dcm4CheeDatabaseURL = EPADConfig.getInstance().getStringPropertyValue(
 			"dcm4CheeDatabaseURL");
+
+	// AIM-related configuration
+	public static final String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
+	public static final String eXistUsername = EPADConfig.getInstance().getStringPropertyValue("username");
+	public static final String eXistPassword = EPADConfig.getInstance().getStringPropertyValue("password");
 	public static final String eXistServerUrl = EPADConfig.getInstance().getStringPropertyValue("serverUrl");
 	public static final String eXistCollection = EPADConfig.getInstance().getStringPropertyValue("collection");
 	public static final String aim3Namespace = EPADConfig.getInstance().getStringPropertyValue("namespace");
 	public static final String eXistURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
-	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");
-	public static final String seriesOrderURI = EPADConfig.getInstance().getStringPropertyValue("seriesOrderURI");
 	public static final String xsdFile = EPADConfig.getInstance().getStringPropertyValue("xsdFile");
 	public static final String xsdFilePath = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir") + xsdFile;
 	public static final String useV4 = EPADConfig.getInstance().getStringPropertyValue("useV4");
@@ -59,9 +67,14 @@ public class EPADConfig
 	public static final String xsdFileV4 = EPADConfig.getInstance().getStringPropertyValue("xsdFileV4");
 	public static final String xsdFilePathV4 = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir")
 			+ xsdFileV4;
+
+	public static final String fieldSeparator = EPADConfig.getInstance().getStringPropertyValue("fieldSeparator");
+
+	// The following three properties should disappear after a full RESTful conversion
+	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");
+	public static final String seriesOrderURI = EPADConfig.getInstance().getStringPropertyValue("seriesOrderURI");
 	public static final String coordinationTermPrefix = EPADConfig.getInstance().getStringPropertyValue(
 			"coordinationTermPrefix");
-	public static final String fieldSeparator = EPADConfig.getInstance().getStringPropertyValue("fieldSeparator");
 
 	public static final String xnatServer = EPADConfig.getInstance().getStringPropertyValue("XNATServer");
 	public static final int xnatPort = EPADConfig.getInstance().getIntegerPropertyValue("XNATPort");
@@ -77,7 +90,7 @@ public class EPADConfig
 
 	private Properties properties;
 
-	public static EPADConfig getInstance()
+	private static EPADConfig getInstance()
 	{
 		return ourInstance;
 	}

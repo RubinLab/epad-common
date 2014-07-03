@@ -7,27 +7,24 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * @author alansnyder Date: 9/7/12
- */
 public abstract class AbstractPluginServletHandler implements PluginServletHandler
 {
 	protected static final Logger logger = PluginLogger.getLogger();
 
 	/**
-	 * The J2EE equivalent of init
+	 * Plugin initialization
 	 */
 	@Override
 	public abstract void init();
 
 	/**
-	 * The J2EE equivalent of destroy.
+	 * Called when a plugin is destroyed
 	 */
 	@Override
 	public abstract void destroy();
 
 	/**
-	 * Standard J2EE doGet handler that is forwarded from the DicomProxy
+	 * Standard doGet handler that is forwarded from the ePAD server
 	 * 
 	 * @param req HttpServletRequest
 	 * @param res HttpServletResponse
@@ -36,7 +33,7 @@ public abstract class AbstractPluginServletHandler implements PluginServletHandl
 	public abstract int doGet(HttpServletRequest req, HttpServletResponse res);
 
 	/**
-	 * Standard J2EE doPost handler that is forwarded from the DicomProxy
+	 * Standard doPost handler that is forwarded from the ePAD server
 	 * 
 	 * @param req HttpServletRequest
 	 * @param res HttpServletResponse
@@ -46,8 +43,6 @@ public abstract class AbstractPluginServletHandler implements PluginServletHandl
 
 	/**
 	 * Very short string to identify this version of the release.
-	 * 
-	 * @return String example "1.0.0 - Aug. 15, 2012"
 	 */
 	@Override
 	public abstract String getVersion();
@@ -78,13 +73,10 @@ public abstract class AbstractPluginServletHandler implements PluginServletHandl
 
 	protected void outputException(Throwable t, PrintWriter out)
 	{
-
-		// make for web-page response
 		out.println("  message: " + t.getMessage());
 		out.println(" ");
 		out.println(printStackTrace(t));
 
-		// log
 		logger.log(Level.WARNING, t.getMessage(), t);
 	}
 
@@ -101,7 +93,6 @@ public abstract class AbstractPluginServletHandler implements PluginServletHandl
 			sb.append(currElement.getLineNumber());
 			sb.append("\n");
 		}
-
 		return sb.toString();
 	}
 }
