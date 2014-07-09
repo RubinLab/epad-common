@@ -44,6 +44,11 @@ public class PixelMedUtils
 	public static final String PixelSpacingTagName = dicomDictionary.getFullNameFromTag(TagFromName.PixelSpacing);
 	public static final String PatientBirthDateCode = TagFromName.PatientBirthDate.toString();
 	public static final String PatientBirthDateTagName = dicomDictionary.getFullNameFromTag(TagFromName.PatientBirthDate);
+	public static final String BitsStoredCode = TagFromName.BitsStored.toString();
+	public static final String BitsStoredTagName = dicomDictionary.getFullNameFromTag(TagFromName.BitsStored);
+	public static final String PixelRepresentationCode = TagFromName.PixelRepresentation.toString();
+	public static final String PixelRepresentationTagName = dicomDictionary
+			.getFullNameFromTag(TagFromName.PixelRepresentation);
 
 	private PixelMedUtils()
 	{
