@@ -24,31 +24,50 @@ public class PixelMedUtils
 
 	private static final DicomDictionary dicomDictionary = new DicomDictionary();
 
-	public static final String WindowWidthTagCode = TagFromName.WindowWidth.toString();
+	public static final String WindowWidthCode = getTagCode(TagFromName.WindowWidth);
 	public static final String WindowWidthTagName = dicomDictionary.getFullNameFromTag(TagFromName.WindowWidth);
-	public static final String WindowCenterTagCode = TagFromName.WindowCenter.toString();
+	public static final String WindowCenterCode = getTagCode(TagFromName.WindowCenter);
 	public static final String WindowCenterTagName = dicomDictionary.getFullNameFromTag(TagFromName.WindowCenter);
-	public static final String RowsTagCode = TagFromName.Rows.toString();
+	public static final String RowsCode = getTagCode(TagFromName.Rows);
 	public static final String RowsTagName = dicomDictionary.getFullNameFromTag(TagFromName.Rows);
-	public static final String ColumnsTagCode = TagFromName.Columns.toString();
+	public static final String ColumnsCode = getTagCode(TagFromName.Columns);
 	public static final String ColumnsTagName = dicomDictionary.getFullNameFromTag(TagFromName.Columns);
-	public static final String StudyDateCode = TagFromName.StudyDate.toString();
+	public static final String StudyDateCode = getTagCode(TagFromName.StudyDate);
 	public static final String StudyDateTagName = dicomDictionary.getFullNameFromTag(TagFromName.StudyDate);
-	public static final String StudyTimeCode = TagFromName.StudyTime.toString();
+	public static final String StudyTimeCode = getTagCode(TagFromName.StudyTime);
 	public static final String StudyTimeTagName = dicomDictionary.getFullNameFromTag(TagFromName.StudyTime);
-	public static final String RescaleSlopeCode = TagFromName.RescaleSlope.toString();
+	public static final String RescaleSlopeCode = getTagCode(TagFromName.RescaleSlope);
 	public static final String RescaleSlopeTagName = dicomDictionary.getFullNameFromTag(TagFromName.RescaleSlope);
-	public static final String RescaleInterceptCode = TagFromName.RescaleIntercept.toString();
+	public static final String RescaleInterceptCode = getTagCode(TagFromName.RescaleIntercept);
 	public static final String RescaleInterceptTagName = dicomDictionary.getFullNameFromTag(TagFromName.RescaleIntercept);
-	public static final String PixelSpacingCode = TagFromName.PixelSpacing.toString();
+	public static final String PixelSpacingCode = getTagCode(TagFromName.PixelSpacing);
 	public static final String PixelSpacingTagName = dicomDictionary.getFullNameFromTag(TagFromName.PixelSpacing);
-	public static final String PatientBirthDateCode = TagFromName.PatientBirthDate.toString();
+	public static final String PatientBirthDateCode = getTagCode(TagFromName.PatientBirthDate);
 	public static final String PatientBirthDateTagName = dicomDictionary.getFullNameFromTag(TagFromName.PatientBirthDate);
-	public static final String BitsStoredCode = TagFromName.BitsStored.toString();
+	public static final String BitsStoredCode = getTagCode(TagFromName.BitsStored);
 	public static final String BitsStoredTagName = dicomDictionary.getFullNameFromTag(TagFromName.BitsStored);
-	public static final String PixelRepresentationCode = TagFromName.PixelRepresentation.toString();
+	public static final String PixelRepresentationCode = getTagCode(TagFromName.PixelRepresentation);
 	public static final String PixelRepresentationTagName = dicomDictionary
 			.getFullNameFromTag(TagFromName.PixelRepresentation);
+
+	private static String getTagCode(AttributeTag tag)
+	{
+		int group = tag.getGroup();
+		int element = tag.getElement();
+		StringBuffer str = new StringBuffer();
+		str.append("(");
+		String groupString = Integer.toHexString(group);
+		for (int i = groupString.length(); i < 4; ++i)
+			str.append("0");
+		str.append(groupString);
+		str.append(",");
+		String elementString = Integer.toHexString(element);
+		for (int i = elementString.length(); i < 4; ++i)
+			str.append("0");
+		str.append(elementString);
+		str.append(")");
+		return str.toString();
+	}
 
 	private PixelMedUtils()
 	{
