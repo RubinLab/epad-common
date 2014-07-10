@@ -49,25 +49,11 @@ public class PixelMedUtils
 	public static final String PixelRepresentationCode = getTagCode(TagFromName.PixelRepresentation);
 	public static final String PixelRepresentationTagName = dicomDictionary
 			.getFullNameFromTag(TagFromName.PixelRepresentation);
-
-	private static String getTagCode(AttributeTag tag)
-	{
-		int group = tag.getGroup();
-		int element = tag.getElement();
-		StringBuffer str = new StringBuffer();
-		str.append("(");
-		String groupString = Integer.toHexString(group);
-		for (int i = groupString.length(); i < 4; ++i)
-			str.append("0");
-		str.append(groupString);
-		str.append(",");
-		String elementString = Integer.toHexString(element);
-		for (int i = elementString.length(); i < 4; ++i)
-			str.append("0");
-		str.append(elementString);
-		str.append(")");
-		return str.toString();
-	}
+	public static final String NumberOfFramesCode = getTagCode(TagFromName.NumberOfFrames);
+	public static final String NumberOfFramesTagName = dicomDictionary.getFullNameFromTag(TagFromName.NumberOfFrames);
+	public static final String ReferencedSOPInstanceUIDCode = getTagCode(TagFromName.ReferencedSOPInstanceUID);
+	public static final String ReferencedSOPInstanceUIDTagName = dicomDictionary
+			.getFullNameFromTag(TagFromName.ReferencedSOPInstanceUID);
 
 	private PixelMedUtils()
 	{
@@ -153,4 +139,22 @@ public class PixelMedUtils
 		}
 	}
 
+	private static String getTagCode(AttributeTag tag)
+	{
+		int group = tag.getGroup();
+		int element = tag.getElement();
+		StringBuffer str = new StringBuffer();
+		str.append("(");
+		String groupString = Integer.toHexString(group);
+		for (int i = groupString.length(); i < 4; ++i)
+			str.append("0");
+		str.append(groupString);
+		str.append(",");
+		String elementString = Integer.toHexString(element);
+		for (int i = elementString.length(); i < 4; ++i)
+			str.append("0");
+		str.append(elementString);
+		str.append(")");
+		return str.toString();
+	}
 }
