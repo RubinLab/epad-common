@@ -44,6 +44,23 @@ public class PixelMedUtils
 	public static final String PixelSpacingTagName = dicomDictionary.getFullNameFromTag(TagFromName.PixelSpacing);
 	public static final String PatientBirthDateCode = getTagCode(TagFromName.PatientBirthDate);
 	public static final String PatientBirthDateTagName = dicomDictionary.getFullNameFromTag(TagFromName.PatientBirthDate);
+
+	public static final String PatientNameCode = getTagCode(TagFromName.PatientName);
+	public static final String PatientNameTagName = dicomDictionary.getFullNameFromTag(TagFromName.PatientName);
+	public static final String PatientSexCode = getTagCode(TagFromName.PatientSex);
+	public static final String PatientSexTagName = dicomDictionary.getFullNameFromTag(TagFromName.PatientSex);
+	public static final String ModalityCode = getTagCode(TagFromName.Modality);
+	public static final String ModalityTagName = dicomDictionary.getFullNameFromTag(TagFromName.Modality);
+	public static final String SeriesDescriptionCode = getTagCode(TagFromName.SeriesDescription);
+	public static final String SeriesDescriptionTagName = dicomDictionary
+			.getFullNameFromTag(TagFromName.SeriesDescription);
+	public static final String ManufacturerCode = getTagCode(TagFromName.Manufacturer);
+	public static final String ManufacturerTagName = dicomDictionary.getFullNameFromTag(TagFromName.Manufacturer);
+	public static final String ModelNameCode = getTagCode(TagFromName.ManufacturerModelName);
+	public static final String ModelNameTagName = dicomDictionary.getFullNameFromTag(TagFromName.ManufacturerModelName);
+	public static final String SoftwareVersionCode = getTagCode(TagFromName.SoftwareVersion);
+	public static final String SoftwareVersionTagName = dicomDictionary.getFullNameFromTag(TagFromName.SoftwareVersion);
+
 	public static final String BitsStoredCode = getTagCode(TagFromName.BitsStored);
 	public static final String BitsStoredTagName = dicomDictionary.getFullNameFromTag(TagFromName.BitsStored);
 	public static final String PixelRepresentationCode = getTagCode(TagFromName.PixelRepresentation);
