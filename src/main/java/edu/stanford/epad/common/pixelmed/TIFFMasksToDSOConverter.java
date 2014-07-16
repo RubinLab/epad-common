@@ -47,7 +47,7 @@ public class TIFFMasksToDSOConverter
 	 * @param outputFile: Name of the output segmentation objects file.
 	 * @throws DicomException
 	 */
-	public void convert(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath)
+	public void generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath)
 			throws DicomException
 	{
 		try {
@@ -192,7 +192,7 @@ public class TIFFMasksToDSOConverter
 
 		try {
 			TIFFMasksToDSOConverter converter = new TIFFMasksToDSOConverter();
-			converter.convert(maskFilePaths, dicomFilePaths, outputFileName);
+			converter.generateDSO(maskFilePaths, dicomFilePaths, outputFileName);
 		} catch (Exception e) {
 			System.err.println(e);
 			e.printStackTrace(System.err);
