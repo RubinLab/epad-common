@@ -45,6 +45,11 @@ public class PixelMedUtils
 	public static final String PatientBirthDateCode = getTagCode(TagFromName.PatientBirthDate);
 	public static final String PatientBirthDateTagName = dicomDictionary.getFullNameFromTag(TagFromName.PatientBirthDate);
 
+	public static final String SliceThicknessCode = getTagCode(TagFromName.SliceThickness);
+	public static final String SliceThicknessTagName = dicomDictionary.getFullNameFromTag(TagFromName.SliceThickness);
+	public static final String SliceLocationCode = getTagCode(TagFromName.SliceLocation);
+	public static final String SliceLocationTagName = dicomDictionary.getFullNameFromTag(TagFromName.SliceLocation);
+
 	public static final String PatientNameCode = getTagCode(TagFromName.PatientName);
 	public static final String PatientNameTagName = dicomDictionary.getFullNameFromTag(TagFromName.PatientName);
 	public static final String PatientSexCode = getTagCode(TagFromName.PatientSex);
