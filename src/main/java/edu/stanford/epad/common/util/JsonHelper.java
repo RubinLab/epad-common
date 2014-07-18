@@ -25,24 +25,4 @@ public class JsonHelper
 	{
 		return "{ \"error\": \"" + errorMessage + "\" }";
 	}
-
-	public static String createJSONErrorResponse(String errorMessage, Throwable t)
-	{
-		return "{ \"error\": \"" + errorMessage + ": " + t.getMessage() + "\" }";
-	}
-
-	/**
-	 * Test driver.
-	 * 
-	 * @param args not used
-	 */
-	public static void main(String[] args)
-	{
-		String[] tests = { "abcdef\\a\\\'\\\"", "abc" };
-		for (int i = 0; i < tests.length; i++) {
-			System.out.println("*****  *****");
-			System.out.println(tests[i]);
-			System.out.println(escape(tests[i]));
-		}
-	}
 }

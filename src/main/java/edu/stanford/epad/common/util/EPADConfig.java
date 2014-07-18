@@ -71,8 +71,6 @@ public class EPADConfig
 			+ xsdFileV4;
 	public static final String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
 
-	public static final String fieldSeparator = EPADConfig.getInstance().getStringPropertyValue("fieldSeparator");
-
 	// The following three properties should disappear after a full RESTful conversion
 	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");
 	public static final String seriesOrderURI = EPADConfig.getInstance().getStringPropertyValue("seriesOrderURI");
