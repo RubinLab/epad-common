@@ -19,8 +19,6 @@ public class PluginController
 	// ToDo: Each plug-in should have its own logger and log file.
 	private final Logger logger = PluginLogger.getLogger();
 
-	private EPadFiles ePadFiles = null;
-
 	/***
 	 * Get ePadFiles and ePadProxyConfig via reflection.
 	 */
@@ -29,19 +27,9 @@ public class PluginController
 
 	}
 
-	public void setImpl(EPadFiles ePadFiles)
-	{
-		this.ePadFiles = ePadFiles;
-	}
-
 	public Logger getLogger()
 	{
 		return logger;
-	}
-
-	public EPadFiles getEPadFiles()
-	{
-		return ePadFiles;
 	}
 
 	public String getInterfaceVersion()
@@ -94,5 +82,4 @@ public class PluginController
 
 		logger.info(sb.toString());
 	}
-
 }
