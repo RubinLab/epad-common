@@ -77,10 +77,6 @@ public class PixelMedUtils
 	public static final String ReferencedSOPInstanceUIDTagName = dicomDictionary
 			.getFullNameFromTag(TagFromName.ReferencedSOPInstanceUID);
 
-	private PixelMedUtils()
-	{
-	}
-
 	public static AttributeList readDICOMAttributeList(File dicomFile)
 	{
 		AttributeList attributeList = new AttributeList();
