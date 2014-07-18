@@ -25,9 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -111,189 +109,6 @@ public class EPADFileUtils
 			IOUtils.closeQuietly(in);
 		}
 		return sb.toString();
-	}
-
-	/**
-	 * Read a file that has a "comma-separated-value" format, as a List of Maps. This file format looks like the
-	 * following:
-	 * 
-	 * line[1]: Key1 , Key2 , Key3 line[2]: Value1, Value2, Value3 line[3]: ValueA, ValueB, ValueC
-	 * 
-	 * This returns a List with two Maps. This first Map is (key1=Value1,Key2=Value2,...). The second Map is (key1=ValueA,
-	 * key2=ValueB, ...).
-	 * 
-	 * @param file File
-	 * @return List of Maps of String to String
-	 * @throws IllegalArgumentException is the file format is not valid.
-	 * @throws IOException with read error
-	 */
-	public static List<Map<String, String>> readCsvFormattedFile(File file) throws IOException
-	{
-		String content = read(file);
-		List<Map<String, String>> retVal = new ArrayList<Map<String, String>>();
-
-		String errorMsg = checkForValidCsvFormat(content);
-		if (!"".equals(errorMsg)) {
-			throw new IllegalArgumentException(errorMsg);
-		}// if
-
-		// parse file contents.
-		String currVal = "";
-		try {
-			String[] lines = content.split("\n");
-			String[] keys = lines[0].split(",");
-
-			for (int i = 1; i < lines.length; i++) {
-				currVal = lines[i];
-				String[] values = lines[i].split(",");
-				Map<String, String> valueMap = createMap(keys, values);
-				retVal.add(valueMap);
-			}// for
-
-		} catch (Exception e) {
-			log.warning("readCsvFormattedFile had: " + e.getMessage() + " for _" + currVal + "_", e);
-		}
-
-		return retVal;
-	}
-
-	/**
-	 * Read a file with the following format:
-	 * 
-	 * ## This is a comment key1=value1 key2=value2
-	 * 
-	 * It will return a Map with key the text before the first = sign.
-	 * 
-	 * @param file File
-	 * @return Map of String key to String values
-	 * @throws java.io.IOException on read error
-	 */
-	public static Map<String, String> readKeyValueFormattedFile(File file) throws IOException
-	{
-		String content = read(file);
-
-		Map<String, String> retVal = new HashMap<String, String>();
-		try {
-			String[] lines = content.split("\n");
-			for (String currLine : lines) {
-				currLine = currLine.trim();
-				if (currLine.startsWith("#")) {
-					continue;
-				}
-				String[] parts = currLine.split("=", 2);
-				if (parts.length == 2) {
-					retVal.put(parts[0].trim(), parts[1].trim());
-				}
-			}// for
-
-		} catch (Exception e) {
-			log.warning("readKeyValueFormattedFile had: " + e.getMessage() + " for _" + content + "_", e);
-		}
-
-		return retVal;
-	}
-
-	/**
-	 * 
-	 * @param keys String[] keys
-	 * @param values String[] values
-	 * @return Map
-	 */
-	private static Map<String, String> createMap(String[] keys, String[] values)
-	{
-		Map<String, String> retVal = new HashMap<String, String>();
-
-		for (int i = 0; i < keys.length; i++) {
-			retVal.put(keys[i], values[i]);
-		}
-		return retVal;
-	}
-
-	/**
-	 * Test a String to see if it is a valid CSV format. Return an empty string if it is valid. If it isn't valid then
-	 * return an error message for the reason.
-	 * 
-	 * Here are the rules: (a) The String must have at least two line. (b) On each line the number of commas must be the
-	 * same.
-	 * 
-	 * @param contents String
-	 * @return String
-	 */
-	public static String checkForValidCsvFormat(String contents)
-	{
-		String[] lines = contents.split("\n");
-		if (lines.length < 2) {
-			return "Too few lines";
-		}
-
-		final int INIT = -1;
-		int numCommas = INIT;
-		for (String line : lines) {
-			int n = countOccurrences(line, ',');
-			if (numCommas == INIT) {
-				numCommas = n;
-			} else {
-				if (numCommas != n) {
-					return "Number of , characters need to be " + numCommas + ". It was " + n + " for " + line;
-				}
-			}
-		}// for
-			// Maybe a better check here.
-		int nFirstLine = INIT;
-		for (String currLine : lines) {
-			String[] parts = currLine.split(",");
-			if (nFirstLine == INIT) {
-				nFirstLine = parts.length;
-			} else {
-				if (parts.length != nFirstLine) {
-					return "Expected " + nFirstLine + " but found " + parts.length + " parts. For=_" + currLine + "_";
-				}
-			}
-		}
-
-		return "";
-	}// checkForValidCsvFormat
-
-	/**
-	 * Count of number of occurrences of a certain character within a String.
-	 * 
-	 * @param line String
-	 * @param check char
-	 * @return int
-	 */
-	public static int countOccurrences(String line, char check)
-	{
-		int count = 0;
-		for (int i = 0; i < line.length(); i++) {
-			if (line.charAt(i) == check) {
-				count++;
-			}
-		}
-		return count;
-	}
-
-	/**
-	 * Find all the files names with a certain extension in the specified directory.
-	 * 
-	 * @param dir File directory to check
-	 * @param extension String file ending to look for
-	 * @return List of Files where file ending matches extension parameter.
-	 */
-	public static List<File> getAllFilesWithExtension(File dir, final String extension)
-	{
-		File[] files = dir.listFiles(new FileFilter() {
-			@Override
-			public boolean accept(File file)
-			{
-				return file.getName().endsWith(extension);
-			}
-		});
-
-		if (files != null) {
-			return Arrays.asList(files);
-		} else {
-			return new ArrayList<File>(); // return an empty list of no files.
-		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -386,87 +201,6 @@ public class EPADFileUtils
 	}
 
 	/**
-	 * Concatenates a file name to a directory path.
-	 * 
-	 * @param dir String
-	 * @param name String
-	 * @return String
-	 */
-	public static String appendNameToDir(String dir, String name)
-	{
-		StringBuilder sb = new StringBuilder(dir);
-		if (!dir.endsWith("/")) {
-			sb.append("/");
-		}
-		sb.append(name);
-		return sb.toString();
-	}
-
-	/**
-	 * Replace the extension of a file with the a new extension.
-	 * 
-	 * @param file File the file to use.
-	 * @param newExt String the extension that will replace the other.
-	 * @return String the new file with the extension replaced.
-	 */
-	public static String replaceExtensionWith(File file, String newExt)
-	{
-		StringBuilder sb = new StringBuilder(fileAbsolutePathWithoutExtension(file));
-		if (!newExt.startsWith(".")) {
-			sb.append(".");
-		}
-		sb.append(newExt);
-		return sb.toString();
-	}
-
-	/**
-	 * Replace the extension of a file with the a new extension.
-	 * 
-	 * @param filePath String the file path to use.
-	 * @param newExt String the extension that will replace the other.
-	 * @return String the new file with the extension replaced.
-	 */
-	public static String replaceExtensionWith(String filePath, String newExt)
-	{
-		return replaceExtensionWith(new File(filePath), newExt);
-	}
-
-	/**
-	 * Check a specific file for the extension. Return true if the file has the extension. The file-ending are NOT case
-	 * sensitive.
-	 * 
-	 * @param checkFile File the file to check.
-	 * @param extension String the extension to look for.
-	 * @return boolean if this matches extension.
-	 */
-	public static boolean isFileType(File checkFile, String extension)
-	{
-		String name = checkFile.getName().toLowerCase();
-		return name.endsWith(extension.toLowerCase());
-	}
-
-	/**
-	 * 
-	 * @param name String
-	 * @return String
-	 */
-	private static String removeExtension(String name)
-	{
-		int lastDotIndex = name.lastIndexOf('.');
-		if (lastDotIndex < 1) {
-			return name;
-		}
-
-		String ext = name.substring(lastDotIndex);
-		ext = ext.replace('.', ' ').trim();
-		if (isNumber(ext)) {
-			return name;
-		}
-
-		return name.substring(0, lastDotIndex);
-	}
-
-	/**
 	 * 
 	 * @param f File
 	 * @return String
@@ -528,18 +262,6 @@ public class EPADFileUtils
 	public static String fileNameWithoutExtension(File f)
 	{
 		return removeExtension(f.getName());
-	}
-
-	private static boolean isNumber(String checkForNumber)
-	{
-
-		for (int i = 0; i < checkForNumber.length(); i++) {
-			// If we find a non-digit character we return false.
-			if (!Character.isDigit(checkForNumber.charAt(i)))
-				return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -746,5 +468,38 @@ public class EPADFileUtils
 			log.warning("Had: " + e.getMessage() + " for " + dir.getAbsolutePath(), e);
 			return false;
 		}
+	}
+
+	/**
+	 * 
+	 * @param name String
+	 * @return String
+	 */
+	private static String removeExtension(String name)
+	{
+		int lastDotIndex = name.lastIndexOf('.');
+		if (lastDotIndex < 1) {
+			return name;
+		}
+	
+		String ext = name.substring(lastDotIndex);
+		ext = ext.replace('.', ' ').trim();
+		if (isNumber(ext)) {
+			return name;
+		}
+	
+		return name.substring(0, lastDotIndex);
+	}
+
+	private static boolean isNumber(String checkForNumber)
+	{
+	
+		for (int i = 0; i < checkForNumber.length(); i++) {
+			// If we find a non-digit character we return false.
+			if (!Character.isDigit(checkForNumber.charAt(i)))
+				return false;
+		}
+	
+		return true;
 	}
 }
