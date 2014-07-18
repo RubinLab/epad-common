@@ -41,15 +41,6 @@ public interface EPadFiles
 	public List<String> getSeries(String parentStudyUID);
 
 	/**
-	 * Get the number of files
-	 * 
-	 * @param seriesUID String
-	 * @param extension String
-	 * @return int number of files of type.
-	 */
-	public int hasFiles(String seriesUID, String extension);
-
-	/**
 	 * Get a list of file associated with an extension for a series.
 	 * 
 	 * @param seriesUID String

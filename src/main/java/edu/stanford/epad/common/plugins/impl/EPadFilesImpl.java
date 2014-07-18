@@ -75,12 +75,6 @@ public class EPadFilesImpl implements EPadFiles
 	}
 
 	@Override
-	public int hasFiles(String seriesUID, String extension)
-	{
-		return getFiles(seriesUID, extension).size();
-	}
-
-	@Override
 	public List<File> getFiles(String seriesUID, final String extension)
 	{
 		String parentStudy = findStudyDirForSeries(seriesUID);
