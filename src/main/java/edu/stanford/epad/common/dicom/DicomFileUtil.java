@@ -16,20 +16,10 @@ import edu.stanford.epad.common.util.EPADLogger;
 
 public class DicomFileUtil
 {
-	static final EPADLogger log = EPADLogger.getInstance();
+	private static final EPADLogger log = EPADLogger.getInstance();
 	private static final int MIN_DICOM_FILE_SIZE = 132;
 	private static final String DICOM_MAGIC_WORD = "DICM";
 
-	private DicomFileUtil()
-	{
-	}
-
-	/**
-	 * Has the magic word "DICM" at offset 128 in the file.
-	 * 
-	 * @param f File
-	 * @return boolean
-	 */
 	public static boolean hasMagicWordInHeader(File f)
 	{
 		if (f.length() < MIN_DICOM_FILE_SIZE) {
@@ -53,12 +43,6 @@ public class DicomFileUtil
 		return DICOM_MAGIC_WORD.equalsIgnoreCase(mWord);
 	}
 
-	/**
-	 * Add DICOM extension to file.
-	 * 
-	 * @param file File
-	 * @return File
-	 */
 	public static File addDcmExtensionToFile(File file)
 	{
 		File newName = new File(file.getAbsolutePath() + ".dcm");
@@ -69,17 +53,4 @@ public class DicomFileUtil
 		}
 		return newName;
 	}
-
-	public static String convertDicomFileNameToImageUID(String currFileName)
-	{
-		int lastDotIndex = currFileName.lastIndexOf('.');
-
-		String uidPart = currFileName;
-		if (lastDotIndex > 0) {
-			uidPart = currFileName.substring(0, lastDotIndex);
-		}
-		uidPart = uidPart.replaceAll("_", ".");
-		return uidPart;
-	}
-
 }
