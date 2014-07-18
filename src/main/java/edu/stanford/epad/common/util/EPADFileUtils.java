@@ -9,17 +9,13 @@ package edu.stanford.epad.common.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,37 +74,6 @@ public class EPADFileUtils
 		File tempFile = new File(tempFilename);
 
 		return write(tempFile, contents) && tempFile.renameTo(file);
-	}// overwrite
-
-	/**
-	 * Read a text based file.
-	 * 
-	 * @param file File the file to read
-	 * @return String content of the file if it is text.
-	 * @throws IOException if exception happens during read
-	 */
-	public static String read(File file) throws IOException
-	{
-		StringBuilder sb = new StringBuilder();
-		FileInputStream fstream = null;
-		DataInputStream in = null;
-		BufferedReader br = null;
-
-		try {
-			fstream = new FileInputStream(file);
-			in = new DataInputStream(fstream);
-			br = new BufferedReader(new InputStreamReader(in));
-
-			String line;
-			while ((line = br.readLine()) != null) {
-				sb.append(line).append("\n");
-			}
-		} finally {
-			IOUtils.closeQuietly(fstream);
-			IOUtils.closeQuietly(br);
-			IOUtils.closeQuietly(in);
-		}
-		return sb.toString();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -481,25 +446,25 @@ public class EPADFileUtils
 		if (lastDotIndex < 1) {
 			return name;
 		}
-	
+
 		String ext = name.substring(lastDotIndex);
 		ext = ext.replace('.', ' ').trim();
 		if (isNumber(ext)) {
 			return name;
 		}
-	
+
 		return name.substring(0, lastDotIndex);
 	}
 
 	private static boolean isNumber(String checkForNumber)
 	{
-	
+
 		for (int i = 0; i < checkForNumber.length(); i++) {
 			// If we find a non-digit character we return false.
 			if (!Character.isDigit(checkForNumber.charAt(i)))
 				return false;
 		}
-	
+
 		return true;
 	}
 }
