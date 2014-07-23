@@ -47,6 +47,8 @@ import com.pixelmed.dicom.UnsignedShortAttribute;
 import com.pixelmed.dicom.VersionAndConstants;
 import com.pixelmed.utils.CopyStream;
 
+import edu.stanford.epad.common.util.EPADLogger;
+
 /**
  * A class for saving segmentation results.
  * 
@@ -59,8 +61,10 @@ public class SegmentationObjectsFileWriter2
 	public static final String ManufacturerModelName = "ePAD";
 	public static final String DeviceSerialNumber = "SN123456";
 	public static final String SoftwareVersion = "2.0.1";
-	public static final String SeriesDescription = "Segmentation result";
+	public static final String SeriesDescription = "ePAD Generated DSO";
 	public static final String SourceApplicationEntityTitle = "Default title";
+
+	private static final EPADLogger log = EPADLogger.getInstance();
 
 	private final AttributeList list = new AttributeList();
 	private final SequenceAttribute segment_sequence = new SequenceAttribute(TagFromName.SegmentSequence);
@@ -260,13 +264,55 @@ public class SegmentationObjectsFileWriter2
 			list.put(a);
 		}
 
-		// Default values and generated UIDs.
-		String uid = null;
+		UIDGenerator u = new UIDGenerator();
 		String study_id = "1"; // Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.StudyID);
 		String series_number = "1000"; // Attribute.getSingleStringValueOrEmptyString(original_attrs,
 																		// TagFromName.SeriesNumber);
 		String instance_number = "1"; // Attribute.getSingleStringValueOrEmptyString(original_attrs,
 																	// TagFromName.InstanceNumber);
+
+		// The following is the original code that generates new series and image UIDs.
+		String uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.StudyID);
+		{
+			Attribute a = new UniqueIdentifierAttribute(TagFromName.StudyInstanceUID);
+			a.addValue(u.getNewStudyInstanceUID(study_id));
+			list.put(a);
+		}
+		{
+			uid = u.getNewSeriesInstanceUID(study_id, series_number);
+			Attribute a = new UniqueIdentifierAttribute(TagFromName.SeriesInstanceUID);
+			a.addValue(uid);
+			list.put(a);
+			a = new UniqueIdentifierAttribute(TagFromName.FrameOfReferenceUID);
+			a.addValue(uid);
+			list.put(a);
+		}
+		{
+			Attribute a = new UniqueIdentifierAttribute(TagFromName.SOPInstanceUID);
+			a.addValue(u.getNewSOPInstanceUID(study_id, series_number, instance_number));
+			list.put(a);
+		}
+
+		// We copy the original study, series and image UID attributes.
+		// String study_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.StudyInstanceUID);
+		// String series_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SeriesInstanceUID);
+		// String image_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SOPInstanceUID);
+		// {
+		// Attribute a = new UniqueIdentifierAttribute(TagFromName.StudyInstanceUID);
+		// a.addValue(study_uid);
+		// list.put(a);
+		// }
+		// {
+		// Attribute a = new UniqueIdentifierAttribute(TagFromName.SeriesInstanceUID);
+		// a.addValue(series_uid);
+		// list.put(a);
+		// }
+		// {
+		// Attribute a = new UniqueIdentifierAttribute(TagFromName.SOPInstanceUID);
+		// a.addValue(image_uid);
+		// list.put(a);
+		// }
+
 		{
 			Attribute a = new ShortStringAttribute(TagFromName.StudyID);
 			a.addValue(study_id);
@@ -282,26 +328,28 @@ public class SegmentationObjectsFileWriter2
 			a.addValue(instance_number);
 			list.put(a);
 		}
-		UIDGenerator u = new UIDGenerator();
-		{
-			Attribute a = new UniqueIdentifierAttribute(TagFromName.SOPInstanceUID);
-			a.addValue(u.getNewSOPInstanceUID(study_id, series_number, instance_number));
-			list.put(a);
+
+		String orig_class_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SOPClassUID);
+		String[] orig_inst_uids = Attribute.getStringValues(original_attrs, TagFromName.SOPInstanceUID);
+		log.info("Found " + orig_inst_uids.length + " instances in original image");
+
+		SequenceAttribute referencedSeriesSequence = new SequenceAttribute(TagFromName.ReferencedSeriesSequence);
+		AttributeList referencedSeriesSequenceAttributes = new AttributeList();
+
+		SequenceAttribute referencedInstanceSequence = new SequenceAttribute(TagFromName.ReferencedInstanceSequence);
+		AttributeList referencedInstanceSequenceAttributes = new AttributeList();
+
+		for (int instanceIndex = 0; instanceIndex < orig_inst_uids.length; instanceIndex++) {
+			Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
+			a.addValue(orig_class_uid);
+			referencedInstanceSequenceAttributes.put(a);
 		}
-		{
-			Attribute a = new UniqueIdentifierAttribute(TagFromName.StudyInstanceUID);
-			a.addValue(u.getNewStudyInstanceUID(study_id));
-			list.put(a);
-		}
-		{
-			uid = u.getNewSeriesInstanceUID(study_id, series_number);
-			Attribute a = new UniqueIdentifierAttribute(TagFromName.SeriesInstanceUID);
-			a.addValue(uid);
-			list.put(a);
-			a = new UniqueIdentifierAttribute(TagFromName.FrameOfReferenceUID);
-			a.addValue(uid);
-			list.put(a);
-		}
+		referencedInstanceSequence.addItem(referencedInstanceSequenceAttributes);
+		referencedSeriesSequenceAttributes.put(referencedInstanceSequence);
+		referencedSeriesSequence.addItem(referencedSeriesSequenceAttributes);
+
+		list.put(referencedSeriesSequence);
+
 		// Add meta information header.
 		FileMetaInformation.addFileMetaInformation(list, TransferSyntax.ExplicitVRLittleEndian,
 				SourceApplicationEntityTitle);
@@ -397,8 +445,6 @@ public class SegmentationObjectsFileWriter2
 		}
 
 		// Following attributes are inherited.
-		String orig_class_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SOPClassUID);
-		String orig_inst_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SOPInstanceUID);
 
 		// Generate Shared Functional Groups Sequence
 		{ // DerivationImageSequence
@@ -454,7 +500,7 @@ public class SegmentationObjectsFileWriter2
 				}
 				{
 					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
-					a.addValue(orig_inst_uid);
+					a.addValue(orig_inst_uids[0]);
 					image.put(a);
 				}
 				source_image_seq.addItem(image);
