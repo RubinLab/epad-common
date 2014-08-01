@@ -53,11 +53,14 @@ public class TIFFMasksToDSOConverter
 		try {
 			// Following call fills in: dicomAttributes, orientation, spacing, thickness, positions, pixels, imageWidth,
 			// imageHeight, imageFrames
+			log.info("Getting attributes from DICOM files");
 			getAttributesFromDICOMFiles(dicomFilePaths);
 
+			log.info("Reading pixels from mask files");
 			byte[] pixels = getPixelsFromMaskFiles(maskFilePaths);
 
-			SegmentationObjectsFileWriter2 dsoWriter = new SegmentationObjectsFileWriter2(dicomAttributes, orientation,
+			log.info("Read pixels from mask files");
+			SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(dicomAttributes, orientation,
 					spacing, thickness);
 			CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
 					"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
@@ -123,16 +126,23 @@ public class TIFFMasksToDSOConverter
 		this.imageWidth = (short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Columns, 1);
 		this.imageHeight = (short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Rows, 1);
 		this.numberOfFrames = (short)dicomFilePaths.size();
+		log.info("Number of frames in DICOM file " + this.numberOfFrames);
 
 		{ // Get geometric info.
 			Attribute dicomAttribute = localDICOMAttributes.get(TagFromName.SliceThickness);
-			this.thickness = dicomAttribute.getSingleDoubleValueOrDefault(0.1);
+			this.thickness = dicomAttribute == null ? 0.1 : dicomAttribute.getSingleDoubleValueOrDefault(0.1);
 			dicomAttribute = localDICOMAttributes.get(TagFromName.PixelSpacing);
-			this.spacing = dicomAttribute.getDoubleValues();
+
+			if (dicomAttribute != null)
+				this.spacing = dicomAttribute.getDoubleValues();
+
 			dicomAttribute = localDICOMAttributes.get(TagFromName.ImageOrientationPatient);
-			String[] s = dicomAttribute.getStringValues();
-			for (int i = 0; i < s.length; i++)
-				this.orientation[i] = (short)Float.parseFloat(s[i]);
+			if (dicomAttribute != null) {
+				String[] s = dicomAttribute.getStringValues();
+				for (int i = 0; i < s.length; i++) {
+					this.orientation[i] = (short)Float.parseFloat(s[i]);
+				}
+			}
 		}
 
 		try { // Get sequence format. Get position of each frame.
@@ -143,7 +153,8 @@ public class TIFFMasksToDSOConverter
 				localDICOMAttributes.clear();
 				localDICOMAttributes.read(dicomInputStream);
 				Attribute attribute = localDICOMAttributes.get(TagFromName.ImagePositionPatient);
-				this.positions[i] = attribute.getDoubleValues();
+				if (attribute != null)
+					this.positions[i] = attribute.getDoubleValues();
 			}
 		} finally {
 			IOUtils.closeQuietly(dicomInputStream);

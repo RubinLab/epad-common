@@ -23,6 +23,7 @@ import com.pixelmed.dicom.CodeStringAttribute;
 import com.pixelmed.dicom.CompositeInstanceContext;
 import com.pixelmed.dicom.DateAttribute;
 import com.pixelmed.dicom.DecimalStringAttribute;
+import com.pixelmed.dicom.DicomDictionary;
 import com.pixelmed.dicom.DicomException;
 import com.pixelmed.dicom.DicomInputStream;
 import com.pixelmed.dicom.DicomOutputStream;
@@ -55,7 +56,7 @@ import edu.stanford.epad.common.util.EPADLogger;
  * @author Wei Lu (luwei@tju.edu.cn)
  * @date 2012-12
  */
-public class SegmentationObjectsFileWriter2
+public class SegmentationObjectsFileWriter
 {
 	public static final String Manufacturer = "Stanford University";
 	public static final String ManufacturerModelName = "ePAD";
@@ -86,10 +87,11 @@ public class SegmentationObjectsFileWriter2
 	 * @param slice_thickness
 	 * @throws DicomException
 	 */
-	@SuppressWarnings("deprecation")
-	public SegmentationObjectsFileWriter2(AttributeList original_attrs, short[] patient_orientation,
+	public SegmentationObjectsFileWriter(AttributeList original_attrs, short[] patient_orientation,
 			double[] pixel_spacing, double slice_thickness) throws DicomException
 	{
+		log.info("Generating DICOM attributes for DSO");
+
 		/*********************************************************************
 		 * Generate a unique name for the temporary pixel data file.
 		 *********************************************************************/
@@ -293,7 +295,7 @@ public class SegmentationObjectsFileWriter2
 			list.put(a);
 		}
 
-		// We copy the original study, series and image UID attributes.
+		// If we want to generate a DSO with the same study.series/image UID we copy the original UID attributes.
 		// String study_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.StudyInstanceUID);
 		// String series_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SeriesInstanceUID);
 		// String image_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SOPInstanceUID);
@@ -329,9 +331,16 @@ public class SegmentationObjectsFileWriter2
 			list.put(a);
 		}
 
+		final DicomDictionary dicomDictionary = new DicomDictionary();
+
 		String orig_class_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SOPClassUID);
 		String[] orig_inst_uids = Attribute.getStringValues(original_attrs, TagFromName.SOPInstanceUID);
-		log.info("Found " + orig_inst_uids.length + " instances in original image");
+		log.info("Found " + orig_inst_uids.length + " instance(s) in original image");
+		for (AttributeTag key : original_attrs.keySet()) {
+			log.info("ATTRIBUTE TAG: " + key);
+			log.info("ATTRIBUTE NAME " + dicomDictionary.getFullNameFromTag(key));
+			log.info("VALUE " + original_attrs.get(key));
+		}
 
 		SequenceAttribute referencedSeriesSequence = new SequenceAttribute(TagFromName.ReferencedSeriesSequence);
 		AttributeList referencedSeriesSequenceAttributes = new AttributeList();
@@ -340,9 +349,16 @@ public class SegmentationObjectsFileWriter2
 		AttributeList referencedInstanceSequenceAttributes = new AttributeList();
 
 		for (int instanceIndex = 0; instanceIndex < orig_inst_uids.length; instanceIndex++) {
-			Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
-			a.addValue(orig_class_uid);
-			referencedInstanceSequenceAttributes.put(a);
+			{
+				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
+				a.addValue(orig_class_uid);
+				referencedInstanceSequenceAttributes.put(a);
+			}
+			{
+				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
+				a.addValue(orig_inst_uids[instanceIndex]);
+				referencedInstanceSequenceAttributes.put(a);
+			}
 		}
 		referencedInstanceSequence.addItem(referencedInstanceSequenceAttributes);
 		referencedSeriesSequenceAttributes.put(referencedInstanceSequence);
@@ -357,6 +373,7 @@ public class SegmentationObjectsFileWriter2
 		/*********************************************************************
 		 * Extract attributes from the original attributes list.
 		 *********************************************************************/
+		@SuppressWarnings("deprecation")
 		CompositeInstanceContext cic = new CompositeInstanceContext(original_attrs);
 		cic.removeInstance();
 		cic.removeSeries();
@@ -1241,7 +1258,7 @@ public class SegmentationObjectsFileWriter2
 		// String mode = args[3]; //"BINARY";
 
 		byte[] pixels = null;
-		SegmentationObjectsFileWriter2 obj = null;
+		SegmentationObjectsFileWriter obj = null;
 		short image_width = 0, image_height = 0, image_frames = 0;
 
 		// Read pixel array from the map_file.
@@ -1273,7 +1290,7 @@ public class SegmentationObjectsFileWriter2
 			double[] spacing = new double[] { 0.65, 0.8 };
 			double thickness = 0.5;
 
-			obj = new SegmentationObjectsFileWriter2(list, orientation, spacing, thickness);
+			obj = new SegmentationObjectsFileWriter(list, orientation, spacing, thickness);
 
 			CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
 					"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
