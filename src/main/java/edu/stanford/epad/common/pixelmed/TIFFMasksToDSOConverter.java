@@ -32,7 +32,7 @@ import edu.stanford.epad.common.util.EPADLogger;
  */
 public class TIFFMasksToDSOConverter
 {
-	private AttributeList dicomAttributes = new AttributeList();
+	private AttributeList[] dicomAttributes;
 	private final short[] orientation = new short[] { 1, 0, 0, 0, 0, 1 };
 	private double[] spacing = new double[] { 0.65, 0.8 };
 	private double thickness = 0.5;
@@ -71,11 +71,15 @@ public class TIFFMasksToDSOConverter
 					null /* codingSchemeVersion */, "T-32000" /* codeValue */, "Heart" /* codeMeaning */,
 					null /* codeStringEquivalent */, null /* synonynms */);
 
+			log.info("Adding One Segment...");
 			dsoWriter.addOneSegment("Segment No.1 is for ...", category, type);
+			log.info("Adding All Frames...");
 			dsoWriter.addAllFrames(pixels, numberOfFrames, imageWidth, imageHeight, "binary", (short)0, positions);
+			log.info("Saving Dicom File...");
 			dsoWriter.saveDicomFile(outputFilePath);
 		} catch (Exception e) {
-			log.warning("Error generating DSO: " + e.getMessage());
+			e.printStackTrace();
+			log.warning("Error generating DSO: " + e);
 			throw (new DicomException("Error generating DSO: " + e.getMessage()));
 		}
 	}
@@ -121,8 +125,8 @@ public class TIFFMasksToDSOConverter
 		} finally {
 			IOUtils.closeQuietly(dicomInputStream);
 		}
-
-		this.dicomAttributes = (AttributeList)localDICOMAttributes.clone();
+		if (dicomAttributes == null) dicomAttributes = new AttributeList[dicomFilePaths.size()];
+		this.dicomAttributes[0] = (AttributeList)localDICOMAttributes.clone();
 		this.imageWidth = (short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Columns, 1);
 		this.imageHeight = (short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Rows, 1);
 		this.numberOfFrames = (short)dicomFilePaths.size();
@@ -155,6 +159,10 @@ public class TIFFMasksToDSOConverter
 				Attribute attribute = localDICOMAttributes.get(TagFromName.ImagePositionPatient);
 				if (attribute != null)
 					this.positions[i] = attribute.getDoubleValues();
+				if (i > 0)
+				{
+					dicomAttributes[i] = (AttributeList) localDICOMAttributes.clone();
+				}
 			}
 		} finally {
 			IOUtils.closeQuietly(dicomInputStream);
@@ -172,13 +180,36 @@ public class TIFFMasksToDSOConverter
 			// BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(),
 			// BufferedImage.TYPE_BYTE_BINARY);
 			byte[] new_frame = ((DataBufferByte)maskImage.getRaster().getDataBuffer()).getData();
+			int numpixels = new_frame.length/4;
+			int numbytes = numpixels/8;
+			byte[] pixel_data = new byte[numbytes];
+			boolean nonzerodata = false;
+			for (int k = 0; k < numbytes; k++)
+			{
+				int index = k*8*4;
+				pixel_data[k] = 0;
+				for (int l = 0; l < 4*8; l=l+4)
+				{
+					if (new_frame[index + l] != 0)
+					{
+						int setBit =  pixel_data[k] + (1 << (l/4));
+						pixel_data[k] =(byte) setBit;
+						nonzerodata = true;
+					}
+				}
+				if (pixel_data[k] != 0)
+					log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
+			}
+			log.info("maskfile" + i + ": " + maskFilePaths.get(i) + " frame_length:" + pixel_data.length + " nonzero data:" + nonzerodata);
 			if (pixels == null) {
-				pixels = new_frame.clone();
+				//pixels = new_frame.clone();
+				pixels = pixel_data;
 			} else {
-				byte[] temp = new byte[pixels.length + new_frame.length];
+				byte[] temp = new byte[pixels.length + pixel_data.length];
 				System.arraycopy(pixels, 0, temp, 0, pixels.length);
-				System.arraycopy(new_frame, 0, temp, pixels.length, new_frame.length);
-				pixels = temp.clone();
+				System.arraycopy(pixel_data, 0, temp, pixels.length, pixel_data.length);
+				//pixels = temp.clone();
+				pixels = temp;
 			}
 		}
 		return pixels;
@@ -192,6 +223,9 @@ public class TIFFMasksToDSOConverter
 		String maskFilesDirectory = args[0];
 		String dicomFilesDirectory = args[1];
 		String outputFileName = args[2];
+		//String maskFilesDirectory = "/Stanford/rlabs/data/tiffmasks";
+		//String dicomFilesDirectory = "/Stanford/rlabs/data/dicoms";
+		//String outputFileName = "/Stanford/rlabs/data/output/dso.dcm";
 
 		List<String> dicomFilePaths = listFilesInAlphabeticOrder(dicomFilesDirectory);
 		List<String> maskFilePaths = listFilesInAlphabeticOrder(maskFilesDirectory);

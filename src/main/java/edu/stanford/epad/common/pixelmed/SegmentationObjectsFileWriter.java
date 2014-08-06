@@ -7,10 +7,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
 
@@ -28,6 +34,7 @@ import com.pixelmed.dicom.DicomException;
 import com.pixelmed.dicom.DicomInputStream;
 import com.pixelmed.dicom.DicomOutputStream;
 import com.pixelmed.dicom.FileMetaInformation;
+import com.pixelmed.dicom.GeometryOfSliceFromAttributeList;
 import com.pixelmed.dicom.IntegerStringAttribute;
 import com.pixelmed.dicom.LongStringAttribute;
 import com.pixelmed.dicom.OtherByteAttribute;
@@ -46,6 +53,7 @@ import com.pixelmed.dicom.UniqueIdentifierAttribute;
 import com.pixelmed.dicom.UnsignedLongAttribute;
 import com.pixelmed.dicom.UnsignedShortAttribute;
 import com.pixelmed.dicom.VersionAndConstants;
+import com.pixelmed.geometry.GeometryOfSlice;
 import com.pixelmed.utils.CopyStream;
 
 import edu.stanford.epad.common.util.EPADLogger;
@@ -68,6 +76,7 @@ public class SegmentationObjectsFileWriter
 	private static final EPADLogger log = EPADLogger.getInstance();
 
 	private final AttributeList list = new AttributeList();
+	private AttributeList geometry_list = new AttributeList();
 	private final SequenceAttribute segment_sequence = new SequenceAttribute(TagFromName.SegmentSequence);
 	private final AttributeList shared_functional_groups_item = new AttributeList();
 	private final SequenceAttribute per_frame_functional_groups_sequence = new SequenceAttribute(
@@ -87,11 +96,13 @@ public class SegmentationObjectsFileWriter
 	 * @param slice_thickness
 	 * @throws DicomException
 	 */
-	public SegmentationObjectsFileWriter(AttributeList original_attrs, short[] patient_orientation,
+	public SegmentationObjectsFileWriter(AttributeList[] original_attrs_list, short[] patient_orientation,
 			double[] pixel_spacing, double slice_thickness) throws DicomException
 	{
 		log.info("Generating DICOM attributes for DSO");
-
+		if (original_attrs_list == null || original_attrs_list.length == 0)
+			throw (new DicomException("The original attributes must not be null!"));
+		AttributeList original_attrs = original_attrs_list[0];
 		/*********************************************************************
 		 * Generate a unique name for the temporary pixel data file.
 		 *********************************************************************/
@@ -111,6 +122,20 @@ public class SegmentationObjectsFileWriter
 
 		if (slice_thickness <= 0)
 			throw (new DicomException("Invalid slice thickness!"));
+
+		/*********************************************************************
+		 * Save the geometric attributes to geometry_list. 
+		 *********************************************************************/
+		{
+			Attribute a = new DecimalStringAttribute(TagFromName.ImageOrientationPatient); 
+			for(int i = 0; i < patient_orientation.length; i++)
+				a.addValue(patient_orientation[i]);
+			geometry_list.put(a);
+			Attribute spacing = new DecimalStringAttribute(TagFromName.PixelSpacing); spacing.addValue(pixel_spacing[0]); spacing.addValue(pixel_spacing[1]);
+			Attribute thickness = new DecimalStringAttribute(TagFromName.SliceThickness); thickness.addValue(slice_thickness);
+			geometry_list.put(spacing);
+			geometry_list.put(thickness);
+		}
 
 		/*********************************************************************
 		 * Add constant attributes of segmentation objects.
@@ -334,8 +359,7 @@ public class SegmentationObjectsFileWriter
 		final DicomDictionary dicomDictionary = new DicomDictionary();
 
 		String orig_class_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SOPClassUID);
-		String[] orig_inst_uids = Attribute.getStringValues(original_attrs, TagFromName.SOPInstanceUID);
-		log.info("Found " + orig_inst_uids.length + " instance(s) in original image");
+
 		for (AttributeTag key : original_attrs.keySet()) {
 			log.info("ATTRIBUTE TAG: " + key);
 			log.info("ATTRIBUTE NAME " + dicomDictionary.getFullNameFromTag(key));
@@ -347,8 +371,8 @@ public class SegmentationObjectsFileWriter
 
 		SequenceAttribute referencedInstanceSequence = new SequenceAttribute(TagFromName.ReferencedInstanceSequence);
 		AttributeList referencedInstanceSequenceAttributes = new AttributeList();
-
-		for (int instanceIndex = 0; instanceIndex < orig_inst_uids.length; instanceIndex++) {
+		String[] orig_inst_uids = new String[original_attrs_list.length];
+		for (int instanceIndex = 0; instanceIndex < original_attrs_list.length; instanceIndex++) {
 			{
 				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
 				a.addValue(orig_class_uid);
@@ -356,9 +380,18 @@ public class SegmentationObjectsFileWriter
 			}
 			{
 				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
-				a.addValue(orig_inst_uids[instanceIndex]);
+				String orig_inst_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs_list[instanceIndex], TagFromName.SOPInstanceUID);
+				log.info("" + instanceIndex + " ReferencedSOPInstanceUID:" + orig_inst_uid);
+				orig_inst_uids[instanceIndex] = orig_inst_uid;
+				a.addValue(orig_inst_uid);
 				referencedInstanceSequenceAttributes.put(a);
 			}
+			// Need this for multiframe source DICOM
+//			{
+//				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedFrameNumber);
+//				a.addValue(0);
+//				referencedInstanceSequenceAttributes.put(a);
+//			}
 		}
 		referencedInstanceSequence.addItem(referencedInstanceSequenceAttributes);
 		referencedSeriesSequenceAttributes.put(referencedInstanceSequence);
@@ -488,8 +521,9 @@ public class SegmentationObjectsFileWriter
 				seq.addItem(item);
 				reference.put(seq);
 			}
+			SequenceAttribute source_image_seq = new SequenceAttribute(TagFromName.SourceImageSequence);
+			for (int i = 0; i < orig_inst_uids.length; i++)
 			{ // SourceImageSequence
-				SequenceAttribute source_image_seq = new SequenceAttribute(TagFromName.SourceImageSequence);
 				AttributeList image = new AttributeList();
 				AttributeList item = new AttributeList();
 				{
@@ -516,13 +550,20 @@ public class SegmentationObjectsFileWriter
 					image.put(a);
 				}
 				{
+					log.info("SourceImageSequence:" + i + " ReferencedSOPInstanceUID:" + orig_inst_uids[i]);
 					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
-					a.addValue(orig_inst_uids[0]);
+					a.addValue(orig_inst_uids[i]);
 					image.put(a);
 				}
+				// Need this for multiframe source DICOM???
+//				{
+//					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedFrameNumber);
+//					a.addValue(0);
+//					referencedInstanceSequenceAttributes.put(a);
+//				}
 				source_image_seq.addItem(image);
-				reference.put(source_image_seq);
 			}
+			reference.put(source_image_seq);
 			derivation_image_seq.addItem(reference);
 			shared_functional_groups_item.put(derivation_image_seq);
 		}
@@ -685,7 +726,9 @@ public class SegmentationObjectsFileWriter
 
 		if (frame_num <= 0 || image_width <= 0 || image_height <= 0)
 			throw (new DicomException("Image size is not correct!"));
-
+		log.info("pixel data length:" + frames.length + " frames:" + frame_num + " width:" + image_width + " height:" + image_height);
+		log.info("(image_width * image_height * frame_num - 1) / 8 + 1): " + ((image_width * image_height * frame_num - 1) / 8 + 1));
+		log.info("image_width * image_height * frame_num :" + image_width * image_height * frame_num);
 		if (type == null)
 			type = "BINARY";
 		else if (!type.equalsIgnoreCase("PROBABILITY") && !type.equalsIgnoreCase("OCCUPANCY"))
@@ -768,9 +811,11 @@ public class SegmentationObjectsFileWriter
 			Attribute a = new UnsignedShortAttribute(TagFromName.Rows);
 			a.addValue(image_height);
 			list.put(a);
+			geometry_list.put(a);
 			a = new UnsignedShortAttribute(TagFromName.Columns);
 			a.addValue(image_width);
 			list.put(a);
+			geometry_list.put(a);
 		} else { // Check whether the new frames have the same resolution.
 			short height = (short)Attribute.getSingleIntegerValueOrDefault(list, TagFromName.Rows, 1);
 			short width = (short)Attribute.getSingleIntegerValueOrDefault(list, TagFromName.Columns, 1);
@@ -805,10 +850,10 @@ public class SegmentationObjectsFileWriter
 		}
 
 		// Sort the frames according to their positions.
-		int[] in_stack_position = sort_frames_by_position(positions, frame_num);
+		int[] in_stack_position = sort_frames_by_position(geometry_list, positions, frame_num);
 
 		// Generate Per-frame attributes. Refer to Table A.51-2 SEGMENTATION FUNCTIONAL GROUP MACROS
-		for (int k = 1; k <= frame_num; k++) {
+		for (int k = 0; k < frame_num; k++) {
 			AttributeList item2 = new AttributeList();
 
 			{
@@ -829,11 +874,11 @@ public class SegmentationObjectsFileWriter
 				a.addValue(Integer.toString(stack_id));
 				item.put(a);
 				a = new UnsignedLongAttribute(TagFromName.InStackPositionNumber);
-				a.addValue(in_stack_position[k - 1]);
+				a.addValue(in_stack_position[k]);
 				item.put(a);
 				a = new UnsignedLongAttribute(TagFromName.DimensionIndexValues);
 				a.addValue(stack_id);
-				a.addValue(in_stack_position[k - 1]);
+				a.addValue(in_stack_position[k]);
 				a.addValue(current_segment);
 				item.put(a);
 				seq.addItem(item);
@@ -845,9 +890,9 @@ public class SegmentationObjectsFileWriter
 				AttributeList item = new AttributeList();
 				Attribute a = new DecimalStringAttribute(TagFromName.ImagePositionPatient);
 				if (positions != null) {
-					a.addValue(positions[k - 1][0]);
-					a.addValue(positions[k - 1][1]);
-					a.addValue(positions[k - 1][2]);
+					a.addValue(positions[k][0]);
+					a.addValue(positions[k][1]);
+					a.addValue(positions[k][2]);
 				} else {
 					a.addValue(0);
 					a.addValue(0);
@@ -1244,6 +1289,66 @@ public class SegmentationObjectsFileWriter
 		return index;
 	}
 
+	private int [] sort_frames_by_position(AttributeList geometry, double [][] positions, int frame_num) throws DicomException {
+		int [] index = new int[frame_num];
+		double [] distances = new double[frame_num];
+		
+	    class DoubleArrayComparator implements Comparator <List <Double>> {
+	        public int compare(List <Double> o1, List <Double> o2) {
+	        	int val;
+	            if(o1.get(0) > o2.get(0))
+	            	val = 1;
+	            else if(o1.get(0) < o2.get(0))
+	            	val = -1;
+	            else {
+		            if(o1.get(1) > o2.get(1))
+		            	val = 1;
+		            else if(o1.get(1) < o2.get(1))
+		            	val = -1;
+		            else
+		            	val = 0;
+	            }
+	            return val;
+	        }
+	    }
+	    
+		SortedMap <ArrayList <Double>, Integer> sorting = new TreeMap <ArrayList <Double>, Integer> (new DoubleArrayComparator());
+		GeometryOfSlice slice_geometry;
+		AttributeList geometry_list = (AttributeList)geometry.clone();
+		ArrayList <Double> key;
+		
+		for(int i = 0; i < frame_num; i++) {
+			Attribute a = new DecimalStringAttribute(TagFromName.ImagePositionPatient);
+			if(positions != null) {
+				a.addValue(positions[i][0]); 
+				a.addValue(positions[i][1]); 
+				a.addValue(positions[i][2]);
+			} else {
+				a.addValue(0); a.addValue(0); a.addValue(0);
+			}
+			geometry_list.put(a);
+			slice_geometry = new GeometryOfSliceFromAttributeList(geometry_list);
+			distances[i] = slice_geometry.getDistanceAlongNormalFromOrigin();
+			
+			key = new ArrayList <Double> (2); 
+			key.add(0, distances[i]); key.add(1, (double)i);  
+			sorting.put(key, 0);
+		}
+
+		// k will be the index of sorted keys.
+		int k = 1;
+		for (Map.Entry <ArrayList <Double>, Integer> entry : sorting.entrySet()) {
+	        sorting.put(entry.getKey(), k++);
+		}
+		
+		for(int i = 0; i < frame_num; i++) {
+			key = new ArrayList <Double> (2); 
+			key.add(0, distances[i]); key.add(1, (double)i);  
+			index[i] = sorting.get(key);
+		}
+		
+		return index;
+	}
 	/**
 	 * This demo gets segmentation maps from map_file, then inserts the maps twice as two segments.
 	 * 
@@ -1289,8 +1394,9 @@ public class SegmentationObjectsFileWriter
 			short[] orientation = new short[] { 1, 0, 0, 0, 0, 1 };
 			double[] spacing = new double[] { 0.65, 0.8 };
 			double thickness = 0.5;
-
-			obj = new SegmentationObjectsFileWriter(list, orientation, spacing, thickness);
+			AttributeList[] lists = new AttributeList[1];
+			lists[0] = list;
+			obj = new SegmentationObjectsFileWriter(lists, orientation, spacing, thickness);
 
 			CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
 					"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
