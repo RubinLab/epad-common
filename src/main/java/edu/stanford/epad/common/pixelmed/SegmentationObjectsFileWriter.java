@@ -7,8 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -71,6 +73,7 @@ public class SegmentationObjectsFileWriter
 	public static final String DeviceSerialNumber = "SN123456";
 	public static final String SoftwareVersion = "2.0.1";
 	public static final String SeriesDescription = "ePAD Generated DSO";
+	public static final String prefix = "ePAD";
 	public static final String SourceApplicationEntityTitle = "Default title";
 
 	private static final EPADLogger log = EPADLogger.getInstance();
@@ -86,7 +89,7 @@ public class SegmentationObjectsFileWriter
 	private int frame_counter = 0;
 	private boolean use_temp_file = false;
 	private String temp_file = "temp_pixel_data_file.tmp"; // Will be renamed to a unique value per instance.
-
+	private SimpleDateFormat timestamp = new SimpleDateFormat("MMM-dd-HHmm");
 	/**
 	 * Initialize the list with constant attributes and inherited attributes.
 	 * 
@@ -99,7 +102,26 @@ public class SegmentationObjectsFileWriter
 	public SegmentationObjectsFileWriter(AttributeList[] original_attrs_list, short[] patient_orientation,
 			double[] pixel_spacing, double slice_thickness) throws DicomException
 	{
+		this(original_attrs_list, patient_orientation, pixel_spacing, slice_thickness, null, null, null);
+	}
+
+	/**
+	 * Initialize the list with constant attributes and inherited attributes.
+	 * 
+	 * @param original_attrs is the whole attributes list.
+	 * @param patient_orientation
+	 * @param pixel_spacing
+	 * @param slice_thickness
+	 * @throws DicomException
+	 */
+	public SegmentationObjectsFileWriter(AttributeList[] original_attrs_list, short[] patient_orientation,
+			double[] pixel_spacing, double slice_thickness, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID) throws DicomException
+	{
 		log.info("Generating DICOM attributes for DSO");
+		// Temporary
+		//dsoSeriesUID = null; // Always create a new Series UID
+		//dsoSeriesDescription = null; // Always create a new description
+		log.info("Create DSO, seriesDesc:" + dsoSeriesDescription + " seriesUID:" + dsoSeriesUID);
 		if (original_attrs_list == null || original_attrs_list.length == 0)
 			throw (new DicomException("The original attributes must not be null!"));
 		AttributeList original_attrs = original_attrs_list[0];
@@ -257,7 +279,16 @@ public class SegmentationObjectsFileWriter
 		}
 		{
 			Attribute a = new LongStringAttribute(TagFromName.SeriesDescription);
-			a.addValue(SeriesDescription);
+			if ((dsoSeriesDescription == null || dsoSeriesDescription.trim().length() == 0) && !dsoSeriesDescription.startsWith(SeriesDescription))
+			{
+				a.addValue(SeriesDescription + " " +  timestamp.format(new Date()));
+			}
+			else	
+			{
+				if (!dsoSeriesDescription.startsWith(prefix))
+					dsoSeriesDescription = prefix + "-" + dsoSeriesDescription;
+				a.addValue(dsoSeriesDescription);
+			}
 			list.put(a);
 		}
 		{
@@ -308,7 +339,10 @@ public class SegmentationObjectsFileWriter
 		{
 			uid = u.getNewSeriesInstanceUID(study_id, series_number);
 			Attribute a = new UniqueIdentifierAttribute(TagFromName.SeriesInstanceUID);
-			a.addValue(uid);
+			if (dsoSeriesUID != null && dsoSeriesUID.trim().length() > 0)
+				a.addValue(dsoSeriesUID);
+			else
+				a.addValue(uid); // Use new uid
 			list.put(a);
 			a = new UniqueIdentifierAttribute(TagFromName.FrameOfReferenceUID);
 			a.addValue(uid);
@@ -316,7 +350,10 @@ public class SegmentationObjectsFileWriter
 		}
 		{
 			Attribute a = new UniqueIdentifierAttribute(TagFromName.SOPInstanceUID);
-			a.addValue(u.getNewSOPInstanceUID(study_id, series_number, instance_number));
+			if (dsoInstanceUID != null && dsoInstanceUID.trim().length() > 0)
+				a.addValue(dsoInstanceUID);
+			else
+				a.addValue(u.getNewSOPInstanceUID(study_id, series_number, instance_number));
 			list.put(a);
 		}
 
@@ -361,18 +398,25 @@ public class SegmentationObjectsFileWriter
 		String orig_class_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SOPClassUID);
 
 		for (AttributeTag key : original_attrs.keySet()) {
-			log.info("ATTRIBUTE TAG: " + key);
-			log.info("ATTRIBUTE NAME " + dicomDictionary.getFullNameFromTag(key));
-			log.info("VALUE " + original_attrs.get(key));
+			log.debug("ATTRIBUTE TAG: " + key);
+			log.debug("ATTRIBUTE NAME " + dicomDictionary.getFullNameFromTag(key));
+			log.debug("VALUE " + original_attrs.get(key));
 		}
 
 		SequenceAttribute referencedSeriesSequence = new SequenceAttribute(TagFromName.ReferencedSeriesSequence);
 		AttributeList referencedSeriesSequenceAttributes = new AttributeList();
+		
+		{
+			Attribute siu = new UniqueIdentifierAttribute(TagFromName.SeriesInstanceUID);
+			String origSeriesInstanceUid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SeriesInstanceUID);
+			siu.addValue(origSeriesInstanceUid);
+			referencedSeriesSequenceAttributes.put(siu);
+		}
 
 		SequenceAttribute referencedInstanceSequence = new SequenceAttribute(TagFromName.ReferencedInstanceSequence);
-		AttributeList referencedInstanceSequenceAttributes = new AttributeList();
 		String[] orig_inst_uids = new String[original_attrs_list.length];
 		for (int instanceIndex = 0; instanceIndex < original_attrs_list.length; instanceIndex++) {
+			AttributeList referencedInstanceSequenceAttributes = new AttributeList();
 			{
 				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
 				a.addValue(orig_class_uid);
@@ -381,7 +425,7 @@ public class SegmentationObjectsFileWriter
 			{
 				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
 				String orig_inst_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs_list[instanceIndex], TagFromName.SOPInstanceUID);
-				log.info("" + instanceIndex + " ReferencedSOPInstanceUID:" + orig_inst_uid);
+				//log.info("" + instanceIndex + " ReferencedSOPInstanceUID:" + orig_inst_uid);
 				orig_inst_uids[instanceIndex] = orig_inst_uid;
 				a.addValue(orig_inst_uid);
 				referencedInstanceSequenceAttributes.put(a);
@@ -392,8 +436,8 @@ public class SegmentationObjectsFileWriter
 //				a.addValue(0);
 //				referencedInstanceSequenceAttributes.put(a);
 //			}
+			referencedInstanceSequence.addItem(referencedInstanceSequenceAttributes);
 		}
-		referencedInstanceSequence.addItem(referencedInstanceSequenceAttributes);
 		referencedSeriesSequenceAttributes.put(referencedInstanceSequence);
 		referencedSeriesSequence.addItem(referencedSeriesSequenceAttributes);
 
@@ -412,6 +456,8 @@ public class SegmentationObjectsFileWriter
 		cic.removeSeries();
 		cic.removeEquipment();
 		list.putAll(cic.getAttributeList());
+		//list.remove(TagFromName.ClinicalTrialSiteID);
+		//list.remove(TagFromName.ClinicalTrialSubjectID);
 
 		{ // Define dimensions as (stack id, in-stack position, segment number).
 			SequenceAttribute seq = new SequenceAttribute(TagFromName.DimensionOrganizationSequence);
@@ -550,7 +596,7 @@ public class SegmentationObjectsFileWriter
 					image.put(a);
 				}
 				{
-					log.info("SourceImageSequence:" + i + " ReferencedSOPInstanceUID:" + orig_inst_uids[i]);
+					//log.info("SourceImageSequence:" + i + " ReferencedSOPInstanceUID:" + orig_inst_uids[i]);
 					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
 					a.addValue(orig_inst_uids[i]);
 					image.put(a);
@@ -726,9 +772,9 @@ public class SegmentationObjectsFileWriter
 
 		if (frame_num <= 0 || image_width <= 0 || image_height <= 0)
 			throw (new DicomException("Image size is not correct!"));
-		log.info("pixel data length:" + frames.length + " frames:" + frame_num + " width:" + image_width + " height:" + image_height);
-		log.info("(image_width * image_height * frame_num - 1) / 8 + 1): " + ((image_width * image_height * frame_num - 1) / 8 + 1));
-		log.info("image_width * image_height * frame_num :" + image_width * image_height * frame_num);
+//		log.info("pixel data length:" + frames.length + " frames:" + frame_num + " width:" + image_width + " height:" + image_height);
+//		log.info("(image_width * image_height * frame_num - 1) / 8 + 1): " + ((image_width * image_height * frame_num - 1) / 8 + 1));
+//		log.info("image_width * image_height * frame_num :" + image_width * image_height * frame_num);
 		if (type == null)
 			type = "BINARY";
 		else if (!type.equalsIgnoreCase("PROBABILITY") && !type.equalsIgnoreCase("OCCUPANCY"))

@@ -50,6 +50,19 @@ public class TIFFMasksToDSOConverter
 	public void generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath)
 			throws DicomException
 	{
+		generateDSO(maskFilePaths, dicomFilePaths, outputFilePath, null, null,null);
+	}
+	
+	/**
+	 * @param maskFiles: Array of the TIFF files which contain the masks.
+	 * @param dicomFiles: Array of the original DICOM files.
+	 * @param outputFile: Name of the output segmentation objects file.
+	 * @param dsoSeriesDescription: Series Name of created segmentation object.
+	 * @throws DicomException
+	 */
+	public void generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID)
+			throws DicomException
+	{
 		try {
 			// Following call fills in: dicomAttributes, orientation, spacing, thickness, positions, pixels, imageWidth,
 			// imageHeight, imageFrames
@@ -59,9 +72,8 @@ public class TIFFMasksToDSOConverter
 			log.info("Reading pixels from mask files");
 			byte[] pixels = getPixelsFromMaskFiles(maskFilePaths);
 
-			log.info("Read pixels from mask files");
 			SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(dicomAttributes, orientation,
-					spacing, thickness);
+					spacing, thickness, dsoSeriesDescription, dsoSeriesUID, dsoInstanceUID);
 			CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
 					"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
 					null /* codingSchemeVersion */, "A-00004" /* codeValue */, "Physical Object" /* codeMeaning */,
@@ -180,27 +192,35 @@ public class TIFFMasksToDSOConverter
 			// BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(),
 			// BufferedImage.TYPE_BYTE_BINARY);
 			byte[] new_frame = ((DataBufferByte)maskImage.getRaster().getDataBuffer()).getData();
-			int numpixels = new_frame.length/4;
-			int numbytes = numpixels/8;
-			byte[] pixel_data = new byte[numbytes];
+			byte[] pixel_data = new_frame;
+			long expectedLen = maskImage.getWidth()*maskImage.getHeight()*4;
+			//System.out.println("Expected length:" + expectedLen + " tiff data len:" + new_frame.length);
 			boolean nonzerodata = false;
-			for (int k = 0; k < numbytes; k++)
+			
+			// looks like 4 bytes/pixel, compress to 1 bit/pixel (else assume it is already 1 bit/pixel)
+			if (new_frame.length == expectedLen)
 			{
-				int index = k*8*4;
-				pixel_data[k] = 0;
-				for (int l = 0; l < 4*8; l=l+4)
+				int numpixels = new_frame.length/4;
+				int numbytes = numpixels/8;
+				pixel_data = new byte[numbytes];
+				for (int k = 0; k < numbytes; k++)
 				{
-					if (new_frame[index + l] != 0)
+					int index = k*8*4;
+					pixel_data[k] = 0;
+					for (int l = 0; l < 4*8; l=l+4)
 					{
-						int setBit =  pixel_data[k] + (1 << (l/4));
-						pixel_data[k] =(byte) setBit;
-						nonzerodata = true;
+						if (new_frame[index + l] != 0)
+						{
+							int setBit =  pixel_data[k] + (1 << (l/4));
+							pixel_data[k] =(byte) setBit;
+							nonzerodata = true;
+						}
 					}
+//					if (pixel_data[k] != 0)
+//						log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
 				}
-				if (pixel_data[k] != 0)
-					log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
 			}
-			log.info("maskfile" + i + ": " + maskFilePaths.get(i) + " frame_length:" + pixel_data.length + " nonzero data:" + nonzerodata);
+//			log.info("maskfile" + i + ": " + maskFilePaths.get(i) + " frame_length:" + pixel_data.length + " nonzero data:" + nonzerodata);
 			if (pixels == null) {
 				//pixels = new_frame.clone();
 				pixels = pixel_data;
@@ -228,7 +248,36 @@ public class TIFFMasksToDSOConverter
 		//String outputFileName = "/Stanford/rlabs/data/output/dso.dcm";
 
 		List<String> dicomFilePaths = listFilesInAlphabeticOrder(dicomFilesDirectory);
+		for (int i = 0; i < dicomFilePaths.size(); i++)
+		{
+			if (!dicomFilePaths.get(i).toLowerCase().endsWith(".dcm"))
+			{
+				System.out.println("Removing DICOM file " + dicomFilePaths.get(i));
+				dicomFilePaths.remove(i);
+				i--;
+			}
+		}
+		if (dicomFilePaths.size() == 0)
+		{
+			System.out.println("No DICOM files found");
+			return;
+		}
+			
 		List<String> maskFilePaths = listFilesInAlphabeticOrder(maskFilesDirectory);
+		for (int i = 0; i < maskFilePaths.size(); i++)
+		{
+			if (!maskFilePaths.get(i).toLowerCase().endsWith(".tif") && !maskFilePaths.get(i).toLowerCase().endsWith(".tiff"))
+			{
+				System.out.println("Removing tif file " + maskFilePaths.get(i));
+				maskFilePaths.remove(i);
+				i--;
+			}
+		}
+		if (maskFilePaths.size() == 0)
+		{
+			System.out.println("No Tif Mask files found");
+			return;
+		}
 
 		if (dicomFilePaths.size() > maskFilePaths.size())
 			dicomFilePaths = dicomFilePaths.subList(0, maskFilePaths.size());
