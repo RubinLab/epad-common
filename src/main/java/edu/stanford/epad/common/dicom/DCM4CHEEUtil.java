@@ -67,6 +67,9 @@ public class DCM4CHEEUtil
 				method.releaseConnection();
 			}
 		}
+		else {
+			log.warning("Wado URL:" + wadoUrl + " Status:" + statusCode);
+		}
 		return statusCode;
 	}
 

@@ -45,12 +45,12 @@ public class TIFFMasksToDSOConverter
 	 * @param maskFiles: Array of the TIFF files which contain the masks.
 	 * @param dicomFiles: Array of the original DICOM files.
 	 * @param outputFile: Name of the output segmentation objects file.
+	 * @return uids: uids[0] = Series UID uids[1] = ImageUID/InstanceUID
 	 * @throws DicomException
-	 */
-	public void generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath)
+	 */	public String[] generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath)
 			throws DicomException
 	{
-		generateDSO(maskFilePaths, dicomFilePaths, outputFilePath, null, null,null);
+		return generateDSO(maskFilePaths, dicomFilePaths, outputFilePath, null, null,null);
 	}
 	
 	/**
@@ -58,9 +58,10 @@ public class TIFFMasksToDSOConverter
 	 * @param dicomFiles: Array of the original DICOM files.
 	 * @param outputFile: Name of the output segmentation objects file.
 	 * @param dsoSeriesDescription: Series Name of created segmentation object.
+	 * @return uids: uids[0] = Series UID uids[1] = ImageUID/InstanceUID
 	 * @throws DicomException
 	 */
-	public void generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID)
+	public String[] generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID)
 			throws DicomException
 	{
 		try {
@@ -82,13 +83,16 @@ public class TIFFMasksToDSOConverter
 					"SRT" /* codingSchemeDesignator */, null /* legacyCodingSchemeDesignator */,
 					null /* codingSchemeVersion */, "T-32000" /* codeValue */, "Heart" /* codeMeaning */,
 					null /* codeStringEquivalent */, null /* synonynms */);
-
 			log.info("Adding One Segment...");
 			dsoWriter.addOneSegment("Segment No.1 is for ...", category, type);
 			log.info("Adding All Frames...");
 			dsoWriter.addAllFrames(pixels, numberOfFrames, imageWidth, imageHeight, "binary", (short)0, positions);
 			log.info("Saving Dicom File...");
 			dsoWriter.saveDicomFile(outputFilePath);
+			String[] seriesImageUids = new String[2];
+			seriesImageUids[0] = dsoWriter.getSeriesUID();
+			seriesImageUids[1] = dsoWriter.getImageUID();
+			return seriesImageUids;
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.warning("Error generating DSO: " + e);
@@ -157,6 +161,21 @@ public class TIFFMasksToDSOConverter
 				String[] s = dicomAttribute.getStringValues();
 				for (int i = 0; i < s.length; i++) {
 					this.orientation[i] = (short)Float.parseFloat(s[i]);
+				}
+			}
+		}
+
+		{ // Check Clinical Trial info.
+			Attribute siteID = localDICOMAttributes.get(TagFromName.ClinicalTrialSiteID);
+			if (siteID != null)
+			{
+				Attribute siteName = localDICOMAttributes.get(TagFromName.ClinicalTrialSiteName);
+				Attribute sponsorName = localDICOMAttributes.get(TagFromName.ClinicalTrialSponsorName);
+				Attribute protocolID = localDICOMAttributes.get(TagFromName.ClinicalTrialProtocolID);
+				Attribute protocolName = localDICOMAttributes.get(TagFromName.ClinicalTrialProtocolName);
+				if (siteName == null || sponsorName == null || protocolID == null || protocolName == null)
+				{
+					log.warning("Missing Clinical Trial Attributes in Source DICOM");
 				}
 			}
 		}
@@ -286,7 +305,8 @@ public class TIFFMasksToDSOConverter
 
 		try {
 			TIFFMasksToDSOConverter converter = new TIFFMasksToDSOConverter();
-			converter.generateDSO(maskFilePaths, dicomFilePaths, outputFileName);
+			String[] uids = converter.generateDSO(maskFilePaths, dicomFilePaths, outputFileName);
+			System.out.println("DICOM Segmentation Object created. SeriesUID:" + uids[0] + " InstanceUID:" + uids[1]);
 		} catch (Exception e) {
 			System.err.println(e);
 			e.printStackTrace(System.err);

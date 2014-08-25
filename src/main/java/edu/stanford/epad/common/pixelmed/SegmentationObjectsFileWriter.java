@@ -90,6 +90,9 @@ public class SegmentationObjectsFileWriter
 	private boolean use_temp_file = false;
 	private String temp_file = "temp_pixel_data_file.tmp"; // Will be renamed to a unique value per instance.
 	private SimpleDateFormat timestamp = new SimpleDateFormat("MMM-dd-HHmm");
+	private String seriesUID = null;
+	private String imageUID = null;
+	
 	/**
 	 * Initialize the list with constant attributes and inherited attributes.
 	 * 
@@ -279,7 +282,7 @@ public class SegmentationObjectsFileWriter
 		}
 		{
 			Attribute a = new LongStringAttribute(TagFromName.SeriesDescription);
-			if ((dsoSeriesDescription == null || dsoSeriesDescription.trim().length() == 0) && !dsoSeriesDescription.startsWith(SeriesDescription))
+			if (dsoSeriesDescription == null || dsoSeriesDescription.trim().length() == 0 || dsoSeriesDescription.startsWith(SeriesDescription))
 			{
 				a.addValue(SeriesDescription + " " +  timestamp.format(new Date()));
 			}
@@ -340,9 +343,15 @@ public class SegmentationObjectsFileWriter
 			uid = u.getNewSeriesInstanceUID(study_id, series_number);
 			Attribute a = new UniqueIdentifierAttribute(TagFromName.SeriesInstanceUID);
 			if (dsoSeriesUID != null && dsoSeriesUID.trim().length() > 0)
+			{
 				a.addValue(dsoSeriesUID);
+				seriesUID = dsoSeriesUID;
+			}
 			else
+			{
 				a.addValue(uid); // Use new uid
+				seriesUID = uid;
+			}
 			list.put(a);
 			a = new UniqueIdentifierAttribute(TagFromName.FrameOfReferenceUID);
 			a.addValue(uid);
@@ -351,9 +360,16 @@ public class SegmentationObjectsFileWriter
 		{
 			Attribute a = new UniqueIdentifierAttribute(TagFromName.SOPInstanceUID);
 			if (dsoInstanceUID != null && dsoInstanceUID.trim().length() > 0)
+			{
 				a.addValue(dsoInstanceUID);
+				imageUID = dsoInstanceUID;
+			}
 			else
-				a.addValue(u.getNewSOPInstanceUID(study_id, series_number, instance_number));
+			{
+				String instanceUID = u.getNewSOPInstanceUID(study_id, series_number, instance_number);
+				a.addValue(instanceUID);
+				imageUID = instanceUID;
+			}
 			list.put(a);
 		}
 
@@ -456,8 +472,8 @@ public class SegmentationObjectsFileWriter
 		cic.removeSeries();
 		cic.removeEquipment();
 		list.putAll(cic.getAttributeList());
-		//list.remove(TagFromName.ClinicalTrialSiteID);
-		//list.remove(TagFromName.ClinicalTrialSubjectID);
+		list.remove(TagFromName.ClinicalTrialSiteID);
+		list.remove(TagFromName.ClinicalTrialSubjectID);
 
 		{ // Define dimensions as (stack id, in-stack position, segment number).
 			SequenceAttribute seq = new SequenceAttribute(TagFromName.DimensionOrganizationSequence);
@@ -543,7 +559,7 @@ public class SegmentationObjectsFileWriter
 		// Following attributes are inherited.
 
 		// Generate Shared Functional Groups Sequence
-		{ // DerivationImageSequence
+		{ // DerivationImageSequence - TODO - Need to verify if this is correct???
 			SequenceAttribute derivation_image_seq = new SequenceAttribute(TagFromName.DerivationImageSequence);
 			AttributeList reference = new AttributeList();
 			{
@@ -602,11 +618,11 @@ public class SegmentationObjectsFileWriter
 					image.put(a);
 				}
 				// Need this for multiframe source DICOM???
-//				{
-//					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedFrameNumber);
-//					a.addValue(0);
-//					referencedInstanceSequenceAttributes.put(a);
-//				}
+				{
+					Attribute a = new IntegerStringAttribute(TagFromName.ReferencedFrameNumber);
+					a.addValue("1");
+					image.put(a);
+				}
 				source_image_seq.addItem(image);
 			}
 			reference.put(source_image_seq);
@@ -1476,6 +1492,22 @@ public class SegmentationObjectsFileWriter
 			e.printStackTrace(System.err);
 			System.exit(0);
 		}
+	}
+
+	public String getSeriesUID() {
+		return seriesUID;
+	}
+
+	public void setSeriesUID(String seriesUID) {
+		this.seriesUID = seriesUID;
+	}
+
+	public String getImageUID() {
+		return imageUID;
+	}
+
+	public void setImageUID(String imageUID) {
+		this.imageUID = imageUID;
 	}
 
 }
