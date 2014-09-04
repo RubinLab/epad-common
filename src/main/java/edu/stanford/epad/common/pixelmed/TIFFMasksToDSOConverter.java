@@ -47,10 +47,16 @@ public class TIFFMasksToDSOConverter
 	 * @param outputFile: Name of the output segmentation objects file.
 	 * @return uids: uids[0] = Series UID uids[1] = ImageUID/InstanceUID
 	 * @throws DicomException
-	 */	public String[] generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath)
+	 */	
+	public String[] generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath)
 			throws DicomException
 	{
 		return generateDSO(maskFilePaths, dicomFilePaths, outputFilePath, null, null,null);
+	}
+	public String[] generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath, String seriesDescription)
+			throws DicomException
+	{
+		return generateDSO(maskFilePaths, dicomFilePaths, outputFilePath, seriesDescription, null,null);
 	}
 	
 	/**
@@ -292,6 +298,12 @@ public class TIFFMasksToDSOConverter
 				i--;
 			}
 		}
+		// Flip them because the code expects that
+		List<String> reverseMaskFilePaths = new ArrayList<String>();
+		for (int i = maskFilePaths.size(); i > 0 ; i--)
+		{
+			reverseMaskFilePaths.add(maskFilePaths.get(i-1));
+		}
 		if (maskFilePaths.size() == 0)
 		{
 			System.out.println("No Tif Mask files found");
@@ -299,13 +311,17 @@ public class TIFFMasksToDSOConverter
 		}
 
 		if (dicomFilePaths.size() > maskFilePaths.size())
-			dicomFilePaths = dicomFilePaths.subList(0, maskFilePaths.size());
-		else if (maskFilePaths.size() > dicomFilePaths.size())
-			maskFilePaths = maskFilePaths.subList(0, dicomFilePaths.size());
+			dicomFilePaths = dicomFilePaths.subList(0, reverseMaskFilePaths.size());
+		else if (reverseMaskFilePaths.size() > dicomFilePaths.size())
+			reverseMaskFilePaths = reverseMaskFilePaths.subList(0, dicomFilePaths.size());
 
 		try {
 			TIFFMasksToDSOConverter converter = new TIFFMasksToDSOConverter();
-			String[] uids = converter.generateDSO(maskFilePaths, dicomFilePaths, outputFileName);
+			String[] uids = null;
+			if (args.length > 3)
+				uids = converter.generateDSO(reverseMaskFilePaths, dicomFilePaths, outputFileName, args[2]);
+			else
+				uids = converter.generateDSO(reverseMaskFilePaths, dicomFilePaths, outputFileName);
 			System.out.println("DICOM Segmentation Object created. SeriesUID:" + uids[0] + " InstanceUID:" + uids[1]);
 		} catch (Exception e) {
 			System.err.println(e);
