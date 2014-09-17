@@ -104,6 +104,12 @@ public class DCM4CHEEUtil
 			try {
 				int exitValue = process.waitFor();
 				log.info("dcmsnd exit value is: " + exitValue);
+				if (sb.toString().contains("Sent 0 objects"))
+				{
+					log.warning("Zero objects sent to dcm4che, some error has occurred");
+					throw new Exception("Error sending files to dcm4che");
+				}
+
 			} catch (InterruptedException e) {
 				log.warning("Error sending DICOM files in: " + inputPathFile, e);
 			}
