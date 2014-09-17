@@ -268,7 +268,7 @@ public class PluginAIMUtil
 		}
 	}
 
-	private static void addSegmentToImageAnnotation(String sopClassUID, String dsoSOPInstanceUID, String sourceImageUID,
+	public static void addSegmentToImageAnnotation(String sopClassUID, String dsoSOPInstanceUID, String sourceImageUID,
 			ImageAnnotation dsoImageAnnotation)
 	{
 		SegmentationCollection sc = new SegmentationCollection();
