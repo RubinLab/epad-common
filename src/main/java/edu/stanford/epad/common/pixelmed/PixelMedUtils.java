@@ -157,7 +157,7 @@ public class PixelMedUtils
 		}
 	}
 
-	private static String getTagCode(AttributeTag tag)
+	public static String getTagCode(AttributeTag tag)
 	{
 		int group = tag.getGroup();
 		int element = tag.getElement();

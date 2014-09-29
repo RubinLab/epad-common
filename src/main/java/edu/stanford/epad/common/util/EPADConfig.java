@@ -259,11 +259,16 @@ public class EPADConfig
 	 * @param name key in config file.
 	 * @return the value of that parameter.
 	 */
-	private String getParam(String name)
+	public String getParam(String name)
 	{
 		return properties.getProperty(name);
 	}
 
+	public static String getParamValue(String name)
+	{
+		return EPADConfig.getInstance().getParam(name);
+	}
+	
 	/**
 	 * 
 	 * @param propertyName
