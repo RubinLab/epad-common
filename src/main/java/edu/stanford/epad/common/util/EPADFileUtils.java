@@ -12,10 +12,12 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -342,6 +344,7 @@ public class EPADFileUtils
 
 	public static boolean createDirsAndFile(File file)
 	{
+		if (file.exists()) return true;
 		boolean success = makeDirs(file.getParentFile());
 		if (!success) {
 			return false;
@@ -434,6 +437,29 @@ public class EPADFileUtils
 			return false;
 		}
 	}
+	
+    public static File copyFile(File src, File dst)
+    {
+		try {
+			InputStream in = new FileInputStream(src);
+			OutputStream out = new FileOutputStream(dst);
+			
+			// Transfer bytes from in to out
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0)
+			{
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+			return dst;
+		} catch (Exception e) {
+			log.warning("Error copying file, from " + src.getAbsolutePath() + " to " + dst.getAbsolutePath(), e);
+		}
+		return null;
+    }
+
 
 	/**
 	 * 
@@ -467,4 +493,5 @@ public class EPADFileUtils
 
 		return true;
 	}
+
 }
