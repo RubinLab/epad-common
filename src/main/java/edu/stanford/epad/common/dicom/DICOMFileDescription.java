@@ -7,6 +7,7 @@ public class DICOMFileDescription
 	public final String filePath;
 	public final int fileSize;
 	public String createdTime;
+	public String modality;
 
 	public DICOMFileDescription(String studyUID, String seriesUID, String imageUID, int instanceNumber, String filePath,
 			int fileSize)
@@ -20,7 +21,7 @@ public class DICOMFileDescription
 	}
 
 	public DICOMFileDescription(String studyUID, String seriesUID, String imageUID, int instanceNumber, String filePath,
-			int fileSize, String createdTime)
+			int fileSize, String createdTime, String modality)
 	{
 		this.studyUID = studyUID;
 		this.seriesUID = seriesUID;
@@ -29,6 +30,7 @@ public class DICOMFileDescription
 		this.filePath = filePath;
 		this.fileSize = fileSize;
 		this.createdTime = createdTime;
+		this.modality = modality;
 	}
 
 	@Override
