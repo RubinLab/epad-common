@@ -17,8 +17,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Writer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -440,22 +440,20 @@ public class EPADFileUtils
 	
     public static File copyFile(File src, File dst)
     {
+    	FileChannel inChannel = null;
+    	FileChannel outChannel = null;
 		try {
-			InputStream in = new FileInputStream(src);
-			OutputStream out = new FileOutputStream(dst);
-			
-			// Transfer bytes from in to out
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = in.read(buf)) > 0)
-			{
-				out.write(buf, 0, len);
-			}
-			in.close();
-			out.close();
+	        inChannel = new FileInputStream(src).getChannel();
+	        outChannel = new FileOutputStream(dst).getChannel();
+	        inChannel.transferTo(0, inChannel.size(), outChannel);
 			return dst;
 		} catch (Exception e) {
 			log.warning("Error copying file, from " + src.getAbsolutePath() + " to " + dst.getAbsolutePath(), e);
+		} finally {
+			try {
+	            if (inChannel != null) inChannel.close();
+	            if (outChannel != null) outChannel.close();
+			} catch (IOException e) {}
 		}
 		return null;
     }
