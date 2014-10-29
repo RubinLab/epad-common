@@ -84,7 +84,9 @@ public class EPADConfig
 			"XNATUploadProjectUser");
 	public static final String xnatUploadProjectPassword = EPADConfig.getInstance().getStringPropertyValue(
 			"XNATUploadProjectPassword");
-
+	public static boolean UseEPADUsersProjects = EPADConfig.getInstance().getBooleanPropertyValue(
+			"UseEPADUsersProjects");
+	
 	private Properties properties;
 
 	private static EPADConfig getInstance()
@@ -302,6 +304,26 @@ public class EPADConfig
 			throw new IllegalArgumentException("The parameter value for property " + propertyName
 					+ " needs to be an integer. It value was " + parameterValue);
 		}
+	}
+
+	/**
+	 * 
+	 * @param propertyName
+	 * @return
+	 * 
+	 */
+	public boolean getBooleanPropertyValue(String propertyName)
+	{
+		String parameterValue = getParam(propertyName);
+		if ("true".equalsIgnoreCase(parameterValue))
+		{
+			return true;
+		}
+		else if (!"false".equalsIgnoreCase(parameterValue))
+		{
+			log.warning("Invalid or missing property value for " + propertyName);
+		}
+		return false;
 	}
 
 	/**

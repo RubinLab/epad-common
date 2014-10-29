@@ -38,7 +38,10 @@ public class EPADLogger
 
 	public void warning(String message, Throwable t)
 	{
-		log.warn(message + ":" + t.getClass().getCanonicalName() + ":" + t.getMessage(), t);
+		if (t == null) 
+			log.warn(message);
+		else
+			log.warn(message + ":" + t.getClass().getCanonicalName() + ":" + t.getMessage(), t);
 	}
 
 	public void warning(String message)
