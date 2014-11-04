@@ -246,6 +246,11 @@ public class EPADConfig
 	{
 		return getEPADWebServerEtcDir() + "jetty-config.xml";
 	}
+	
+	public static String getEPADWebServerJJVectorDataDir()
+    {
+		return System.getProperty("user.home") + "/tmp/jjvectorData";
+    }
 
 	private File getConfigurationFile()
 	{
