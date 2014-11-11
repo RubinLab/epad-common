@@ -200,6 +200,37 @@ public class PluginAIMUtil
 		return new ROIData(roixData, roiyData);
 	}
 
+	public static List<Double> extractPoints (ImageAnnotation templateImageAnnotation) {
+		List<Double> points = new ArrayList<Double>();
+		double[] roixData = null;
+		double[] roiyData = null;
+
+		GeometricShapeCollection geometricShapeCollection = templateImageAnnotation.getGeometricShapeCollection();
+		for (int i = 0; i < geometricShapeCollection.getGeometricShapeList().size(); i++) {
+			GeometricShape geometricShape = geometricShapeCollection.getGeometricShapeList().get(i);
+			if (geometricShape.getXsiType().equals("MultiPoint")) {
+				int numberOfROIs = geometricShape.getSpatialCoordinateCollection().getSpatialCoordinateList().size();
+				roixData = new double[numberOfROIs];
+				roiyData = new double[numberOfROIs];
+				for (int j = 0; j < numberOfROIs; j++) {
+					SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
+							.getSpatialCoordinateList().get(j);
+					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
+						TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
+						int idx = twoDimensionSpatialCoordinate.getCoordinateIndex();
+						roixData[idx] = twoDimensionSpatialCoordinate.getX();
+						roiyData[idx] = twoDimensionSpatialCoordinate.getY();
+						
+						points.add(roixData[idx]);
+						points.add(roiyData[idx]);
+					}
+				}
+			}
+		}
+		
+		return points;
+	}
+
 	public static double[] extractCoordinateFromAIMFile(File aimFile, int positionOfImageInSeries) throws Exception
 	{
 		double[] roixData = null;
