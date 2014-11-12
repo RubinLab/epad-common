@@ -251,6 +251,11 @@ public class EPADConfig
     {
 		return System.getProperty("user.home") + "/tmp/jjvectorData";
     }
+	
+	public static String getEPADPluginDataDirectory()
+    {
+		return System.getProperty("user.home") + getParamValue("EPADPluginDataDirectory","/tmp");
+    }
 
 	private File getConfigurationFile()
 	{
@@ -274,6 +279,15 @@ public class EPADConfig
 	public static String getParamValue(String name)
 	{
 		return EPADConfig.getInstance().getParam(name);
+	}
+
+	public static String getParamValue(String name, String defaultValue)
+	{
+		String value =  getParamValue(name);
+		if (value != null)
+			return value;
+		else
+			return defaultValue;
 	}
 	
 	/**
