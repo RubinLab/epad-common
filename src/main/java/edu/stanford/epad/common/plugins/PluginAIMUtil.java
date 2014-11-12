@@ -283,7 +283,52 @@ public class PluginAIMUtil
 
 		return point;
 	}
-
+	
+	public static boolean setNewSegmentationPoints(File aimFile, String imageUID, String pluginName, double[] xVector, double[] yVector) {
+		int index = 0;
+		ImageAnnotation imageAnnotation = null;
+		try {
+			imageAnnotation = PluginAIMUtil.getImageAnnotationFromFile(aimFile);
+			
+			GeometricShapeCollection geometricShapeCollection = imageAnnotation.getGeometricShapeCollection();
+			GeometricShape geometricShape = geometricShapeCollection.getGeometricShapeList().get(0);
+			if (geometricShape.getXsiType().equals("Polyline"))
+			{
+				for (SpatialCoordinate spatialCoordinate : geometricShape.getSpatialCoordinateCollection().getSpatialCoordinateList())
+				{				
+					if (spatialCoordinate.getXsiType().equals("TwoDimensionSpatialCoordinate"))
+					{
+						TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
+						index = twoDimensionSpatialCoordinate.getCoordinateIndex();
+						twoDimensionSpatialCoordinate.setX(xVector[index]);
+						twoDimensionSpatialCoordinate.setY(yVector[index]);
+					}
+				}
+			} else {
+				log.warning(pluginName + ": failed to find a polyline geometric shape");
+				return false;
+			}
+			
+			// TODO referencedFrameNumber may be different than 1 in the future with DSO
+			int cagridId = geometricShape.getCagridId();
+			for (int i = index+1, ii = xVector.length; i < ii; i++) {
+				geometricShape.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(cagridId, i, imageUID, 1, xVector[i], yVector[i]));
+			}
+			
+			AnnotationBuilder.saveToServer(imageAnnotation, EPADConfig.eXistServerUrl, EPADConfig.aim3Namespace,
+						EPADConfig.eXistCollection, EPADConfig.xsdFilePath, EPADConfig.eXistUsername, EPADConfig.eXistPassword);
+			
+			AnnotationBuilder.saveToFile(imageAnnotation, aimFile.getAbsolutePath(), EPADConfig.xsdFilePath);
+			
+			
+		} catch (AimException e) {
+			log.warning(pluginName + ": failed to save new segmentation points: ", e);
+			return false;
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * Get the canonical path if possible, otherwise get the absolute path.
 	 * 
