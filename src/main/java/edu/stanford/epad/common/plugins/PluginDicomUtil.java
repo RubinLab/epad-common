@@ -14,16 +14,23 @@ import org.apache.commons.io.IOUtils;
 
 import com.google.gson.Gson;
 
+import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.epad.dtos.EPADDatabaseSeries;
+import edu.stanford.hakan.aim3api.base.AimException;
+import edu.stanford.hakan.aim3api.base.ImageAnnotation;
 
 public class PluginDicomUtil
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
 
-	public static List<String> getDicomImageUIDsInSeries(String seriesUID, String sessionID) throws IOException
+	public static List<String> getDicomImageUIDsInSeries(String studyUID, String seriesUID, String sessionID, String username) throws IOException
 	{
-		String url = "TODO" + "?series_iuid=" + seriesUID; // TODO Use new RESTful /images/ route.
+		String url = "http://localhost:" + EPADConfig.epadPort + "/epad/v2" +
+				"/studies/" + studyUID + "/series/" + seriesUID + "/images/?username=" + username;
+		log.info("url for getDicomImageUIDsInSeries: " + url);
+		
+//		String url = "TODO" + "?series_iuid=" + seriesUID; // TODO Use new RESTful /images/ route.
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(url);
 		InputStreamReader streamReader = null;
@@ -49,10 +56,15 @@ public class PluginDicomUtil
 		}
 	}
 
-	public static int getPositionOfImageInDicomSeries(String seriesUID, String imageUID, String sessionID)
+	public static int getPositionOfImageInDicomSeries(String studyUID, String seriesUID, String imageUID, String sessionID, String username)
 			throws Exception
-	{ // TODO Use new RESTful /images/ route.
-		String url = "TODO" + "?series_iuid=" + seriesUID;
+	{ 		
+		String url = "http://localhost:" + EPADConfig.epadPort + "/epad/v2" +
+				"/studies/" + studyUID + "/series/" + seriesUID + "/images/?username=" + username;
+		log.info("url for getPositionOfImageInDicomSeries: " + url);
+		
+		// TODO Use new RESTful /images/ route.
+		//String url = "TODO" + "?series_iuid=" + seriesUID;
 		HttpClient client = new HttpClient();
 		GetMethod method = new GetMethod(url);
 		InputStreamReader streamReader = null;

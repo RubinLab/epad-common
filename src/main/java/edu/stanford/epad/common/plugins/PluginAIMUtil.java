@@ -360,7 +360,7 @@ public class PluginAIMUtil
 		imageAnnotation.addImageReference(dicomImageReference);
 	}
 
-	private static String getOwnerFromImageAnnotation(ImageAnnotation aim) throws AimException
+	public static String getOwnerFromImageAnnotation(ImageAnnotation aim) throws AimException
 	{
 		if (aim.getListUser() != null) {
 			if (!aim.getListUser().isEmpty())
