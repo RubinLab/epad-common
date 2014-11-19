@@ -2,6 +2,9 @@ package edu.stanford.epad.common.plugins;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +73,8 @@ public class PluginAIMUtil
 
 	/**
 	 * Currently called by plugins after generating DSO.
-	 * This code is a copy of function in epad-ws/AIMUtil.java - need to consolidate them somehow
+	 * TODO: This code is a copy of function in epad-ws/AIMUtil.java - we need to consolidate them
+	 *       So this function may not remain here in future releases
 	 * <p>
 	 * Also see {@link AIMUtil#generateAIMFileForDSO} for DSO AIM generation when not invoked from plugin.
 	 */
@@ -400,5 +404,30 @@ public class PluginAIMUtil
 				return aim.getListUser().get(0).getLoginName();
 		}
 		throw new AimException("No User in image annotation");
+	}
+	
+	public static void addAIMToDatabase(String annotationID, String projectID, String patientID, 
+			String studyUID, String seriesUID, String imageUID, int frameNo, String dsoSeriesUID, String loginUsername) throws Exception
+	{
+		String username = EPADConfig.epadDatabaseUsername;
+		String password = EPADConfig.epadDatabasePassword;
+		String epadDatabaseURL = EPADConfig.epadDatabaseURL;
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con = null;
+		Statement statement = null;
+		try
+		{
+			con = DriverManager.getConnection(epadDatabaseURL, username, password);
+			String sqlInsert = "INSERT INTO annotations (UserLoginName,PatientID,SeriesUID,StudyUID,ImageUID,FrameID,AnnotationUID,ProjectUID,DSOSeriesUID) VALUES (" 
+    				+ "'" + loginUsername + "', '" + patientID + "', '" + seriesUID + "', '" 
+    				+ studyUID + "', '" + imageUID + "', " + frameNo + ", '" + annotationID + "', '" + projectID + "', '" + dsoSeriesUID + "')";
+			statement = con.createStatement();
+			statement.executeUpdate(sqlInsert);
+		}
+		finally
+		{
+			if (statement != null) statement.close();
+			if (con != null) con.close();
+		}
 	}
 }
