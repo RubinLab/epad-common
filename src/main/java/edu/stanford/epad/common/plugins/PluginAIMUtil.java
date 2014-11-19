@@ -78,7 +78,7 @@ public class PluginAIMUtil
 	 * <p>
 	 * Also see {@link AIMUtil#generateAIMFileForDSO} for DSO AIM generation when not invoked from plugin.
 	 */
-	public static ImageAnnotation generateAIMFileForDSO(ImageAnnotation templateImageAnnotation,
+	public static ImageAnnotation generateAIMFileForDSO(ImageAnnotation imageAnnotation,
 			AttributeList dsoDICOMAttributes, String sourceStudyUID, String sourceSeriesUID, String sourceImageUID, String username)
 			throws Exception
 	{
@@ -106,36 +106,13 @@ public class PluginAIMUtil
 
 		String name = description;
 		if (name == null || name.trim().length() == 0) name = "segmentation";
-		ImageAnnotation imageAnnotation = new ImageAnnotation(0, "", dsoDate.substring(0,4) + "-" + dsoDate.substring(4,6) + "-" + dsoDate.substring(6,8) + "T00:00:00", name, "SEG",
-				"SEG Only", "", "", "");
 
 		SegmentationCollection sc = new SegmentationCollection();
 		sc.AddSegmentation(new Segmentation(0, imageUID, sopClassUID, sourceImageUID, 1));
 		imageAnnotation.setSegmentationCollection(sc);
-
-		DICOMImageReference originalDICOMImageReference = PluginAIMUtil.createDICOMImageReference(sourceStudyUID,
-				sourceSeriesUID, sourceImageUID);
-		imageAnnotation.addImageReference(originalDICOMImageReference);
-		DICOMImageReference dsoDICOMImageReference = PluginAIMUtil.createDICOMImageReference(studyUID, seriesUID,
-				imageUID);
-		imageAnnotation.addImageReference(dsoDICOMImageReference);
-
-		Person person = new Person();
-		person.setSex(patientSex.trim());
-		if (patientBirthDay.trim().length() == 8)
-			person.setBirthDate(patientBirthDay.substring(0,4) + "-" + patientBirthDay.substring(4,6) + "-" + patientBirthDay.substring(6,8) + "T00:00:00"); // TODO
-		person.setId(patientID);
-		person.setName(patientName);
-		person.setCagridId(0);
-		imageAnnotation.addPerson(person);
-
-		List<User> userList = new ArrayList<User>();
-		User user = new User();
-		user.setLoginName(username);
-		user.setName(username);
-		user.setCagridId(0);
-		userList.add(user);
-		imageAnnotation.setListUser(userList);
+		
+		addDICOMImageReferenceToImageAnnotation(studyUID, seriesUID,
+				imageUID, imageAnnotation);
 		return imageAnnotation;
 	}
 
