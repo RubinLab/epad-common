@@ -23,6 +23,7 @@ import edu.stanford.hakan.aim3api.base.Segmentation;
 import edu.stanford.hakan.aim3api.base.SegmentationCollection;
 import edu.stanford.hakan.aim3api.base.SpatialCoordinate;
 import edu.stanford.hakan.aim3api.base.TwoDimensionSpatialCoordinate;
+import edu.stanford.hakan.aim3api.base.User;
 import edu.stanford.hakan.aim3api.usage.AnnotationBuilder;
 import edu.stanford.hakan.aim3api.usage.AnnotationExtender;
 import edu.stanford.hakan.aim3api.usage.AnnotationGetter;
@@ -69,37 +70,69 @@ public class PluginAIMUtil
 
 	/**
 	 * Currently called by plugins after generating DSO.
+	 * This code is a copy of function in epad-ws/AIMUtil.java - need to consolidate them somehow
 	 * <p>
 	 * Also see {@link AIMUtil#generateAIMFileForDSO} for DSO AIM generation when not invoked from plugin.
 	 */
 	public static ImageAnnotation generateAIMFileForDSO(ImageAnnotation templateImageAnnotation,
-			AttributeList dsoDICOMAttributes, String sourceStudyUID, String sourceSeriesUID, String sourceImageUID)
-			throws AimException
+			AttributeList dsoDICOMAttributes, String sourceStudyUID, String sourceSeriesUID, String sourceImageUID, String username)
+			throws Exception
 	{
 		String patientID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientID);
 		String patientName = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientName);
+		String patientBirthDay = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientBirthDate);
+		if (patientBirthDay.trim().length() != 8) patientBirthDay = "19650212";
+		String patientSex = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientSex);
+		if (patientSex.trim().length() != 1) patientSex = "F";
+		String dsoDate = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SeriesDate);
+		if (dsoDate.trim().length() != 8) dsoDate = "20001017";
 		String sopClassUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPClassUID);
-		String dsoStudyUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.StudyInstanceUID);
-		String dsoSeriesUID = Attribute
-				.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SeriesInstanceUID);
-		String dsoImageUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPInstanceUID);
+		String studyUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.StudyInstanceUID);
+		String seriesUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SeriesInstanceUID);
+		String imageUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPInstanceUID);
+		String description = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SeriesDescription);
 
-		String username = getOwnerFromImageAnnotation(templateImageAnnotation);
-		// Person person = getPersonFromImageAnnotation(templateImageAnnotation);
+		log.info("Generating AIM file for DSO series " + seriesUID + " for patient " + patientName);
+		log.info("SOP Class UID=" + sopClassUID);
+		log.info("DSO Study UID=" + studyUID);
+		log.info("DSO Series UID=" + seriesUID);
+		log.info("DSO Image UID=" + imageUID);
+		log.info("Referenced SOP Instance UID=" + sourceImageUID);
+		log.info("Referenced Series Instance UID=" + sourceSeriesUID);
 
-		log.info("template AIM ID " + templateImageAnnotation.getUniqueIdentifier());
+		String name = description;
+		if (name == null || name.trim().length() == 0) name = "segmentation";
+		ImageAnnotation imageAnnotation = new ImageAnnotation(0, "", dsoDate.substring(0,4) + "-" + dsoDate.substring(4,6) + "-" + dsoDate.substring(6,8) + "T00:00:00", name, "SEG",
+				"SEG Only", "", "", "");
 
-		log.info("patientID " + patientID);
-		log.info("patientName " + patientName);
-		log.info("DSO Study " + dsoStudyUID);
-		log.info("DSO Series " + dsoSeriesUID);
-		log.info("DSO Image " + dsoImageUID);
-		log.info("User " + username);
+		SegmentationCollection sc = new SegmentationCollection();
+		sc.AddSegmentation(new Segmentation(0, imageUID, sopClassUID, sourceImageUID, 1));
+		imageAnnotation.setSegmentationCollection(sc);
 
-		addSegmentToImageAnnotation(sopClassUID, dsoImageUID, sourceImageUID, templateImageAnnotation);
-		addDICOMImageReferenceToImageAnnotation(dsoStudyUID, dsoSeriesUID, dsoImageUID, templateImageAnnotation);
+		DICOMImageReference originalDICOMImageReference = PluginAIMUtil.createDICOMImageReference(sourceStudyUID,
+				sourceSeriesUID, sourceImageUID);
+		imageAnnotation.addImageReference(originalDICOMImageReference);
+		DICOMImageReference dsoDICOMImageReference = PluginAIMUtil.createDICOMImageReference(studyUID, seriesUID,
+				imageUID);
+		imageAnnotation.addImageReference(dsoDICOMImageReference);
 
-		return templateImageAnnotation;
+		Person person = new Person();
+		person.setSex(patientSex.trim());
+		if (patientBirthDay.trim().length() == 8)
+			person.setBirthDate(patientBirthDay.substring(0,4) + "-" + patientBirthDay.substring(4,6) + "-" + patientBirthDay.substring(6,8) + "T00:00:00"); // TODO
+		person.setId(patientID);
+		person.setName(patientName);
+		person.setCagridId(0);
+		imageAnnotation.addPerson(person);
+
+		List<User> userList = new ArrayList<User>();
+		User user = new User();
+		user.setLoginName(username);
+		user.setName(username);
+		user.setCagridId(0);
+		userList.add(user);
+		imageAnnotation.setListUser(userList);
+		return imageAnnotation;
 	}
 
 	public static void saveAnnotationToAnnotationsDirectory(ImageAnnotation imageAnnotation) throws AimException
