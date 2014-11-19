@@ -421,6 +421,7 @@ public class PluginAIMUtil
 			String sqlInsert = "INSERT INTO annotations (UserLoginName,PatientID,SeriesUID,StudyUID,ImageUID,FrameID,AnnotationUID,ProjectUID,DSOSeriesUID) VALUES (" 
     				+ "'" + loginUsername + "', '" + patientID + "', '" + seriesUID + "', '" 
     				+ studyUID + "', '" + imageUID + "', " + frameNo + ", '" + annotationID + "', '" + projectID + "', '" + dsoSeriesUID + "')";
+			log.info("add aim sql:" + sqlInsert);
 			statement = con.createStatement();
 			statement.executeUpdate(sqlInsert);
 		}
