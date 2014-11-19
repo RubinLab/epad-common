@@ -113,6 +113,7 @@ public class PluginAIMUtil
 		
 		addDICOMImageReferenceToImageAnnotation(studyUID, seriesUID,
 				imageUID, imageAnnotation);
+		updateDSOAIMInDatabase(imageAnnotation.getUniqueIdentifier(), seriesUID);
 		return imageAnnotation;
 	}
 
@@ -383,8 +384,7 @@ public class PluginAIMUtil
 		throw new AimException("No User in image annotation");
 	}
 	
-	public static void addAIMToDatabase(String annotationID, String projectID, String patientID, 
-			String studyUID, String seriesUID, String imageUID, int frameNo, String dsoSeriesUID, String loginUsername) throws Exception
+	private static void updateDSOAIMInDatabase(String annotationID,String dsoSeriesUID) throws Exception
 	{
 		String username = EPADConfig.epadDatabaseUsername;
 		String password = EPADConfig.epadDatabasePassword;
@@ -395,12 +395,10 @@ public class PluginAIMUtil
 		try
 		{
 			con = DriverManager.getConnection(epadDatabaseURL, username, password);
-			String sqlInsert = "INSERT INTO annotations (UserLoginName,PatientID,SeriesUID,StudyUID,ImageUID,FrameID,AnnotationUID,ProjectUID,DSOSeriesUID) VALUES (" 
-    				+ "'" + loginUsername + "', '" + patientID + "', '" + seriesUID + "', '" 
-    				+ studyUID + "', '" + imageUID + "', " + frameNo + ", '" + annotationID + "', '" + projectID + "', '" + dsoSeriesUID + "')";
-			log.info("add aim sql:" + sqlInsert);
+    	    String sql = "UPDATE annotations set DSOSeriesUID = '" + dsoSeriesUID + "' where AnnotationUID = '" + annotationID + "'";
+            log.info("DSO AIM update:" + sql);
 			statement = con.createStatement();
-			statement.executeUpdate(sqlInsert);
+			statement.executeUpdate(sql);
 		}
 		finally
 		{
