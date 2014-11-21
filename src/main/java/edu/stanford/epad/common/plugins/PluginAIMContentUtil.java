@@ -57,6 +57,16 @@ public class PluginAIMContentUtil
 		return getUIDFromAIM("Image", "sopInstanceUID", aimFileContents);
 	}
 
+	public static String getSecondSeriesUID(String aimFileContents) throws PluginServletException
+	{
+		return getUIDFromAIM("<ImageSeries ", "instanceUID", aimFileContents, 2);
+	}
+
+	public static String getSecondSOPInstanceUID(String aimFileContents) throws PluginServletException
+	{
+		return getUIDFromAIM("<Image ", "sopInstanceUID", aimFileContents, 2);
+	}
+
 	/**
 	 * This data comes from a AIM-Template.
 	 * 
@@ -118,12 +128,26 @@ public class PluginAIMContentUtil
 	private static String getUIDFromAIM(String tag, String attribute, String aimFileContents)
 			throws PluginServletException
 	{
+		return getUIDFromAIM(tag, attribute, aimFileContents, 1);
+	}
+	private static String getUIDFromAIM(String tag, String attribute, String aimFileContents, int index)
+			throws PluginServletException
+	{
 
 		tag = tag.toLowerCase();
 		attribute = attribute.toLowerCase();
 		aimFileContents = aimFileContents.toLowerCase();
 
-		int tagIndex = aimFileContents.indexOf(tag);
+		int fromIndex = 0;
+		int tagIndex = 0;
+		while (fromIndex < aimFileContents.length() && tagIndex != -1 && index > 0)
+		{
+			tagIndex = aimFileContents.indexOf(tag, fromIndex);
+			index--;
+			fromIndex = tagIndex + tag.length();
+			//log.info(" tagIndex=" + tagIndex + " fromIndex=" + fromIndex + " index=" + index);
+		}
+		
 		if (tagIndex > 0) {
 			int attribIndex = aimFileContents.indexOf(attribute, tagIndex);
 
@@ -136,10 +160,11 @@ public class PluginAIMContentUtil
 				retVal = retVal.replace('"', ' ').trim();
 				return retVal;
 			} else {
-				throw new PluginServletException("input error", "Didn't find tag: " + tag);
+				throw new PluginServletException("input error", "Didn't find attribute: " + attribute + " in tag:" + tag);
 			}
 		} else {
-			throw new PluginServletException("input error", "Didn't find attribute: " + attribute);
+			log.warning("Didn't find tag: " + tag);
+			return null;
 		}
 	}
 

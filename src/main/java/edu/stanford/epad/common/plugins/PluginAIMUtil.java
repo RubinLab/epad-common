@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,6 @@ import edu.stanford.hakan.aim3api.base.Segmentation;
 import edu.stanford.hakan.aim3api.base.SegmentationCollection;
 import edu.stanford.hakan.aim3api.base.SpatialCoordinate;
 import edu.stanford.hakan.aim3api.base.TwoDimensionSpatialCoordinate;
-import edu.stanford.hakan.aim3api.base.User;
 import edu.stanford.hakan.aim3api.usage.AnnotationBuilder;
 import edu.stanford.hakan.aim3api.usage.AnnotationExtender;
 import edu.stanford.hakan.aim3api.usage.AnnotationGetter;
@@ -409,6 +409,35 @@ public class PluginAIMUtil
             log.info("DSO AIM update:" + sql);
 			statement = con.createStatement();
 			statement.executeUpdate(sql);
+		}
+		finally
+		{
+			if (statement != null) statement.close();
+			if (con != null) con.close();
+		}
+	}
+	
+	public static String getDSOSeriesUID(String annotationID) throws Exception
+	{
+		String username = EPADConfig.epadDatabaseUsername;
+		String password = EPADConfig.epadDatabasePassword;
+		String epadDatabaseURL = EPADConfig.epadDatabaseURL;
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con = null;
+		Statement statement = null;
+		ResultSet rs = null;
+		String dsoSeriesUID = null;
+		try
+		{
+			con = DriverManager.getConnection(epadDatabaseURL, username, password);
+    	    String sql = "SELECT  DSOSeriesUID from annotations where AnnotationUID = '" + annotationID + "'";
+            log.info("DSO AIM selecte:" + sql);
+			statement = con.createStatement();
+			rs = statement.executeQuery(sql);
+			if (rs.next()) {
+				dsoSeriesUID = rs.getString(1);
+			}
+			return dsoSeriesUID;
 		}
 		finally
 		{
