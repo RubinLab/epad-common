@@ -441,6 +441,7 @@ public class PluginAIMUtil
 		}
 		finally
 		{
+			if (rs != null) rs.close();
 			if (statement != null) statement.close();
 			if (con != null) con.close();
 		}
