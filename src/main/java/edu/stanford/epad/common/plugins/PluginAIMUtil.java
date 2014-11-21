@@ -276,6 +276,16 @@ public class PluginAIMUtil
 							roiyData[idx] = twoDimensionSpatialCoordinate.getY();
 						}
 					}
+				} else if (geometricShape.getXsiType().equals("Point")) {
+					roixData = new double[1];
+					roiyData = new double[1];
+					SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
+							.getSpatialCoordinateList().get(0);
+					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
+						TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
+						roixData[0] = twoDimensionSpatialCoordinate.getX();
+						roiyData[0] = twoDimensionSpatialCoordinate.getY();
+					}
 				}
 			}
 		} catch (Throwable t) {
