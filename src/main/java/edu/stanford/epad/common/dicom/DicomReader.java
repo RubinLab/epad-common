@@ -155,6 +155,19 @@ public class DicomReader
 		return studyIUID;
 	}
 	
+	public static DicomObject getDicomObject(File dicomFile) throws IOException
+	{
+		DicomInputStream dis = null;
+
+		try {
+			dis = new DicomInputStream(dicomFile);
+
+			return dis.readDicomObject();
+		} finally {
+			IOUtils.closeQuietly(dis);
+		}
+	}
+	
 	public static String getModality(File dicomFile) throws IOException
 	{
 		DicomInputStream dis = null;
