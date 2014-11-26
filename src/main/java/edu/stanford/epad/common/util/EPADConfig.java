@@ -227,6 +227,11 @@ public class EPADConfig
 		return getEPADWebServerResourcesDir() + "dicom_grid/";
 	}
 
+	public static String getEPADWebServerFilesDir()
+	{
+		return getEPADWebServerResourcesDir() + "files/";
+	}
+
 	public static String getEPADWebServerPluginConfigFilePath()
 	{
 		return getEPADWebServerEtcDir() + "plugin-config.txt";
