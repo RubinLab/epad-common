@@ -177,6 +177,11 @@ public class EPADConfig
 		return getEPADWebServerResourcesDir() + "upload/";
 	}
 
+	public static String getEPADWebServerFileUploadDir()
+	{
+		return getEPADWebServerResourcesDir() + "fileupload/";
+	}
+
 	public static String getEPADWebServerRSNADir()
 	{
 		return getEPADWebServerResourcesDir() + "rsna/";
