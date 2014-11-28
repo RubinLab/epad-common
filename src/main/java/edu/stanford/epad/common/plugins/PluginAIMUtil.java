@@ -23,6 +23,7 @@ import edu.stanford.hakan.aim3api.base.ImageAnnotation;
 import edu.stanford.hakan.aim3api.base.ImageSeries;
 import edu.stanford.hakan.aim3api.base.ImageStudy;
 import edu.stanford.hakan.aim3api.base.Person;
+import edu.stanford.hakan.aim3api.base.Polyline;
 import edu.stanford.hakan.aim3api.base.Segmentation;
 import edu.stanford.hakan.aim3api.base.SegmentationCollection;
 import edu.stanford.hakan.aim3api.base.SpatialCoordinate;
@@ -309,48 +310,21 @@ public class PluginAIMUtil
 		return point;
 	}
 	
-	public static boolean setNewSegmentationPoints(File aimFile, String imageUID, String pluginName, double[] xVector, double[] yVector) {
-		int index = 0;
-		ImageAnnotation imageAnnotation = null;
-		try {
-			imageAnnotation = PluginAIMUtil.getImageAnnotationFromFile(aimFile);
-			
-			GeometricShapeCollection geometricShapeCollection = imageAnnotation.getGeometricShapeCollection();
-			GeometricShape geometricShape = geometricShapeCollection.getGeometricShapeList().get(0);
-			if (geometricShape.getXsiType().equals("Polyline"))
-			{
-				for (SpatialCoordinate spatialCoordinate : geometricShape.getSpatialCoordinateCollection().getSpatialCoordinateList())
-				{				
-					if (spatialCoordinate.getXsiType().equals("TwoDimensionSpatialCoordinate"))
-					{
-						TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
-						index = twoDimensionSpatialCoordinate.getCoordinateIndex();
-						twoDimensionSpatialCoordinate.setX(xVector[index]);
-						twoDimensionSpatialCoordinate.setY(yVector[index]);
-					}
-				}
-			} else {
-				log.warning(pluginName + ": failed to find a polyline geometric shape");
-				return false;
-			}
-			
-			// TODO referencedFrameNumber may be different than 1 in the future with DSO
-			int cagridId = geometricShape.getCagridId();
-			for (int i = index+1, ii = xVector.length; i < ii; i++) {
-				geometricShape.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(cagridId, i, imageUID, 1, xVector[i], yVector[i]));
-			}
-			
-			AnnotationBuilder.saveToServer(imageAnnotation, EPADConfig.eXistServerUrl, EPADConfig.aim3Namespace,
-						EPADConfig.eXistCollection, EPADConfig.xsdFilePath, EPADConfig.eXistUsername, EPADConfig.eXistPassword);
-			
-			AnnotationBuilder.saveToFile(imageAnnotation, aimFile.getAbsolutePath(), EPADConfig.xsdFilePath);
-			
-			
-		} catch (AimException e) {
-			log.warning(pluginName + ": failed to save new segmentation points: ", e);
-			return false;
+	public static boolean setNewSegmentationPoints (ImageAnnotation imageAnnotation, String imageUID, String pluginName, double[] xVector, double[] yVector) {
+		Polyline polyline = new Polyline();
+		polyline.setCagridId(0);
+		polyline.setIncludeFlag(true);
+		polyline.setShapeIdentifier(0);
+		polyline.setLineStyle("lineStyle");
+		
+		// TODO referencedFrameNumber may be different than 0 (?)
+		for (int i = 0, ii = xVector.length; i < ii; i++) {
+		   polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, i, imageUID, 0, xVector[i], yVector[i]));
 		}
 		
+// TODO use a different approach to replace the geometric shape
+		GeometricShapeCollection geometricShapeCollection = imageAnnotation.getGeometricShapeCollection();		
+		geometricShapeCollection.getGeometricShapeList().set(0, polyline);		
 		return true;
 	}
 	
