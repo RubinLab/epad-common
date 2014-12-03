@@ -225,6 +225,7 @@ public class TIFFMasksToDSOConverter
 			// looks like 4 bytes/pixel, compress to 1 bit/pixel (else assume it is already 1 bit/pixel)
 			if (new_frame.length == expectedLen)
 			{
+				System.out.println("Compressing tiff mask");
 				int numpixels = new_frame.length/4;
 				int numbytes = numpixels/8;
 				pixel_data = new byte[numbytes];
@@ -241,6 +242,66 @@ public class TIFFMasksToDSOConverter
 							nonzerodata = true;
 						}
 					}
+//					if (pixel_data[k] != 0)
+//						log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
+				}
+			}
+			else
+			{
+				System.out.println("Flipping odd bytes of tiff mask");
+				int numbytes = maskImage.getWidth()*maskImage.getHeight()/8;
+				pixel_data = new byte[numbytes];
+				for (int k = 0; k < numbytes; k++)
+				{
+					// Flip every odd byte. why on earth do we need to do this?
+					if (k%2 != 0)
+					{
+						pixel_data[k] = 0;
+						if ((new_frame[k] & 1) == 1)
+						{
+							int setBit = pixel_data[k]+128;
+							pixel_data[k] =(byte) setBit;
+						}
+						if ((new_frame[k] & 2) == 2)
+						{
+							int setBit = pixel_data[k]+64;
+							pixel_data[k] =(byte) setBit;
+						}
+						if ((new_frame[k] & 4) == 4)
+						{
+							int setBit = pixel_data[k]+32;
+							pixel_data[k] =(byte) setBit;
+						}
+						if ((new_frame[k] & 8) == 8)
+						{
+							int setBit = pixel_data[k]+16;
+							pixel_data[k] =(byte) setBit;
+						}
+						if ((new_frame[k] & 16) == 16)
+						{
+							int setBit = pixel_data[k]+8;
+							pixel_data[k] =(byte) setBit;
+						}
+						if ((new_frame[k] & 32) == 32)
+						{
+							int setBit = pixel_data[k]+4;
+							pixel_data[k] =(byte) setBit;
+						}
+						if ((new_frame[k] & 64) == 64)
+						{
+							int setBit = pixel_data[k]+2;
+							pixel_data[k] =(byte) setBit;
+						}
+						if ((new_frame[k] & 128) == 128)
+						{
+							int setBit = pixel_data[k]+1;
+							pixel_data[k] =(byte) setBit;
+						}
+						if (new_frame[k] != 0)
+							System.out.println("Old byte:" + new_frame[k] + " New byte:" + pixel_data[k]);	
+					}
+					else
+						pixel_data[k] = new_frame[k];
 //					if (pixel_data[k] != 0)
 //						log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
 				}
