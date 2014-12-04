@@ -31,6 +31,7 @@ import edu.stanford.hakan.aim3api.base.TwoDimensionSpatialCoordinate;
 import edu.stanford.hakan.aim3api.usage.AnnotationBuilder;
 import edu.stanford.hakan.aim3api.usage.AnnotationExtender;
 import edu.stanford.hakan.aim3api.usage.AnnotationGetter;
+import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
 
 public class PluginAIMUtil
 {
@@ -43,6 +44,10 @@ public class PluginAIMUtil
 	private static final String eXistUsername = EPADConfig.eXistUsername;
 	private static final String aim3XSDFilePath = EPADConfig.getEPADWebServerAIM3XSDFilePath();
 	private static final String eXistURI = EPADConfig.eXistURI;
+	private static final String aim4Namespace = EPADConfig.aim4Namespace;
+	private static final String eXistCollectionV4 = EPADConfig.eXistCollectionV4;
+	private static final String xsdFileV4 = EPADConfig.xsdFileV4;
+	private static final String xsdFilePathV4 = EPADConfig.xsdFilePathV4;
 
 	public static ImageAnnotation getImageAnnotationFromServer(String aimID) throws AimException
 	{
@@ -62,10 +67,34 @@ public class PluginAIMUtil
 		return aim;
 	}
 
+	public static ImageAnnotationCollection getImageAnnotationCollectionFromServer(String aimID, String projectID) throws edu.stanford.hakan.aim4api.base.AimException
+	{
+	    String collection4Name = eXistCollectionV4;
+	    if (projectID != null && projectID.length() > 0)
+	    	collection4Name = collection4Name + "/" + projectID;
+		ImageAnnotationCollection aim = edu.stanford.hakan.aim4api.usage.AnnotationGetter
+				.getImageAnnotationCollectionByUniqueIdentifier(eXistServerUrl, aim4Namespace, collection4Name,
+						eXistUsername, eXistPassword, aimID);
+		return aim;
+	}
+	
 	public static void sendImageAnnotationToServer(ImageAnnotation imageAnnotation) throws AimException
 	{
 		AnnotationBuilder.saveToServer(imageAnnotation, eXistURI, aim3Namespace, eXistCollection, aim3XSDFilePath,
 				eXistUsername, eXistPassword);
+
+		String result = AnnotationBuilder.getAimXMLsaveResult();
+
+		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
+	}
+	
+	public static void sendImageAnnotationToServer(ImageAnnotationCollection imageAnnotation, String projectID) throws edu.stanford.hakan.aim4api.base.AimException
+	{
+	    String collectionName = eXistCollectionV4;
+	    if (projectID != null && projectID.length() > 0)
+	    	collectionName = collectionName + "/" + projectID;
+		edu.stanford.hakan.aim4api.usage.AnnotationBuilder.saveToServer(imageAnnotation, eXistServerUrl, aim4Namespace,
+				collectionName, xsdFilePathV4, eXistUsername, eXistPassword);
 
 		String result = AnnotationBuilder.getAimXMLsaveResult();
 
@@ -117,6 +146,48 @@ public class PluginAIMUtil
 		updateDSOAIMInDatabase(imageAnnotation.getUniqueIdentifier(), seriesUID);
 		return imageAnnotation;
 	}
+	
+	public static ImageAnnotationCollection generateAIMFileForDSO(ImageAnnotationCollection imageAnnotation,
+			AttributeList dsoDICOMAttributes, String sourceStudyUID, String sourceSeriesUID, String sourceImageUID, String username)
+			throws Exception
+	{
+		String patientID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientID);
+		String patientName = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientName);
+		String patientBirthDay = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientBirthDate);
+		if (patientBirthDay.trim().length() != 8) patientBirthDay = "19650212";
+		String patientSex = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientSex);
+		if (patientSex.trim().length() != 1) patientSex = "F";
+		String dsoDate = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SeriesDate);
+		if (dsoDate.trim().length() != 8) dsoDate = "20001017";
+		String sopClassUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPClassUID);
+		String studyUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.StudyInstanceUID);
+		String seriesUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SeriesInstanceUID);
+		String imageUID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SOPInstanceUID);
+		String description = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.SeriesDescription);
+
+		log.info("Generating AIM file for DSO series " + seriesUID + " for patient " + patientName);
+		log.info("SOP Class UID=" + sopClassUID);
+		log.info("DSO Study UID=" + studyUID);
+		log.info("DSO Series UID=" + seriesUID);
+		log.info("DSO Image UID=" + imageUID);
+		log.info("Referenced SOP Instance UID=" + sourceImageUID);
+		log.info("Referenced Series Instance UID=" + sourceSeriesUID);
+
+		String name = description;
+		if (name == null || name.trim().length() == 0) name = "segmentation";
+
+		// Hakan needs to give equivalent code for AIM4
+		SegmentationCollection sc = new SegmentationCollection();
+		sc.AddSegmentation(new Segmentation(0, imageUID, sopClassUID, sourceImageUID, 1));
+		
+		// imageAnnotation.setSegmentationCollection(sc);
+		DICOMImageReference dicomImageReference = createDICOMImageReference(studyUID, seriesUID,
+				imageUID);
+		// imageAnnotation.addImageReference(dicomImageReference);
+		
+		updateDSOAIMInDatabase(imageAnnotation.getUniqueIdentifier().getRoot(), seriesUID);
+		return imageAnnotation;
+	}
 
 	public static void saveAnnotationToAnnotationsDirectory(ImageAnnotation imageAnnotation) throws AimException
 	{
@@ -125,9 +196,21 @@ public class PluginAIMUtil
 				EPADConfig.getEPADWebServerAIM3XSDFilePath());
 	}
 
+	public static void saveAnnotationToAnnotationsDirectory(ImageAnnotationCollection imageAnnotation) throws edu.stanford.hakan.aim4api.base.AimException
+	{
+		edu.stanford.hakan.aim4api.usage.AnnotationBuilder.saveToFile(imageAnnotation,
+				EPADConfig.getEPADWebServerAnnotationsDir() + imageAnnotation.getUniqueIdentifier().getRoot() + ".xml",
+				xsdFilePathV4);
+	}
+
 	public static ImageAnnotation getImageAnnotationFromFile(File file) throws AimException
 	{
 		return AnnotationGetter.getImageAnnotationFromFile(getRealPath(file));
+	}
+
+	public static ImageAnnotationCollection getImageAnnotationV4FromFile(File file) throws edu.stanford.hakan.aim4api.base.AimException
+	{
+		return edu.stanford.hakan.aim4api.usage.AnnotationGetter.getImageAnnotationCollectionFromFile(getRealPath(file), xsdFilePathV4);
 	}
 
 	public static DICOMImageReference createDICOMImageReference(String dsoStudyInstanceUID, String dsoSeriesInstanceUID,

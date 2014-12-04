@@ -35,6 +35,12 @@
     </dependency>
 
     <dependency>
+      <groupId>edu.stanford.hakan.aim4api</groupId>
+      <artifactId>aimapi</artifactId>
+      <version>${aimapi.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>edu.stanford.epad</groupId>
       <artifactId>epad-dto</artifactId>
       <version>${project.version}</version> 
