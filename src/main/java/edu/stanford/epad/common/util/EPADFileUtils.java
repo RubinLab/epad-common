@@ -17,7 +17,9 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
+import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,8 +27,13 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -456,6 +463,54 @@ public class EPADFileUtils
 			} catch (IOException e) {}
 		}
 		return null;
+    }
+
+    public static void downloadFile(HttpServletRequest httpRequest, HttpServletResponse httpResponse, File file, String fileName) throws Exception
+    {
+		InputStream is = null; 
+		try
+		{		
+			is = new BufferedInputStream(new FileInputStream(file)); 
+			String mimeType = URLConnection.guessContentTypeFromStream(is);
+			httpResponse.setContentType (mimeType) ;
+			httpResponse.setHeader("Content-disposition", "attachment;filename=" + fileName) ;
+			httpResponse.setHeader("pragma", "no-cache");
+			OutputStream outStream = null;
+			String encoding = httpRequest.getHeader("Accept-Encoding");    
+			  
+			if (encoding != null && encoding.indexOf("gzip") != -1)
+			{
+				httpResponse.setHeader("Content-Encoding" , "gzip");
+				outStream = new GZIPOutputStream(httpResponse.getOutputStream());
+			}
+			else if (encoding != null && encoding.indexOf("compress") != -1)
+			{
+				httpResponse.setHeader("Content-Encoding" , "compress");
+				outStream = new ZipOutputStream(httpResponse.getOutputStream());
+			} 
+			else
+			{
+				outStream = httpResponse.getOutputStream();
+			}
+			int chunk = 1024 ;
+		
+			byte[] buffer = new byte[chunk] ;
+			int length = -1 ;
+			int i = 0 ;
+		
+			while ((length = is.read(buffer)) != -1)
+			{
+				outStream.write(buffer, 0, length) ;
+				if (length < chunk)
+					break;
+			}
+			is.close();
+			is = null;
+		}
+		finally
+		{
+			if (is != null) is.close();
+		}
     }
 
 

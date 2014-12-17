@@ -85,7 +85,7 @@ public class EPADConfig
 	public static final String xnatUploadProjectPassword = EPADConfig.getInstance().getStringPropertyValue(
 			"XNATUploadProjectPassword");
 	public static boolean UseEPADUsersProjects = EPADConfig.getInstance().getBooleanPropertyValue(
-			"UseEPADUsersProjects");
+			"UseEPADUsersProjects", true);
 	
 	private Properties properties;
 
@@ -344,6 +344,28 @@ public class EPADConfig
 	public boolean getBooleanPropertyValue(String propertyName)
 	{
 		String parameterValue = getParam(propertyName);
+		if ("true".equalsIgnoreCase(parameterValue))
+		{
+			return true;
+		}
+		else if (!"false".equalsIgnoreCase(parameterValue))
+		{
+			log.warning("Invalid or missing property value for " + propertyName);
+		}
+		return false;
+	}
+
+	/**
+	 * 
+	 * @param propertyName
+	 * @return
+	 * 
+	 */
+	public boolean getBooleanPropertyValue(String propertyName, boolean defaultValue)
+	{
+		String parameterValue = getParam(propertyName);
+		if (parameterValue == null)
+			return defaultValue;
 		if ("true".equalsIgnoreCase(parameterValue))
 		{
 			return true;
