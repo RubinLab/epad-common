@@ -275,6 +275,11 @@ public class EPADConfig
 		return configFile;
 	}
 
+	public static String getEPADRemotePACsConfigFilePath()
+	{
+		return getEPADWebServerEtcDir() + "RemotePACsConfig.properties";
+	}
+
 	/**
 	 * Returns the values of a property in ePAD's configuration file.
 	 * 
