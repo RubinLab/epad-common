@@ -58,26 +58,34 @@ public class TIFFMasksToDSOConverter
 	{
 		return generateDSO(maskFilePaths, dicomFilePaths, outputFilePath, seriesDescription, null,null);
 	}
-	
+	public String[] generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID)
+			throws DicomException
+	{
+		return generateDSO(maskFilePaths, dicomFilePaths, outputFilePath, dsoSeriesDescription, dsoSeriesUID, dsoInstanceUID, false);
+	}
 	/**
 	 * @param maskFiles: Array of the TIFF files which contain the masks.
 	 * @param dicomFiles: Array of the original DICOM files.
 	 * @param outputFile: Name of the output segmentation objects file.
 	 * @param dsoSeriesDescription: Series Name of created segmentation object.
+	 * @param dsoSeriesUID: Series UID.
+	 * @param dsoInstanceUID: SOP Instance UID.
+	 * @param removeEmptyFrames: if true, optimize size by removing empty frames.
 	 * @return uids: uids[0] = Series UID uids[1] = ImageUID/InstanceUID
 	 * @throws DicomException
 	 */
-	public String[] generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID)
+	public String[] generateDSO(List<String> maskFilePaths, List<String> dicomFilePaths, String outputFilePath, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID, boolean removeEmptyFrames)
 			throws DicomException
 	{
 		try {
 			// Following call fills in: dicomAttributes, orientation, spacing, thickness, positions, pixels, imageWidth,
 			// imageHeight, imageFrames
-			log.info("Getting attributes from DICOM files");
-			getAttributesFromDICOMFiles(dicomFilePaths);
 
 			log.info("Reading pixels from mask files");
-			byte[] pixels = getPixelsFromMaskFiles(maskFilePaths);
+			byte[] pixels = getPixelsFromMaskFiles(maskFilePaths, dicomFilePaths, removeEmptyFrames);
+			
+			log.info("Getting attributes from DICOM files");
+			getAttributesFromDICOMFiles(dicomFilePaths);
 
 			SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(dicomAttributes, orientation,
 					spacing, thickness, dsoSeriesDescription, dsoSeriesUID, dsoInstanceUID);
@@ -206,11 +214,11 @@ public class TIFFMasksToDSOConverter
 		}
 	}
 
-	private byte[] getPixelsFromMaskFiles(List<String> maskFilePaths) throws FileNotFoundException, IOException,
+	private byte[] getPixelsFromMaskFiles(List<String> maskFilePaths, List<String> dicomFilePaths, boolean removeEmpty) throws FileNotFoundException, IOException,
 			DicomException
 	{
 		byte[] pixels = null;
-
+		List<Integer> emptyFileIndex = new ArrayList<Integer>();
 		for (int i = 0; i < maskFilePaths.size(); i++) {
 			File maskFile = new File(maskFilePaths.get(i));
 			BufferedImage maskImage = ImageIO.read(maskFile);
@@ -254,7 +262,9 @@ public class TIFFMasksToDSOConverter
 				for (int k = 0; k < numbytes; k++)
 				{
 					// Flip every odd byte. why on earth do we need to do this?
-					if (k%2 != 0)
+					if (new_frame[k] != 0)
+						nonzerodata = true;
+					if (k%2 != 0 && new_frame[k] != 0)
 					{
 						pixel_data[k] = 0;
 						if ((new_frame[k] & 1) == 1)
@@ -307,6 +317,11 @@ public class TIFFMasksToDSOConverter
 				}
 			}
 //			log.info("maskfile" + i + ": " + maskFilePaths.get(i) + " frame_length:" + pixel_data.length + " nonzero data:" + nonzerodata);
+			if (!nonzerodata && removeEmpty) {
+				log.info("Nodata - maskfile" + i + ": " + maskFilePaths.get(i) + " frame_length:" + pixel_data.length);
+				emptyFileIndex.add(i);
+				continue;
+			}
 			if (pixels == null) {
 				//pixels = new_frame.clone();
 				pixels = pixel_data;
@@ -318,6 +333,19 @@ public class TIFFMasksToDSOConverter
 				pixels = temp;
 			}
 		}
+		for (int i = emptyFileIndex.size(); i > 0; i--)
+		{
+			int index = emptyFileIndex.get(i-1);
+			log.info("Removing dicom " + index);
+			dicomFilePaths.remove(index);
+		}
+//		for (int i = 0; i < emptyFileIndex.size(); i++)
+//		{
+//			int index = emptyFileIndex.get(i);
+//			log.info("Removing dicom " + (maskFilePaths.size() - index - 1));
+//			dicomFilePaths.remove(maskFilePaths.size() - index - 1); // DicomFiles are in reverse order for!!!
+//		}
+		log.info("Number of pixels:" + pixels.length + " dicoms:" + dicomFilePaths.size());	
 		return pixels;
 	}
 

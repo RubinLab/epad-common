@@ -474,7 +474,8 @@ public class SegmentationObjectsFileWriter
 		list.putAll(cic.getAttributeList());
 		list.remove(TagFromName.ClinicalTrialSiteID);
 		list.remove(TagFromName.ClinicalTrialSubjectID);
-
+		list.remove(TagFromName.SliceThickness); // Not useful per Andriy, Sandy,  Clunie
+		
 		{ // Define dimensions as (stack id, in-stack position, segment number).
 			SequenceAttribute seq = new SequenceAttribute(TagFromName.DimensionOrganizationSequence);
 			AttributeList a = SequenceAttribute.getAttributeListFromWithinSequenceWithSingleItem(original_attrs,
@@ -796,18 +797,18 @@ public class SegmentationObjectsFileWriter
 		else if (!type.equalsIgnoreCase("PROBABILITY") && !type.equalsIgnoreCase("OCCUPANCY"))
 			type = "BINARY";
 
-		// if (!type.equalsIgnoreCase("BINARY")) { // 8-bit/pixel
-		// System.err.println("frames.length " + frames.length);
-		// System.err.println("image_width * image_height * frame_num " + image_width * image_height * frame_num);
-		// if (frames.length != image_width * image_height * frame_num) {
-		// throw (new DicomException("Image size or type is not correct!"));
-		// }
-		// } else if (frames.length != (image_width * image_height * frame_num - 1) / 8 + 1) {
-		// System.err.println("frames.length " + frames.length);
-		// System.err.println("image_width * image_height * frame_num - 1) / 8 + 1 "
-		// + (image_width * image_height * frame_num - 1) / 8 + 1);
-		// throw (new DicomException("Image size or type is not correct!"));
-		// }
+		 if (!type.equalsIgnoreCase("BINARY")) { // 8-bit/pixel
+		 System.err.println("frames.length " + frames.length);
+		 System.err.println("image_width * image_height * frame_num " + image_width * image_height * frame_num);
+		 if (frames.length != image_width * image_height * frame_num) {
+		 throw (new DicomException("Image size or type is not correct!"));
+		 }
+		 } else if (frames.length != (image_width * image_height * frame_num - 1) / 8 + 1) {
+		 System.err.println("frames.length " + frames.length);
+		 System.err.println("image_width * image_height * frame_num - 1) / 8 + 1 "
+		 + (image_width * image_height * frame_num - 1) / 8 + 1);
+		 throw (new DicomException("Image size or type is not correct!"));
+		 }
 
 		if (frame_counter == 0) { // Record the segmentation type at the first time.
 			if (!type.equalsIgnoreCase("BINARY")) { // 8-bit/pixel
