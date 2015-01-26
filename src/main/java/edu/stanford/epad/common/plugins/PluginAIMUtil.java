@@ -258,6 +258,12 @@ public class PluginAIMUtil
 	{
 		return AnnotationExtender.addFeature(imageAnnotation, featureValue, featureString, featureVersion);
 	}
+	
+	public static ImageAnnotationCollection addFeature(ImageAnnotationCollection imageAnnotationCollection, double[] featureValue,
+			String[] featureString, double featureVersion) throws edu.stanford.hakan.aim4api.base.AimException 
+	{
+		return edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, featureValue, featureString, featureVersion);
+	}
 
 	public static List<String> getPersonNames(ImageAnnotation imageAnnotation)
 	{
@@ -269,15 +275,25 @@ public class PluginAIMUtil
 
 		return personNames;
 	}
+	
+	public static String getPersonName(ImageAnnotationCollection imageAnnotationCollection)
+	{
+		edu.stanford.hakan.aim4api.base.Person person = imageAnnotationCollection.getPerson();
+		
+		if (person == null)
+			return null;
+		
+		return person.getName().getValue();
+	}
 
-	public static ROIData extractROIData(ImageAnnotation imageAnnotation)
+	public static ROIData extractROIData(edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation imageAnnotation)
 	{
 		int numROI;
 		double[] roixData = null;
 		double[] roiyData = null;
 
-		GeometricShapeCollection geometricShapeCollection = imageAnnotation.getGeometricShapeCollection();
-		GeometricShape geometricShape = null;
+		edu.stanford.hakan.aim4api.compability.aimv3.GeometricShapeCollection geometricShapeCollection = imageAnnotation.getGeometricShapeCollection();
+		edu.stanford.hakan.aim4api.compability.aimv3.GeometricShape geometricShape = null;
 		for (int i = 0; i < geometricShapeCollection.getGeometricShapeList().size(); i++) {
 			geometricShape = geometricShapeCollection.getGeometricShapeList().get(i);
 			if (geometricShape.getXsiType().equals("Polyline")) {
@@ -285,10 +301,11 @@ public class PluginAIMUtil
 				roixData = new double[numROI];
 				roiyData = new double[numROI];
 				for (int j = 0; j < numROI; j++) {
-					SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
-							.getSpatialCoordinateList().get(j);
+					edu.stanford.hakan.aim4api.compability.aimv3.SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
+																										.getSpatialCoordinateList().get(j);
 					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
-						TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
+						edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = 
+								(edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate)spatialCoordinate;
 						int idx = twoDimensionSpatialCoordinate.getCoordinateIndex();
 						roixData[idx] = twoDimensionSpatialCoordinate.getX();
 						roiyData[idx] = twoDimensionSpatialCoordinate.getY();
@@ -330,31 +347,32 @@ public class PluginAIMUtil
 		return points;
 	}
 
-	public static double[] extractCoordinateFromAIMFile(File aimFile, int positionOfImageInSeries) throws Exception
+	public static double[] extractCoordinateFromAIMFile(ImageAnnotationCollection fileImageAnnotationCollection, int positionOfImageInSeries) throws Exception
 	{
 		double[] roixData = null;
 		double[] roiyData = null;
 
 		try { // Fill in roixData, roiyData
-			ImageAnnotation fileImageAnnotation = AnnotationGetter.getImageAnnotationFromFile(PluginAIMUtil
-					.getRealPath(aimFile));
-			List<Person> listPerson = fileImageAnnotation.getListPerson();
+//			ImageAnnotationCollection fileImageAnnotationCollection = edu.stanford.hakan.aim4api.usage.AnnotationGetter.getImageAnnotationCollectionFromFile(PluginAIMUtil.getRealPath(aimFile));
+			edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation fileImageAnnotation = new edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation(fileImageAnnotationCollection);
+			List<edu.stanford.hakan.aim4api.compability.aimv3.Person> listPerson = fileImageAnnotation.getListPerson();
 			if (listPerson.size() > 0) {
 				listPerson.get(0);
 			}
 
-			GeometricShapeCollection geometricShapeCollection = fileImageAnnotation.getGeometricShapeCollection();
+			edu.stanford.hakan.aim4api.compability.aimv3.GeometricShapeCollection geometricShapeCollection = fileImageAnnotation.getGeometricShapeCollection();
 			for (int i = 0; i < geometricShapeCollection.getGeometricShapeList().size(); i++) {
-				GeometricShape geometricShape = geometricShapeCollection.getGeometricShapeList().get(i);
+				edu.stanford.hakan.aim4api.compability.aimv3.GeometricShape geometricShape = geometricShapeCollection.getGeometricShapeList().get(i);
 				if (geometricShape.getXsiType().equals("MultiPoint")) {
 					int numberOfROIs = geometricShape.getSpatialCoordinateCollection().getSpatialCoordinateList().size();
 					roixData = new double[numberOfROIs];
 					roiyData = new double[numberOfROIs];
 					for (int j = 0; j < numberOfROIs; j++) {
-						SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
+						edu.stanford.hakan.aim4api.compability.aimv3.SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
 								.getSpatialCoordinateList().get(j);
 						if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
-							TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
+							edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = 
+									(edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate)spatialCoordinate;
 							int idx = twoDimensionSpatialCoordinate.getCoordinateIndex();
 							roixData[idx] = twoDimensionSpatialCoordinate.getX();
 							roiyData[idx] = twoDimensionSpatialCoordinate.getY();
@@ -363,10 +381,11 @@ public class PluginAIMUtil
 				} else if (geometricShape.getXsiType().equals("Point")) {
 					roixData = new double[1];
 					roiyData = new double[1];
-					SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
+					edu.stanford.hakan.aim4api.compability.aimv3.SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
 							.getSpatialCoordinateList().get(0);
 					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
-						TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
+						edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = 
+								(edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate)spatialCoordinate;
 						roixData[0] = twoDimensionSpatialCoordinate.getX();
 						roiyData[0] = twoDimensionSpatialCoordinate.getY();
 					}
@@ -393,8 +412,8 @@ public class PluginAIMUtil
 		return point;
 	}
 	
-	public static boolean setNewSegmentationPoints (ImageAnnotation imageAnnotation, String imageUID, String pluginName, double[] xVector, double[] yVector) {
-		Polyline polyline = new Polyline();
+	public static boolean setNewSegmentationPoints (edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation imageAnnotation, String imageUID, String pluginName, double[] xVector, double[] yVector) {
+		edu.stanford.hakan.aim4api.compability.aimv3.Polyline polyline = new edu.stanford.hakan.aim4api.compability.aimv3.Polyline();
 		polyline.setCagridId(0);
 		polyline.setIncludeFlag(true);
 		polyline.setShapeIdentifier(0);
@@ -402,11 +421,11 @@ public class PluginAIMUtil
 		
 		// TODO referencedFrameNumber may be different than 0 (?)
 		for (int i = 0, ii = xVector.length; i < ii; i++) {
-		   polyline.addSpatialCoordinate(new TwoDimensionSpatialCoordinate(0, i, imageUID, 0, xVector[i], yVector[i]));
+		   polyline.addSpatialCoordinate(new edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate(0, i, imageUID, 0, xVector[i], yVector[i]));
 		}
 		
-// TODO use a different approach to replace the geometric shape
-		GeometricShapeCollection geometricShapeCollection = imageAnnotation.getGeometricShapeCollection();		
+		// TODO use a different approach to replace the geometric shape
+		edu.stanford.hakan.aim4api.compability.aimv3.GeometricShapeCollection geometricShapeCollection = imageAnnotation.getGeometricShapeCollection();		
 		geometricShapeCollection.getGeometricShapeList().set(0, polyline);		
 		return true;
 	}
