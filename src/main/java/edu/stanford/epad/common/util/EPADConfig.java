@@ -70,6 +70,7 @@ public class EPADConfig
 	public static final String xsdFilePathV4 = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir")
 			+ xsdFileV4;
 	public static final String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
+	public static final String templateXSDPath = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir") + EPADConfig.getInstance().getParamValue("templateSchema", "AIMTemplate_v2rvStanford.xsd");
 
 	// The following three properties should disappear after a full RESTful conversion
 	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");

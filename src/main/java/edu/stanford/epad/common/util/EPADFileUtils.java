@@ -13,6 +13,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,9 +35,15 @@ import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.XMLConstants;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.xml.sax.SAXException;
 
 /**
  * Utility for writing generic files with text data.
@@ -513,6 +520,52 @@ public class EPADFileUtils
 		}
     }
 
+	// is this a valid file against its schema?
+	public static boolean isValidXml(File f, String xsdSchema) {
+		try {
+			FileInputStream xml = new FileInputStream(f);
+			InputStream xsd = null;
+			try {
+				xsd = new FileInputStream(xsdSchema);
+				SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+				Schema schema = factory.newSchema(new StreamSource(xsd));
+				Validator validator = schema.newValidator();
+				validator.validate(new StreamSource(xml));
+				return true;
+			} catch (SAXException ex) {
+				log.info("Error: validating template/annotation " + ex.getMessage());
+			} catch (IOException e) {
+				log.info("Error: validating template/annotation " + e.getMessage());
+			}
+		} catch (IOException e) {
+			log.info("Exception validating a file: " + f.getName());
+		}
+		return false;
+	}
+
+	// is this a valid file against its schema?
+	public static boolean isValidXmlUsingClassPathSchema(File f, String xsdSchema) {
+		try {
+			log.debug("xml:" + f.getName() + " xsd:" + xsdSchema);
+			FileInputStream xml = new FileInputStream(f);
+			InputStream xsd = null;
+			try {
+				xsd = EPADFileUtils.class.getClassLoader().getResourceAsStream(xsdSchema);
+				SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+				Schema schema = factory.newSchema(new StreamSource(xsd));
+				Validator validator = schema.newValidator();
+				validator.validate(new StreamSource(xml));
+				return true;
+			} catch (SAXException ex) {
+				log.info("Error: validating template/annotation " + ex.getMessage());
+			} catch (IOException e) {
+				log.info("Error: validating template/annotation " + e.getMessage());
+			}
+		} catch (IOException e) {
+			log.info("Exception validating a file: " + f.getName());
+		}
+		return false;
+	}
 
 	/**
 	 * 
