@@ -32,6 +32,7 @@ import edu.stanford.hakan.aim3api.usage.AnnotationBuilder;
 import edu.stanford.hakan.aim3api.usage.AnnotationExtender;
 import edu.stanford.hakan.aim3api.usage.AnnotationGetter;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
+import edu.stanford.hakan.aim4api.project.epad.Aim;
 
 public class PluginAIMUtil
 {
@@ -147,10 +148,11 @@ public class PluginAIMUtil
 		return imageAnnotation;
 	}
 	
-	public static ImageAnnotationCollection generateAIMFileForDSO(ImageAnnotationCollection imageAnnotation,
+	public static ImageAnnotationCollection generateAIMFileForDSO(ImageAnnotationCollection imageAnnotationCollection,
 			AttributeList dsoDICOMAttributes, String sourceStudyUID, String sourceSeriesUID, String sourceImageUID, String username)
 			throws Exception
 	{
+            edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation imageAnnotation = new edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation(imageAnnotationCollection);
 		String patientID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientID);
 		String patientName = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientName);
 		String patientBirthDay = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientBirthDate);
@@ -177,16 +179,16 @@ public class PluginAIMUtil
 		if (name == null || name.trim().length() == 0) name = "segmentation";
 
 		// Hakan needs to give equivalent code for AIM4
-		SegmentationCollection sc = new SegmentationCollection();
-		sc.AddSegmentation(new Segmentation(0, imageUID, sopClassUID, sourceImageUID, 1));
+                edu.stanford.hakan.aim4api.compability.aimv3.SegmentationCollection sc = new edu.stanford.hakan.aim4api.compability.aimv3.SegmentationCollection();
+		sc.AddSegmentation(new edu.stanford.hakan.aim4api.compability.aimv3.Segmentation(0, imageUID, sopClassUID, sourceImageUID, 1));
 		
-		// imageAnnotation.setSegmentationCollection(sc);
-		DICOMImageReference dicomImageReference = createDICOMImageReference(studyUID, seriesUID,
+		imageAnnotation.setSegmentationCollection(sc);
+		edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference dicomImageReference = createDICOMImageReferenceV3Compability(studyUID, seriesUID,
 				imageUID);
-		// imageAnnotation.addImageReference(dicomImageReference);
+		imageAnnotation.addImageReference(dicomImageReference);
 		
-		updateDSOAIMInDatabase(imageAnnotation.getUniqueIdentifier().getRoot(), seriesUID);
-		return imageAnnotation;
+		updateDSOAIMInDatabase(imageAnnotation.getUniqueIdentifier(), seriesUID);
+		return imageAnnotation.toAimV4();
 	}
 
 	public static void saveAnnotationToAnnotationsDirectory(ImageAnnotation imageAnnotation) throws AimException
@@ -230,6 +232,35 @@ public class PluginAIMUtil
 		imageSeries.setInstanceUID(dsoSeriesInstanceUID);
 
 		edu.stanford.hakan.aim3api.base.Image image = new edu.stanford.hakan.aim3api.base.Image();
+		image.setCagridId(0);
+		image.setSopClassUID(""); // TODO
+		image.setSopInstanceUID(dsoSOPInstanceUID);
+
+		imageSeries.addImage(image); // Add Image to ImageSeries
+		imageStudy.setImageSeries(imageSeries); // Add ImageSeries to ImageStudy
+		dicomImageReference.setImageStudy(imageStudy); // Add ImageStudy to ImageReference
+
+		return dicomImageReference;
+	}
+        
+        
+	public static edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference createDICOMImageReferenceV3Compability(String dsoStudyInstanceUID, String dsoSeriesInstanceUID,
+			String dsoSOPInstanceUID)
+	{
+		edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference dicomImageReference = new edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference();
+		dicomImageReference.setCagridId(0);
+
+		edu.stanford.hakan.aim4api.compability.aimv3.ImageStudy imageStudy = new edu.stanford.hakan.aim4api.compability.aimv3.ImageStudy();
+		imageStudy.setCagridId(0);
+		imageStudy.setInstanceUID(dsoStudyInstanceUID);
+		imageStudy.setStartDate("2012-01-01T01:01:01"); // TODO
+		imageStudy.setStartTime("12:00:00"); // TODO
+
+		edu.stanford.hakan.aim4api.compability.aimv3.ImageSeries imageSeries = new edu.stanford.hakan.aim4api.compability.aimv3.ImageSeries();
+		imageSeries.setCagridId(0);
+		imageSeries.setInstanceUID(dsoSeriesInstanceUID);
+
+		edu.stanford.hakan.aim4api.compability.aimv3.Image image = new edu.stanford.hakan.aim4api.compability.aimv3.Image();
 		image.setCagridId(0);
 		image.setSopClassUID(""); // TODO
 		image.setSopInstanceUID(dsoSOPInstanceUID);
