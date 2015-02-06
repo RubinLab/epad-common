@@ -108,15 +108,19 @@
 	<dependency>
 		<groupId>javax.mail</groupId>
 		<artifactId>mail</artifactId>
-		<version>1.4</version>
+		<version>${javamail.version}</version>
 	</dependency>
 	
 	<dependency>
 		<groupId>hsqldb</groupId>
 		<artifactId>hsqldb</artifactId>
-		<version>1.8.0.7</version>
+		<version>${hsqldb.version}</version>
 	</dependency>
-
+	<dependency>
+		<groupId>org.mongodb</groupId>
+		<artifactId>mongo-java-driver</artifactId>
+		<version>${mongodb.version}</version>
+	</dependency>
   </dependencies>
 
 </project>

@@ -9,15 +9,16 @@ package edu.stanford.epad.common.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URLConnection;
@@ -519,6 +520,30 @@ public class EPADFileUtils
 			if (is != null) is.close();
 		}
     }
+    
+    public static String readFileAsString(File file) throws Exception {
+		BufferedReader reader = null;
+		InputStream is = null;
+		try {
+			is = new FileInputStream(file);
+			reader = new BufferedReader(new InputStreamReader(is, "UTF8"));
+			StringBuilder sb = new StringBuilder();
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+				sb.append("\n");
+			}
+			return sb.toString();
+		} catch (Exception x) {
+			x.printStackTrace();
+			throw x;
+		} finally {
+			if (reader != null)
+				reader.close();
+			else if (is != null)
+				is.close();
+		}
+	}
 
 	// is this a valid file against its schema?
 	public static boolean isValidXml(File f, String xsdSchema) {

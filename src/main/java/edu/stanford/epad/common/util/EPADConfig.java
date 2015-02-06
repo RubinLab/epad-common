@@ -87,6 +87,11 @@ public class EPADConfig
 			"XNATUploadProjectPassword");
 	public static boolean UseEPADUsersProjects = EPADConfig.getInstance().getBooleanPropertyValue(
 			"UseEPADUsersProjects", true);
+	public static String mongoHostname = EPADConfig.getInstance().getParam("MongoHost");
+	public static final int mongoPort = EPADConfig.getInstance().getIntegerPropertyValue("MongoPort", 27017);
+	public static String mongoDB = EPADConfig.getInstance().getParamValue("MongoDB", "epaddb");
+	public static String mongoUser = EPADConfig.getInstance().getParam("MongoUser");
+	public static String mongoPassword = EPADConfig.getInstance().getParam("MongoPassword");
 	
 	private Properties properties;
 
@@ -333,6 +338,18 @@ public class EPADConfig
 	public int getIntegerPropertyValue(String propertyName)
 	{
 		String parameterValue = getStringPropertyValue(propertyName);
+		try {
+			return Integer.parseInt(parameterValue);
+		} catch (NumberFormatException nfe) {
+			throw new IllegalArgumentException("The parameter value for property " + propertyName
+					+ " needs to be an integer. It value was " + parameterValue);
+		}
+	}
+
+	public int getIntegerPropertyValue(String propertyName, int defaultValue)
+	{
+		String parameterValue = getParamValue(propertyName);
+		if (parameterValue == null) return defaultValue;
 		try {
 			return Integer.parseInt(parameterValue);
 		} catch (NumberFormatException nfe) {
