@@ -99,21 +99,47 @@ public class MongoDBOperations {
 	        if (jsonString == null)
 	        	throw new Exception("Error converting to json");
 	        DBCollection dbColl = db.getCollection(collection);
-	        BasicDBObject dbObj = new BasicDBObject("ImageAnnotationCollection.imageAnnotations.ImageAnnotation.uniqueIdentifier.root", 1);
-	        dbColl.createIndex(dbObj, "uid_idx"); // Does not create index, if it already exists
+	        BasicDBObject dbObj = new BasicDBObject("ImageAnnotationCollection.uniqueIdentifier.root", 1);
+	        dbColl.createIndex(dbObj, "uid_idx", true); // Does not create index, if it already exists
 	        BasicDBObject query = new BasicDBObject();
-	        query.put("ImageAnnotationCollection.imageAnnotations.ImageAnnotation.uniqueIdentifier.root", annotationID);
+	        query.put("ImageAnnotationCollection.uniqueIdentifier.root", annotationID);
 			DBObject dbObject = (DBObject) JSON.parse(jsonString);
 	        DBCursor cursor = dbColl.find(query);
             if (cursor.count() > 0) {
-                //Logger.info("Updating existing annotation");
+                log.info("Updating existing annotation in mongoDB:" + annotationID + " in " + collection);
             	dbColl.update(query, dbObject, true, false);
             } else {
-                //Logger.info("Creating new annotation in mongoDB");
+                log.info("Creating new annotation in mongoDB:" + annotationID + " in " + collection);
             	dbColl.insert(dbObject);
             }
 		} catch (Exception e) {
 			log.warning("Error saving AIM to mongodb:", e);
+			throw e;
+		}
+	}
+	
+	public static void deleteAnotationInMongo(String annotationID, String collection) throws Exception
+	{
+		try {
+			DB db = MongoDBOperations.getMongoDB();
+	        if (db == null)
+	        {
+	        	log.warning("No connection to Mongo DB");
+	        	return;
+	        }
+	        DBCollection dbColl = db.getCollection(collection);
+	        BasicDBObject query = new BasicDBObject();
+	        query.put("ImageAnnotationCollection.uniqueIdentifier.root", annotationID);
+	        DBCursor cursor = dbColl.find(query);
+            if (cursor.count() > 0) {
+                log.info("Deleting annotation in mongoDB:" + annotationID + " in " + collection);
+                DBObject annotation = cursor.next();
+                dbColl.remove(annotation);
+            } else {
+                log.info("Annotation not found in mongoDB:" + annotationID + " in " + collection);
+           }
+		} catch (Exception e) {
+			log.warning("Error deleting AIM from mongodb:", e);
 			throw e;
 		}
 	}
