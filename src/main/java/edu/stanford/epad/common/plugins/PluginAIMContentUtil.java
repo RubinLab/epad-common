@@ -5,8 +5,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.hakan.aim3api.base.AimException;
+import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
+import edu.stanford.hakan.aim4api.usage.AnnotationBuilder;
+import edu.stanford.hakan.aim4api.usage.AnnotationGetter;
 
 /**
  * TODO This text-based approach to extracting content from an AIM file is terrible and should be replaced.
@@ -77,49 +81,27 @@ public class PluginAIMContentUtil
 	 * @return String
 	 * @throws edu.stanford.epad.common.plugins.PluginServletException
 	 */
-	public static String getOrganFromAimFile(String aimFileContents) throws PluginServletException
+	public static String getOrganFromAimFile(File aimFile) throws Exception
 	{
 		String templateOrganValue = null;
-		int indexOfEntity = -2;
-		int indexOfCodeMeaning = -2;
-		int indexOfStartQuote = -2;
-		int indexOfEndQuote = -2;
-
+		ImageAnnotationCollection iac = null;
 		try {
-			indexOfEntity = aimFileContents.indexOf("AnatomicEntity");
-			indexOfCodeMeaning = aimFileContents.indexOf("codeMeaning", indexOfEntity + 1);
-			indexOfStartQuote = aimFileContents.indexOf("\"", indexOfCodeMeaning + 1);
-			indexOfEndQuote = aimFileContents.indexOf("\"", indexOfStartQuote + 1);
-
-			// get the substring.
-			templateOrganValue = aimFileContents.substring(indexOfStartQuote, indexOfEndQuote - 1);
-
-			// clean value up.
-			templateOrganValue = templateOrganValue.replace("\"", " ");
-			templateOrganValue = templateOrganValue.trim();
-			templateOrganValue = templateOrganValue.toLowerCase();
+			iac = AnnotationGetter.getImageAnnotationCollectionFromFile(aimFile.getPath(),
+					EPADConfig.xsdFilePathV4);
+			templateOrganValue = iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getCodeSystem();
 
 		} catch (Exception e) {
-			StringBuilder sb = new StringBuilder();
 
-			sb.append("templateOrganValue=").append(templateOrganValue);
-			sb.append("indexOfEntity=").append("" + indexOfEntity);
-			sb.append("indexOfCodeMeaning=").append(indexOfCodeMeaning);
-			sb.append("indexOfStartQuote=").append(indexOfStartQuote);
-			sb.append("indexOfEndQuote=").append(indexOfEndQuote);
-			sb.append("\n\n");
-			sb.append(aimFileContents);
-
-			throw new PluginServletException("Invalid input.", "Had: " + e.getMessage() + ". data:" + sb.toString());
+			throw new PluginServletException("Invalid input.", "Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac));
 		}
 
-		if (templateOrganValue.contains("liver")) {
+		if (templateOrganValue.toLowerCase().contains("liver")) {
 			return "Liver";
-		} else if (templateOrganValue.contains("lung")) {
+		} else if (templateOrganValue.toLowerCase().contains("lung")) {
 			return "Lung";
-		} else if (templateOrganValue.contains("breast")) {
+		} else if (templateOrganValue.toLowerCase().contains("breast")) {
 			return "Breast";
-		} else if (templateOrganValue.contains("bone")) {
+		} else if (templateOrganValue.toLowerCase().contains("bone")) {
 			return "Bone";
 		}
 		throw new PluginServletException("Invalid input.", "Invalid input: templateOrganValue=" + templateOrganValue);
