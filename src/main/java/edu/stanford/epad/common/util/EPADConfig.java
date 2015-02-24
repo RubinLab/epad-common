@@ -38,6 +38,7 @@ public class EPADConfig
 	public static final String dicomServerPort = EPADConfig.getInstance().getStringPropertyValue("DicomServerPort");
 	public static final String dicomServerIP = EPADConfig.getInstance().getStringPropertyValue("DicomServerIP");
 	public static final String aeTitle = EPADConfig.getInstance().getStringPropertyValue("DicomServerAETitle");
+	public static final String dcm4cheeHome = EPADConfig.getInstance().getParamValue("dcm4cheeHome", "/home/pacs");
 
 	// ePAD's MySQL database configuration
 	public static final String epadDatabaseUsername = EPADConfig.getInstance().getStringPropertyValue(
