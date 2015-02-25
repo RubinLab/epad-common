@@ -14,10 +14,21 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.util.JSON;
 
+/**
+ * Class for jsonAnnotations operations in MongoDB
+ * The class is here instead of epad-ws, because plugins may need to call it
+ * 
+ * @author Dev Gude
+ *
+ */
 public class MongoDBOperations {
 	private static final EPADLogger log = EPADLogger.getInstance();
 
 	private static DB mongoDB;
+	/**
+	 * Connection to mongo database
+	 * @return
+	 */
 	public static DB getMongoDB()
 	{
 		if (mongoDB == null)
@@ -43,6 +54,12 @@ public class MongoDBOperations {
 		return mongoDB;
 	}
 	
+	/**
+	 * Saves a json doc to mongoDB
+	 * @param jsonString
+	 * @param collection
+	 * @throws Exception
+	 */
 	public static void saveJsonToMongo(String jsonString, String collection) throws Exception
 	{
 		try {
@@ -62,6 +79,13 @@ public class MongoDBOperations {
 		}
 	}
 	
+	/**
+	 * Get number of documents in mongoDB
+	 * @param jsonQuery
+	 * @param collection
+	 * @return
+	 * @throws Exception
+	 */
 	public static int getNumberOfDocuments(String jsonQuery, String collection) throws Exception
 	{
 		try {
@@ -72,12 +96,12 @@ public class MongoDBOperations {
 	        	log.warning("No connection to Mongo DB");
 	        	return count;
 	        }
-			DBCollection coll = db.getCollection(collection);
+			DBCollection dbColl = db.getCollection(collection);
 			if (jsonQuery != null && jsonQuery.trim().length() > 0)	{
 				DBObject dbQuery = (DBObject) JSON.parse(jsonQuery);
-				return coll.find(dbQuery).count();
+				return dbColl.find(dbQuery).count();
 			} else {
-				return coll.find().count();				
+				return dbColl.find().count();				
 			}
 
 		} catch (Exception e) {
@@ -86,6 +110,42 @@ public class MongoDBOperations {
 		}
 	}
 	
+	/**
+	 * Create indexes (only if they don't already exist)
+	 * @param collection
+	 * @throws Exception
+	 */
+	public static void createIndexes(String collection) throws Exception
+	{
+		try {
+			int count = 0;
+			DB db = MongoDBOperations.getMongoDB();
+	        if (db == null)
+	        {
+	        	log.warning("No connection to Mongo DB");
+	        	return;
+	        }
+			DBCollection dbColl = db.getCollection(collection);
+	        BasicDBObject dbObj = new BasicDBObject("ImageAnnotationCollection.uniqueIdentifier.root", 1);
+	        dbColl.createIndex(dbObj, "uid_idx", true); // Does not create index, if it already exists
+	        dbObj = new BasicDBObject("ImageAnnotationCollection.person.name.value", 1);
+	        dbColl.createIndex(dbObj, "patientname_idx", false); // Does not create index, if it already exists
+	        dbObj = new BasicDBObject("ImageAnnotationCollection.person.id.value", 1);
+	        dbColl.createIndex(dbObj, "patientid_idx", false); // Does not create index, if it already exists
+
+		} catch (Exception e) {
+			log.warning("Error querying mongodb:", e);
+			throw e;
+		}
+	}
+	
+	/**
+	 * Converts and saves an annotation to mongoDB
+	 * @param annotationID
+	 * @param aimXML
+	 * @param collection
+	 * @throws Exception
+	 */
 	public static void saveAnnotationToMongo(String annotationID, String aimXML, String collection) throws Exception
 	{
 		try {
@@ -118,6 +178,13 @@ public class MongoDBOperations {
 		}
 	}
 	
+	/**
+	 * Deletes json annotation from mongoDB
+	 * 
+	 * @param annotationID
+	 * @param collection
+	 * @throws Exception
+	 */
 	public static void deleteAnotationInMongo(String annotationID, String collection) throws Exception
 	{
 		try {
