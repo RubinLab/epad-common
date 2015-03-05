@@ -155,6 +155,7 @@ public class MongoDBOperations {
 	        	log.warning("No connection to Mongo DB");
 	        	return;
 	        }
+	        if (aimXML == null || aimXML.trim().length() == 0) return;
 			String jsonString =  XML.toJSONObject(aimXML).toString(0);;
 	        if (jsonString == null)
 	        	throw new Exception("Error converting to json");
