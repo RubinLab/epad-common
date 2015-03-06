@@ -93,6 +93,7 @@ public class EPADConfig
 	public static String mongoDB = EPADConfig.getInstance().getParamValue("MongoDB", "epaddb");
 	public static String mongoUser = EPADConfig.getInstance().getParam("MongoUser");
 	public static String mongoPassword = EPADConfig.getInstance().getParam("MongoPassword");
+	public static String webAuthPassword = EPADConfig.getInstance().getParamValue("WebAuthPassword", null);
 	
 	private Properties properties;
 
