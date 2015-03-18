@@ -116,11 +116,19 @@
 		<artifactId>hsqldb</artifactId>
 		<version>${hsqldb.version}</version>
 	</dependency>
+
 	<dependency>
 		<groupId>org.mongodb</groupId>
 		<artifactId>mongo-java-driver</artifactId>
 		<version>${mongodb.version}</version>
 	</dependency>
+	
+	<dependency>
+	    <groupId>org.json</groupId>
+	    <artifactId>json</artifactId>
+	    <version>${json.version}</version>
+	</dependency>
+
   </dependencies>
 
 </project>
