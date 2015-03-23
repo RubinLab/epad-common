@@ -245,6 +245,11 @@ public class EPADConfig
 		return getEPADWebServerResourcesDir() + "files/";
 	}
 
+	public static String getEPADWebServerTemplatesDir()
+	{
+		return getEPADWebServerResourcesDir() + "templates/";
+	}
+
 	public static String getEPADWebServerPluginConfigFilePath()
 	{
 		return getEPADWebServerEtcDir() + "plugin-config.txt";
