@@ -2,6 +2,7 @@ package edu.stanford.epad.common.plugins;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -23,7 +24,6 @@ import edu.stanford.hakan.aim3api.base.ImageAnnotation;
 import edu.stanford.hakan.aim3api.base.ImageSeries;
 import edu.stanford.hakan.aim3api.base.ImageStudy;
 import edu.stanford.hakan.aim3api.base.Person;
-import edu.stanford.hakan.aim3api.base.Polyline;
 import edu.stanford.hakan.aim3api.base.Segmentation;
 import edu.stanford.hakan.aim3api.base.SegmentationCollection;
 import edu.stanford.hakan.aim3api.base.SpatialCoordinate;
@@ -32,7 +32,6 @@ import edu.stanford.hakan.aim3api.usage.AnnotationBuilder;
 import edu.stanford.hakan.aim3api.usage.AnnotationExtender;
 import edu.stanford.hakan.aim3api.usage.AnnotationGetter;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
-import edu.stanford.hakan.aim4api.project.epad.Aim;
 
 public class PluginAIMUtil
 {
@@ -85,7 +84,6 @@ public class PluginAIMUtil
 				eXistUsername, eXistPassword);
 
 		String result = AnnotationBuilder.getAimXMLsaveResult();
-
 		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
 	}
 	
@@ -98,6 +96,12 @@ public class PluginAIMUtil
 				collectionName, xsdFilePathV4, eXistUsername, eXistPassword);
 
 		String result = AnnotationBuilder.getAimXMLsaveResult();
+		try {
+			updateAIMXmlInDatabase(imageAnnotation.getUniqueIdentifier().getRoot(),
+					edu.stanford.hakan.aim4api.usage.AnnotationBuilder.convertToString(imageAnnotation));
+		} catch (Exception e) {
+			throw new edu.stanford.hakan.aim4api.base.AimException(e.getMessage());
+		}
 
 		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
 	}
@@ -522,6 +526,41 @@ public class PluginAIMUtil
 			if (statement != null) statement.close();
 			if (con != null) con.close();
 		}
+	}
+	
+	private static void updateAIMXmlInDatabase(String annotationID,String xml) throws Exception
+	{
+		String username = EPADConfig.epadDatabaseUsername;
+		String password = EPADConfig.epadDatabasePassword;
+		String epadDatabaseURL = EPADConfig.epadDatabaseURL;
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con = null;
+		Statement statement = null;
+		try
+		{
+			con = DriverManager.getConnection(epadDatabaseURL, username, password);
+    	    String sql = "UPDATE annotations set Xml = '" + sqlEncode(xml) + "' where AnnotationUID = '" + annotationID + "'";
+			statement = con.createStatement();
+			statement.executeUpdate(sql);
+		}
+		finally
+		{
+			if (statement != null) statement.close();
+			if (con != null) con.close();
+		}
+	}
+	
+	public static String sqlEncode(String str) 
+	{
+		if (str == null) return str;
+		StringWriter sw = new StringWriter();
+		for (int i = 0; i < str.length(); i++) 
+		{
+		    char c = str.charAt(i);
+		    if (c == '\'') sw.append('\'');
+		    sw.append(c);
+		}
+		return sw.toString();
 	}
 	
 	public static String getDSOSeriesUID(String annotationID) throws Exception
