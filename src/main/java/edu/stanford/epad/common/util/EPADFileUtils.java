@@ -486,12 +486,12 @@ public class EPADFileUtils
 			OutputStream outStream = null;
 			String encoding = httpRequest.getHeader("Accept-Encoding");    
 			  
-			if (encoding != null && encoding.indexOf("gzip") != -1)
+			if (false && encoding != null && encoding.indexOf("gzip") != -1)
 			{
 				httpResponse.setHeader("Content-Encoding" , "gzip");
 				outStream = new GZIPOutputStream(httpResponse.getOutputStream());
 			}
-			else if (encoding != null && encoding.indexOf("compress") != -1)
+			else if (false && encoding != null && encoding.indexOf("compress") != -1)
 			{
 				httpResponse.setHeader("Content-Encoding" , "compress");
 				outStream = new ZipOutputStream(httpResponse.getOutputStream());
