@@ -53,4 +53,20 @@ public class EPADLogger
 	{
 		log.fatal(message, t);
 	}
+	
+	public boolean isInfoEnabled()
+	{
+		return log.isInfoEnabled();
+	}	
+	
+	public boolean isDebugEnabled()
+	{
+		return log.isDebugEnabled();
+	}	
+	
+	public boolean isTraceEnabled()
+	{
+		return log.isTraceEnabled();
+	}
+
 }
