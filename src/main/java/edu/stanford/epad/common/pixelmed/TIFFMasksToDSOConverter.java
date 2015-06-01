@@ -226,14 +226,18 @@ public class TIFFMasksToDSOConverter
 			// BufferedImage.TYPE_BYTE_BINARY);
 			byte[] new_frame = ((DataBufferByte)maskImage.getRaster().getDataBuffer()).getData();
 			byte[] pixel_data = new_frame;
-			long expectedLen = maskImage.getWidth()*maskImage.getHeight()*4;
-			//System.out.println("Expected length:" + expectedLen + " tiff data len:" + new_frame.length);
+			long rgbLen = maskImage.getWidth()*maskImage.getHeight()*4;
+			long bwLen = maskImage.getWidth()*maskImage.getHeight()/8;
+			long greyLen = maskImage.getWidth()*maskImage.getHeight();
+			if (i == 0)
+				System.out.println("Expected length, RGB:" + rgbLen + " BW:" + bwLen + " Grey:" + greyLen 
+							+ " Actual tiff data len:" + new_frame.length);
 			boolean nonzerodata = false;
 			
 			// looks like 4 bytes/pixel, compress to 1 bit/pixel (else assume it is already 1 bit/pixel)
-			if (new_frame.length == expectedLen)
+			if (new_frame.length == rgbLen)
 			{
-				System.out.println("Compressing tiff mask");
+				System.out.println("Compressing tiff mask from rgb, mask:" + i);
 				int numpixels = new_frame.length/4;
 				int numbytes = numpixels/8;
 				pixel_data = new byte[numbytes];
@@ -254,9 +258,32 @@ public class TIFFMasksToDSOConverter
 //						log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
 				}
 			}
+			else if (new_frame.length == greyLen)
+			{
+				System.out.println("Compressing tiff mask from grey, mask:" + i);
+				int numpixels = new_frame.length;
+				int numbytes = numpixels/8;
+				pixel_data = new byte[numbytes];
+				for (int k = 0; k < numbytes; k++)
+				{
+					int index = k*8;
+					pixel_data[k] = 0;
+					for (int l = 0; l < 8; l++)
+					{
+						if (new_frame[index + l] != 0)
+						{
+							int setBit =  pixel_data[k] + (1 << l);
+							pixel_data[k] =(byte) setBit;
+							nonzerodata = true;
+						}
+					}
+//					if (pixel_data[k] != 0)
+//						log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
+				}
+			}
 			else
 			{
-				System.out.println("Flipping odd bytes of tiff mask");
+				System.out.println("Flipping odd bytes of bw tif, mask:" + i);
 				int numbytes = maskImage.getWidth()*maskImage.getHeight()/8;
 				pixel_data = new byte[numbytes];
 				for (int k = 0; k < numbytes; k++)
