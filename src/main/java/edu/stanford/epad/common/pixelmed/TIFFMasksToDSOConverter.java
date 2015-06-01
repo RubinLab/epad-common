@@ -420,6 +420,9 @@ public class TIFFMasksToDSOConverter
 		{
 			reverseMaskFilePaths.add(maskFilePaths.get(i-1));
 		}
+		
+		// Don't flip masks
+		reverseMaskFilePaths = maskFilePaths;
 		if (maskFilePaths.size() == 0)
 		{
 			System.out.println("No Tif Mask files found");
