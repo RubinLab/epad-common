@@ -88,6 +88,12 @@ public class PluginHandlerMap
 	public PluginServletHandler loadFromClassName(String className)
 	{
 		try {
+			Class pluginClass = Class.forName(className);
+			if ((pluginClass.newInstance() instanceof PluginServletHandler)) {
+				logger.info(className + " is instanceof PluginServletHandler");
+				return (PluginServletHandler) pluginClass.newInstance();
+			}
+
 			ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
 			Class<?> clazz = systemClassLoader.loadClass(className);
 			if (clazz != null) {

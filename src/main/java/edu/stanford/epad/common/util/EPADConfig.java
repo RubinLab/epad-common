@@ -9,6 +9,7 @@ package edu.stanford.epad.common.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -283,6 +284,15 @@ public class EPADConfig
 	private File getConfigurationFile()
 	{
 		File configFile = new File(EPADConfig.getEPADWebServerConfigFilePath());
+		if (!configFile.exists())
+		{
+			URL properties = this.getClass().getClassLoader().getResource("proxy-config.properties");
+			String path = properties.getFile();
+			if (path != null)
+			{
+				configFile = new File(path);
+			}
+		}
 		log.info("Found configuration file " + configFile.getAbsolutePath());
 
 		return configFile;
