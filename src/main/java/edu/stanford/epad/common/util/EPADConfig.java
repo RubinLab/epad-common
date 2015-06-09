@@ -119,6 +119,7 @@ public class EPADConfig
 			}
 		} catch (Exception e) {
 			log.severe("Error reading ePAD configuration file", e);
+			throw new RuntimeException(e.getMessage());
 		}
 	}
 

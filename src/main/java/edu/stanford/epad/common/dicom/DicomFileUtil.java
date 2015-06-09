@@ -7,10 +7,15 @@
  */
 package edu.stanford.epad.common.dicom;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 
+import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADFileUtils;
 import edu.stanford.epad.common.util.EPADLogger;
 
@@ -52,5 +57,51 @@ public class DicomFileUtil
 			log.warning("Failed to rename file: " + file.getAbsolutePath(), ioe);
 		}
 		return newName;
+	}
+	
+	/*
+	 * Convert dicom to nifti file
+	 */
+	public static File[] convertDicomsToNifti(File dicomFolder) throws Exception
+	{
+		//dcm2nii.exe -g n -r n -f y -d n -p n -e n -o /outputfolder /inputfolder
+		String command = EPADConfig.getEPADWebServerDICOMBinDir() + "dcm2nii -g n -r n -f y -d n -p n -e n " + dicomFolder.getAbsolutePath();
+		InputStream is = null;
+		InputStreamReader isr = null;
+		BufferedReader br = null;
+		try {
+			ProcessBuilder processBuilder = new ProcessBuilder(command);
+			processBuilder.directory(new File(EPADConfig.getEPADWebServerDICOMBinDir()));
+			processBuilder.redirectErrorStream(true);
+			Process process = processBuilder.start();
+			is = process.getInputStream();
+			isr = new InputStreamReader(is);
+			br = new BufferedReader(isr);
+	
+			String line;
+			StringBuilder sb = new StringBuilder();
+			while ((line = br.readLine()) != null) {
+				sb.append(line).append("\n");
+				log.debug("./dcm2nii output: " + line);
+			}
+
+			int exitValue = process.waitFor();
+			log.info("DICOM convert exit value is: " + exitValue);
+			class DirFilter implements FilenameFilter {
+				public boolean accept(File dir, String name) {
+					boolean regResult = name.endsWith(".nii");
+					return regResult;
+				}
+			}
+
+			FilenameFilter filter = new DirFilter();
+			File[] niftis = dicomFolder.listFiles(filter);
+			log.debug("Result files:" + niftis);
+			return niftis;
+		} catch (Exception e) {
+			log.warning("Error converting dicoms", e);
+			throw e;
+		}
+		
 	}
 }

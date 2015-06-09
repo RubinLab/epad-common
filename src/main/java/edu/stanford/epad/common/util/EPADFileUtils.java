@@ -548,6 +548,18 @@ public class EPADFileUtils
 	// is this a valid file against its schema?
 	public static boolean isValidXml(File f, String xsdSchema) {
 		try {
+			String err = validateXml(f, xsdSchema);
+			if ("".equals(err))
+				return true;
+		} catch (Exception e) {
+			log.warning("Exception validating a file: " + f.getName(), e);
+		}
+		return false;
+	}
+
+	// is this a valid file against its schema?
+	public static String validateXml(File f, String xsdSchema) throws Exception {
+		try {
 			FileInputStream xml = new FileInputStream(f);
 			InputStream xsd = null;
 			try {
@@ -556,16 +568,18 @@ public class EPADFileUtils
 				Schema schema = factory.newSchema(new StreamSource(xsd));
 				Validator validator = schema.newValidator();
 				validator.validate(new StreamSource(xml));
-				return true;
+				return "";
 			} catch (SAXException ex) {
 				log.info("Error: validating template/annotation " + ex.getMessage());
+				return ex.getMessage();
 			} catch (IOException e) {
 				log.info("Error: validating template/annotation " + e.getMessage());
+				throw e;
 			}
 		} catch (IOException e) {
 			log.info("Exception validating a file: " + f.getName());
+			throw e;
 		}
-		return false;
 	}
 
 	// is this a valid file against its schema?

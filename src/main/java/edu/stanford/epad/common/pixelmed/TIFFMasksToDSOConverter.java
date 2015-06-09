@@ -80,10 +80,22 @@ public class TIFFMasksToDSOConverter
 		try {
 			// Following call fills in: dicomAttributes, orientation, spacing, thickness, positions, pixels, imageWidth,
 			// imageHeight, imageFrames
-
 			log.info("Reading pixels from mask files");
 			byte[] pixels = getPixelsFromMaskFiles(maskFilePaths, dicomFilePaths, removeEmptyFrames);
-			
+			return generateDSO(pixels, dicomFilePaths, outputFilePath, dsoSeriesDescription, dsoSeriesUID, dsoInstanceUID, removeEmptyFrames);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.warning("Error generating DSO: " + e);
+			throw (new DicomException("Error generating DSO: " + e.getMessage()));
+		}	
+	}
+	
+	public String[] generateDSO(byte[] pixeldata, List<String> dicomFilePaths, String outputFilePath, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID, boolean removeEmptyFrames)
+			throws DicomException
+	{
+		try {
+			// Following call fills in: dicomAttributes, orientation, spacing, thickness, positions, pixels, imageWidth,
+			// imageHeight, imageFrames
 			log.info("Getting attributes from DICOM files");
 			getAttributesFromDICOMFiles(dicomFilePaths);
 
@@ -100,7 +112,7 @@ public class TIFFMasksToDSOConverter
 			log.info("Adding One Segment...");
 			dsoWriter.addOneSegment("Segment No.1 is for ...", category, type);
 			log.info("Adding All Frames...");
-			dsoWriter.addAllFrames(pixels, numberOfFrames, imageWidth, imageHeight, "binary", (short)0, positions);
+			dsoWriter.addAllFrames(pixeldata, numberOfFrames, imageWidth, imageHeight, "binary", (short)0, positions);
 			log.info("Saving Dicom File...");
 			dsoWriter.saveDicomFile(outputFilePath);
 			String[] seriesImageUids = new String[2];

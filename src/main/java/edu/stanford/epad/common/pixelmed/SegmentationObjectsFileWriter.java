@@ -798,16 +798,21 @@ public class SegmentationObjectsFileWriter
 			type = "BINARY";
 
 		 if (!type.equalsIgnoreCase("BINARY")) { // 8-bit/pixel
-		 System.err.println("frames.length " + frames.length);
-		 System.err.println("image_width * image_height * frame_num " + image_width * image_height * frame_num);
-		 if (frames.length != image_width * image_height * frame_num) {
-		 throw (new DicomException("Image size or type is not correct!"));
-		 }
+			 System.err.println("type:" + type + " frames.length " + frames.length + " width:" + image_width + " height:" + image_height + " frames:" + frame_num);
+			 System.err.println("image_width * image_height * frame_num " + image_width * image_height * frame_num);
+			 log.warning("type:" + type + " frames.length " + frames.length + " width:" + image_width + " height:" + image_height + " frames:" + frame_num);
+			 log.warning("image_width * image_height * frame_num " + image_width * image_height * frame_num);
+			 if (frames.length != image_width * image_height * frame_num) {
+				 throw (new DicomException("Image size or type is not correct!"));
+			 }
 		 } else if (frames.length != (image_width * image_height * frame_num - 1) / 8 + 1) {
-		 System.err.println("frames.length " + frames.length);
-		 System.err.println("image_width * image_height * frame_num - 1) / 8 + 1 "
-		 + (image_width * image_height * frame_num - 1) / 8 + 1);
-		 throw (new DicomException("Image size or type is not correct!"));
+			 System.err.println("type:" + type + " frames.length " + frames.length + " width:" + image_width + " height:" + image_height + " frames:" + frame_num);
+			 System.err.println("image_width * image_height * frame_num - 1) / 8 + 1 :"
+					 + ((image_width * image_height * frame_num - 1) / 8 + 1));
+			 log.warning("type:" + type + " frames.length " + frames.length + " width:" + image_width + " height:" + image_height + " frames:" + frame_num);
+			 log.warning("image_width * image_height * frame_num - 1) / 8 + 1 :"
+					 + ((image_width * image_height * frame_num - 1) / 8 + 1));
+			 throw (new DicomException("Image size or type is not correct!"));
 		 }
 
 		if (frame_counter == 0) { // Record the segmentation type at the first time.
