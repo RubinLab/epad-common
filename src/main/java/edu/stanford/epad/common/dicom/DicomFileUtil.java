@@ -65,13 +65,14 @@ public class DicomFileUtil
 	public static File[] convertDicomsToNifti(File dicomFolder) throws Exception
 	{
 		//dcm2nii.exe -g n -r n -f y -d n -p n -e n -o /outputfolder /inputfolder
-		String command = EPADConfig.getEPADWebServerDICOMBinDir() + "dcm2nii -g n -r n -f y -d n -p n -e n " + dicomFolder.getAbsolutePath();
+		String command = EPADConfig.getEPADWebServerBaseDir() + "bin/dcm2nii -g n -r n -f y -d n -p n -e n " + dicomFolder.getAbsolutePath();
+		String[] args = command.split(" ");
 		InputStream is = null;
 		InputStreamReader isr = null;
 		BufferedReader br = null;
 		try {
-			ProcessBuilder processBuilder = new ProcessBuilder(command);
-			processBuilder.directory(new File(EPADConfig.getEPADWebServerDICOMBinDir()));
+			ProcessBuilder processBuilder = new ProcessBuilder(args);
+			processBuilder.directory(new File(EPADConfig.getEPADWebServerBaseDir() + "bin/"));
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 			is = process.getInputStream();
@@ -104,4 +105,38 @@ public class DicomFileUtil
 		}
 		
 	}
+	
+//	public static File[] matlabDicomsToNifti(File dicomFolder, File niiFolder) throws Exception
+//	{
+//		Dicom2Nifti dicom2Nifti = null; // MATLAB-generated Java class containing function
+//		try {
+//			dicom2Nifti = new Dicom2Nifti();
+//		} catch (MWException t) {
+//			log.warning("Failed to initialize MATLAB RT Processor", t);
+//			throw t;
+//		}
+//		try {
+//			MWCharArray dicomFolderPath = new MWCharArray(dicomFolder.getAbsolutePath());
+//			MWCharArray niiFolderPath = new MWCharArray(niiFolder.getAbsolutePath());
+//			MWCharArray format = new MWCharArray("nii");
+//			log.info("Invoking MATLAB-generated code...");
+//			long starttime = System.currentTimeMillis();
+//			dicom2Nifti.dicm2nii(2, dicomFolderPath, niiFolderPath);
+//			long endtime = System.currentTimeMillis();
+//			log.info("Returned from MATLAB... took " + (endtime-starttime)/1000 + " secs");
+//			File[] niftis = niiFolder.listFiles();
+//			log.debug("Result files:" + niftis);
+//			return niftis;
+//		} catch (Exception e) {
+//			log.warning("Error converting dicoms", e);
+//			throw e;
+//		} finally {
+//			if (dicom2Nifti != null) {
+//				dicom2Nifti.dispose();
+//				dicom2Nifti = null;
+//			}
+//		}
+//		
+//	}
+
 }

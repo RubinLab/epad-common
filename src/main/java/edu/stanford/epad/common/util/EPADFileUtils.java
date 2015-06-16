@@ -611,7 +611,7 @@ public class EPADFileUtils
 	 * @param name String
 	 * @return String
 	 */
-	private static String removeExtension(String name)
+	public static String removeExtension(String name)
 	{
 		int lastDotIndex = name.lastIndexOf('.');
 		if (lastDotIndex < 1) {
