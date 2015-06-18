@@ -223,21 +223,21 @@ public class TIFFMasksToDSOConverter
 					instanceNos[i] = Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.InstanceNumber, 1);
 				}
 			}
-			for (int i = 0; i < instanceNos.length; i++) {
-				for (int j = i+1; j < instanceNos.length; j++) {
-					int instance = instanceNos[i];
-					double[] position = positions[i];
-					AttributeList alist = dicomAttributes[i];
-					if (instanceNos[j] < instance) {
-						instanceNos[i] = instanceNos[j];
-						positions[i] = positions[j];
-						dicomAttributes[i] = dicomAttributes[j];
-						instanceNos[j] = instance;
-						positions[j] = position;
-						dicomAttributes[j] = alist;
-					}
-				}
-			}
+//			for (int i = 0; i < instanceNos.length; i++) {
+//				for (int j = i+1; j < instanceNos.length; j++) {
+//					int instance = instanceNos[i];
+//					double[] position = positions[i];
+//					AttributeList alist = dicomAttributes[i];
+//					if (instanceNos[j] < instance) {
+//						instanceNos[i] = instanceNos[j];
+//						positions[i] = positions[j];
+//						dicomAttributes[i] = dicomAttributes[j];
+//						instanceNos[j] = instance;
+//						positions[j] = position;
+//						dicomAttributes[j] = alist;
+//					}
+//				}
+//			}
 				
 		} finally {
 			IOUtils.closeQuietly(dicomInputStream);
