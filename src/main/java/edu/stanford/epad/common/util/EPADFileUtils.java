@@ -484,7 +484,9 @@ public class EPADFileUtils
 			httpResponse.setHeader("Content-disposition", "attachment;filename=" + fileName) ;
 			httpResponse.setHeader("pragma", "no-cache");
 			OutputStream outStream = null;
-			String encoding = httpRequest.getHeader("Accept-Encoding");    
+			String encoding = null;
+			if (httpRequest != null)
+				encoding = httpRequest.getHeader("Accept-Encoding");    
 			  
 			if (false && encoding != null && encoding.indexOf("gzip") != -1)
 			{
