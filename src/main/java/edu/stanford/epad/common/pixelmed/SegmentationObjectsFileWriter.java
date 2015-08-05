@@ -73,7 +73,7 @@ public class SegmentationObjectsFileWriter
 	public static final String DeviceSerialNumber = "SN123456";
 	public static final String SoftwareVersion = "2.0.1";
 	public static final String SeriesDescription = "ePAD Generated DSO";
-	public static final String prefix = "ePAD Generated";
+	public static final String prefix = "ePAD DSO";
 	public static final String SourceApplicationEntityTitle = "Default title";
 
 	private static final EPADLogger log = EPADLogger.getInstance();
