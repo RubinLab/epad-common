@@ -5,7 +5,7 @@ import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
 
-// import javax.imageio.stream.ImageInputStream;
+import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageInputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -16,6 +16,8 @@ import org.dcm4che2.imageioimpl.plugins.dcm.DicomImageReader;
 import org.dcm4che2.imageioimpl.plugins.dcm.DicomImageReaderSpi;
 import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
+
+import com.pixelmed.display.ConsumerFormatImageMaker;
 
 /**
  * Read a DICOM instance and generate a variety of other formats that can be used to create files.
@@ -31,6 +33,10 @@ public class DicomReader
 {
 	protected final File dicomFile;
 
+	static {
+		ImageIO.scanForPlugins();
+	}
+	
 	public DicomReader(File dicomFile)
 	{
 		this.dicomFile = dicomFile;
@@ -183,4 +189,41 @@ public class DicomReader
 		}
 		return modality;
 	}
+	
+	/*
+	 * Copied from dcmche forums (appears to be same as above method)
+	 */
+//	public void dcmconvpng2(int index, File pngFile) throws Exception{
+//		ImageIO.scanForPlugins();
+//		Iterator<ImageReader> iter = ImageIO.getImageReadersByFormatName("dicom");
+//		 if (!iter.hasNext())
+//			 throw new Exception("Dicom Reader not found");
+//		ImageReader readers =  iter.next();//next item
+//		DicomImageReadParam param = (DicomImageReadParam) readers.getDefaultReadParam();//return DicomImageReadParam
+//		// Adjust the values of Rows and Columns in it and add a Pixel Data attribute with the byte array from the DataBuffer of the scaled Raster 
+//
+//		ImageInputStream iis = ImageIO.createImageInputStream(dicomFile);
+//
+//		readers.setInput(iis, true);//sets the input source to use the given ImageInputSteam or other Object 
+//
+//		BufferedImage myPngImage = readers.read(index, param); //read dicom 
+//		OutputStream output = new BufferedOutputStream(new FileOutputStream(pngFile)); //BufferedOuput permit make file 
+//		try {
+//			PNGEncodeParam.RGB param2 = new PNGEncodeParam.RGB();
+//			ImageEncoder enc = ImageCodec.createImageEncoder("PNG", output,param2);
+//			enc.encode( myPngImage);
+//		}
+//		finally {
+//			output.close();
+//		}
+//	}
+
+	
+	/*
+	 * Pixelmed library
+	 */
+	public void dcmconvpng3(int index, File pngFile) throws Exception{
+		ConsumerFormatImageMaker.convertFileToEightBitImage(dicomFile.getAbsolutePath(), pngFile.getAbsolutePath(), "png", index);
+	}	
+
 }
