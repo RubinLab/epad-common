@@ -98,19 +98,28 @@
       <artifactId>commons-cli</artifactId>
       <version>${commons.cli.version}</version>
     </dependency>
-
+    
+	<dependency>
+		<groupId>commons-net</groupId>
+		<artifactId>commons-net</artifactId>
+		<version>${commons.net.version}</version>
+	</dependency>
+	
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>${gson.version}</version>
     </dependency>
-    
-	<dependency>
-		<groupId>javax.mail</groupId>
-		<artifactId>mail</artifactId>
-		<version>${javamail.version}</version>
+    <dependency>
+	    <groupId>javax.mail</groupId>
+	    <artifactId>javax.mail-api</artifactId>
+	    <version>${javamail.version}</version>
 	</dependency>
-	
+	<dependency>
+	    <groupId>com.sun.mail</groupId>
+	    <artifactId>javax.mail</artifactId>
+	    <version>${javamail.version}</version>
+	</dependency>	
 	<dependency>
 		<groupId>hsqldb</groupId>
 		<artifactId>hsqldb</artifactId>
@@ -134,7 +143,7 @@
          <artifactId>commons-codec</artifactId>
          <version>${commons.codec.version}</version>
     </dependency>
-        
+   
   </dependencies>
 
 </project>
