@@ -475,13 +475,18 @@ public class EPADFileUtils
 
     public static void downloadFile(HttpServletRequest httpRequest, HttpServletResponse httpResponse, File file, String fileName) throws Exception
     {
+    	sendFile(httpRequest, httpResponse, file, fileName, true);
+    }
+    public static void sendFile(HttpServletRequest httpRequest, HttpServletResponse httpResponse, File file, String fileName, boolean download) throws Exception
+    {
 		InputStream is = null; 
 		try
 		{		
 			is = new BufferedInputStream(new FileInputStream(file)); 
 			String mimeType = URLConnection.guessContentTypeFromStream(is);
 			httpResponse.setContentType (mimeType) ;
-			httpResponse.setHeader("Content-disposition", "attachment;filename=" + fileName) ;
+			if (download)
+				httpResponse.setHeader("Content-disposition", "attachment;filename=" + fileName) ;
 			httpResponse.setHeader("pragma", "no-cache");
 			OutputStream outStream = null;
 			String encoding = null;
