@@ -101,7 +101,7 @@ public class TIFFMasksToDSOConverter
 				this.numberOfFrames = (short)dicomFilePaths.size();
 			}
 			log.debug("Dicom Files:" + dicomFilePaths.size() + " attributeLists:" + dicomAttributes.length);
-			return generateDSO(pixels, dicomFilePaths, outputFilePath, dsoSeriesDescription, dsoSeriesUID, dsoInstanceUID, removeEmptyFrames);
+			return generateDSO(pixels, dicomFilePaths, outputFilePath, dsoSeriesDescription, dsoSeriesUID, dsoInstanceUID);
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.warning("Error generating DSO: " + e);
@@ -109,7 +109,7 @@ public class TIFFMasksToDSOConverter
 		}	
 	}
 	
-	public String[] generateDSO(byte[] pixeldata, List<String> dicomFilePaths, String outputFilePath, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID, boolean removeEmptyFrames)
+	public String[] generateDSO(byte[] pixeldata, List<String> dicomFilePaths, String outputFilePath, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID)
 			throws DicomException
 	{
 		try {
