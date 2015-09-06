@@ -8,6 +8,7 @@ import java.util.List;
 
 import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
+import edu.stanford.epad.common.util.PluginDBUtil;
 
 /**
  * Reads the file plugin-config.txt one line at a time. Each line is the class name for the plugin handler.
@@ -30,6 +31,21 @@ public class PluginConfig
 	private PluginConfig()
 	{
 		try {
+			if (!PluginDBUtil.getPlugins(pluginHandlerList, pluginTemplateList, pluginNameList)) {
+				migrate2DB();
+			}
+		} catch (Exception e) {
+			log.info("Failed to read plugin list from database");
+		}
+	}
+	
+	
+	/**
+	 * Read plugin list from config file, fill handlerList, templateList and nameList and 
+	 * insert the plugin list to database
+	 */
+	private void migrate2DB() {
+		try {
 			File configFile = getConfigFile();
 			if (!configFile.exists())
 				throw new IllegalStateException("No plugin config file: " + configFile.getAbsolutePath());
@@ -47,6 +63,7 @@ public class PluginConfig
 						pluginHandlerList.add(linePart[0]);
 						pluginTemplateList.add(linePart[1]);
 						pluginNameList.add(linePart[2]);
+						PluginDBUtil.addPlugin(linePart[0],linePart[1],linePart[2]);
 					}
 				}
 			}
@@ -54,6 +71,7 @@ public class PluginConfig
 		} catch (Exception e) {
 			log.warning("Failed to read plugin config file for: " + e.getMessage(), e);
 		}
+		
 	}
 
 	private static boolean isCommentLine(String line)
