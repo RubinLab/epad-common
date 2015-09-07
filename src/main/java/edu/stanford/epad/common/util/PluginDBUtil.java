@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,8 +72,10 @@ public class PluginDBUtil {
 		Statement statement = null;
 		try
 		{
+			Timestamp timestamp = new Timestamp(new Date().getTime());
 			con = DriverManager.getConnection(epadDatabaseURL, username, password);
-    	    String sql = "INSERT into plugin (javaclass,plugin_id,name) values( '" + handlerClass + "','" +  pluginId + "','" + pluginName + "')";
+    	    String sql = "INSERT into plugin (javaclass,plugin_id,name,enabled,createdtime,updatetime) values( '" + handlerClass +
+    	    		"','" +  pluginId + "','" + pluginName + "',1,'"+ timestamp + "','" + timestamp +"')"; //should also record creator
 			statement = con.createStatement();
 			statement.executeUpdate(sql);
 		}
