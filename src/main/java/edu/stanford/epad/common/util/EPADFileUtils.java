@@ -552,6 +552,26 @@ public class EPADFileUtils
 		}
 	}
 
+	public static boolean isImage(File file) {
+		String name = file.getName().toLowerCase();
+		if (name.endsWith(".jpeg")
+				|| name.endsWith(".jpg")
+				|| name.endsWith(".png")
+				|| name.endsWith(".gif")
+				|| name.endsWith(".nii")
+				|| name.endsWith(".bmp")
+				|| name.endsWith(".tif")
+				|| name.endsWith(".tiff")
+				|| name.endsWith(".yuv")
+				|| name.endsWith(".psd")
+				|| name.endsWith(".xcf")
+				|| name.endsWith(".mhd")
+				)
+			return true;
+		else
+			return false;
+	}
+
 	// is this a valid file against its schema?
 	public static boolean isValidXml(File f, String xsdSchema) {
 		try {
