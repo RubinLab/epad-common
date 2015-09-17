@@ -4,11 +4,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.hakan.aim3api.base.AimException;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
+import edu.stanford.hakan.aim4api.plugin.PluginParameter;
+import edu.stanford.hakan.aim4api.plugin.v4.PluginV4;
 import edu.stanford.hakan.aim4api.usage.AnnotationBuilder;
 import edu.stanford.hakan.aim4api.usage.AnnotationGetter;
 
@@ -44,6 +47,30 @@ public class PluginAIMContentUtil
 			log.warning("AIM file " + aimFile.getAbsolutePath() + "does not exist");
 			throw new AimException("input error - AIM.xml does not exist. file: " + aimFile.getAbsolutePath());
 		}
+	}
+	
+	public static List<PluginParameter> getPluginParametersFromFile(File aimFile,String pluginId) throws Exception {
+		List<PluginParameter> parameters=null;
+		ImageAnnotationCollection iac = null;
+		try {
+			iac = AnnotationGetter.getImageAnnotationCollectionFromFile(aimFile.getPath(),
+					EPADConfig.xsdFilePathV4);
+		} catch (Exception e) {
+
+			throw new PluginServletException("Invalid input.", "Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac));
+		}
+		for (PluginV4 p : iac.getImageAnnotation().getPluginCollection().getListPlugin()) {
+	        log.info("Plugins "+p.getName());
+	        
+	        if (p.getName().equals(pluginId)) {
+	        	parameters=p.getPluginParemeterCollection().getListPluginParameter();
+	        }
+	       
+			
+			
+		}
+		log.info("Parameters "+parameters);
+		return parameters;
 	}
 
 	public static String getStudyUID(String aimFileContents) throws PluginServletException

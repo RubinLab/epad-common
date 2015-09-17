@@ -1,11 +1,19 @@
 package edu.stanford.epad.common.plugins.impl;
 
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+
+import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.hakan.aim3api.base.ImageAnnotation;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
+import edu.stanford.hakan.aim4api.plugin.PluginParameter;
+import edu.stanford.hakan.aim4api.plugin.v4.PluginV4;
 
 public class PluginAIMOptions
 {
 	public final String pluginName, aimUID, aimName, patientID, patientName, templateID, templateName, sessionID;
+	
 
 	public PluginAIMOptions(String pluginName, String aimUID, String aimName, String patientID, String patientName,
 			String templateID, String templateName, String sessionID)
@@ -43,6 +51,8 @@ public class PluginAIMOptions
 		this.templateID = imageAnnotationV4.getListTypeCode().get(0).getCode();
 		this.templateName = imageAnnotationV4.getListTypeCode().get(0).getCodeSystem();
 		this.sessionID = sessionID;
+		
+		
 	}	
 	
 }
