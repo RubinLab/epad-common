@@ -17,8 +17,6 @@ import com.google.gson.Gson;
 import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.epad.dtos.EPADDatabaseSeries;
-import edu.stanford.hakan.aim3api.base.AimException;
-import edu.stanford.hakan.aim3api.base.ImageAnnotation;
 
 public class PluginDicomUtil
 {

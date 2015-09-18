@@ -8,7 +8,7 @@ import java.util.List;
 
 import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
-import edu.stanford.hakan.aim3api.base.AimException;
+import edu.stanford.hakan.aim4api.base.AimException;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
 import edu.stanford.hakan.aim4api.plugin.PluginParameter;
 import edu.stanford.hakan.aim4api.plugin.v4.PluginV4;

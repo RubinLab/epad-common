@@ -47,30 +47,35 @@ public class DCM4CHEEUtil
 		wadoUrlBuilder.setSeriesUID(seriesUID);
 		wadoUrlBuilder.setObjectUID(imageUID);
 		String wadoUrl = wadoUrlBuilder.build();
-
-		HttpClient client = new HttpClient();
-		GetMethod method = new GetMethod(wadoUrl);
-		int statusCode = client.executeMethod(method);
-
-		if (statusCode == HttpServletResponse.SC_OK) {
-			OutputStream outputStream = null;
-			try {
-				outputStream = new FileOutputStream(outputDicomFile);
-				InputStream inputStream = method.getResponseBodyAsStream();
-				int read = 0;
-				byte[] bytes = new byte[4096];
-				while ((read = inputStream.read(bytes)) != -1) {
-					outputStream.write(bytes, 0, read);
+		try {
+	
+			HttpClient client = new HttpClient();
+			GetMethod method = new GetMethod(wadoUrl);
+			int statusCode = client.executeMethod(method);
+	
+			if (statusCode == HttpServletResponse.SC_OK) {
+				OutputStream outputStream = null;
+				try {
+					outputStream = new FileOutputStream(outputDicomFile);
+					InputStream inputStream = method.getResponseBodyAsStream();
+					int read = 0;
+					byte[] bytes = new byte[4096];
+					while ((read = inputStream.read(bytes)) != -1) {
+						outputStream.write(bytes, 0, read);
+					}
+				} finally {
+					IOUtils.closeQuietly(outputStream);
+					method.releaseConnection();
 				}
-			} finally {
-				IOUtils.closeQuietly(outputStream);
-				method.releaseConnection();
 			}
+			else {
+				log.warning("Wado URL:" + wadoUrl + " Status:" + statusCode);
+			}
+			return statusCode;
+		} catch (IOException x) {
+			log.warning("Error downloading from WADO Url:" + wadoUrl, x);
+			throw x;
 		}
-		else {
-			log.warning("Wado URL:" + wadoUrl + " Status:" + statusCode);
-		}
-		return statusCode;
 	}
 
 	public static void dcmsnd(String inputPathFile, boolean throwException) throws Exception
