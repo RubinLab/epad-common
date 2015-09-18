@@ -95,6 +95,9 @@ public class EPADConfig
 	public static String mongoPassword = EPADConfig.getInstance().getParam("MongoPassword");
 	public static String webAuthPassword = EPADConfig.getInstance().getParamValue("WebAuthPassword", null);
 	
+	
+	public static String pluginMaxtime = EPADConfig.getInstance().getParamValue("pluginMaxtime", null);
+	
 	private Properties properties;
 
 	private static EPADConfig getInstance()
