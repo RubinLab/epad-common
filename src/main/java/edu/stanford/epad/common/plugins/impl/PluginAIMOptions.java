@@ -1,6 +1,5 @@
 package edu.stanford.epad.common.plugins.impl;
 
-import edu.stanford.hakan.aim3api.base.ImageAnnotation;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
 
 public class PluginAIMOptions
@@ -17,18 +16,6 @@ public class PluginAIMOptions
 		this.patientName = patientName;
 		this.templateID = templateID;
 		this.templateName = templateName;
-		this.sessionID = sessionID;
-	}
-
-	public PluginAIMOptions(String pluginName, String sessionID, ImageAnnotation imageAnnotation)
-	{
-		this.pluginName = pluginName;
-		this.aimUID = imageAnnotation.getUniqueIdentifier();
-		this.aimName = imageAnnotation.getName();
-		this.patientID = imageAnnotation.getListPerson().get(0).getId();
-		this.patientName = imageAnnotation.getListPerson().get(0).getName();
-		this.templateID = imageAnnotation.getCodeValue();
-		this.templateName = imageAnnotation.getCodeMeaning();
 		this.sessionID = sessionID;
 	}
 	

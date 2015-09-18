@@ -24,7 +24,8 @@ import org.apache.commons.io.IOUtils;
 public class EPADConfig
 {
 	private static final EPADLogger log = EPADLogger.getInstance();
-	private static final EPADConfig ourInstance = new EPADConfig();
+	private static EPADConfig ourInstance = null;
+	public static final String configFileName = "proxy-config.properties";
 
 	// The port that the ePAD server is sitting on
 	public static final int epadPort = EPADConfig.getInstance().getIntegerPropertyValue("ePadClientPort");
@@ -72,11 +73,8 @@ public class EPADConfig
 			+ xsdFileV4;
 	public static final String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
 	public static final String templateXSDPath = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir") + EPADConfig.getInstance().getParamValue("templateSchema", "AIMTemplate_v2rvStanford.xsd");
-
-	// The following three properties should disappear after a full RESTful conversion
+	
 	public static final String eventResourceURI = EPADConfig.getInstance().getStringPropertyValue("eventResourceURI");
-	public static final String coordinationTermPrefix = EPADConfig.getInstance().getStringPropertyValue(
-			"coordinationTermPrefix");
 
 	public static final String xnatServer = EPADConfig.getInstance().getStringPropertyValue("XNATServer");
 	public static final int xnatPort = EPADConfig.getInstance().getIntegerPropertyValue("XNATPort");
@@ -99,6 +97,8 @@ public class EPADConfig
 
 	private static EPADConfig getInstance()
 	{
+		if (ourInstance == null)
+			ourInstance = new EPADConfig();
 		return ourInstance;
 	}
 
@@ -258,7 +258,7 @@ public class EPADConfig
 
 	public static String getEPADWebServerConfigFilePath()
 	{
-		return getEPADWebServerEtcDir() + "proxy-config.properties";
+		return getEPADWebServerEtcDir() + configFileName;
 	}
 
 	public static String getEPADWebServerLogFilePath()
