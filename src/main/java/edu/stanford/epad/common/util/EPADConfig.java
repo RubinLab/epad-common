@@ -57,8 +57,8 @@ public class EPADConfig
 			"dcm4CheeDatabaseURL");
 
 	// AIM-related configuration
-	public static final String aimeServerUrl = EPADConfig.getInstance().getStringPropertyValue("aimeServerUrl");//ml
-	public static final String aimeApiKey = EPADConfig.getInstance().getStringPropertyValue("aimeApiKey");//ml
+	public static final String aimeServerUrl = EPADConfig.getInstance().getParamValue("aimeServerUrl",null);//ml
+	public static final String aimeApiKey = EPADConfig.getInstance().getParamValue("aimeApiKey",null);//ml
 	public static final String eXistServerUrl = EPADConfig.getInstance().getStringPropertyValue("serverUrl");
 	public static final String eXistURI = EPADConfig.getInstance().getStringPropertyValue("serverUrlUpload");
 	public static final String eXistUsername = EPADConfig.getInstance().getStringPropertyValue("username");
