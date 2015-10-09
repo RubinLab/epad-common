@@ -113,7 +113,12 @@ public class EPADConfig
 			properties = new Properties();
 			File configFile = getConfigurationFile();
 			if (!configFile.exists())
-				throw new IllegalStateException("Could not find ePAD configuration file " + configFile.getAbsolutePath());
+			{
+				// Check for properties from docker running on mac
+				configFile = getMacDockerConfigFile();
+				if (!configFile.exists())
+					throw new IllegalStateException("Could not find ePAD configuration file " + configFile.getAbsolutePath());
+			}
 
 			FileInputStream fis = new FileInputStream(configFile);
 			try {
@@ -293,6 +298,11 @@ public class EPADConfig
 
 		return configFile;
 	}
+	
+	public static File getMacDockerConfigFile()
+    {
+		return new File(System.getProperty("user.home") + "/mac/etc/" + EPADConfig.configFileName);
+    }
 
 	public static String getEPADRemotePACsConfigFilePath()
 	{
