@@ -76,6 +76,8 @@ public class PixelMedUtils
 	public static final String ReferencedSOPInstanceUIDCode = getTagCode(TagFromName.ReferencedSOPInstanceUID);
 	public static final String ReferencedSOPInstanceUIDTagName = dicomDictionary
 			.getFullNameFromTag(TagFromName.ReferencedSOPInstanceUID);
+	public static final String ReferencedSegmentNumberCode = getTagCode(TagFromName.ReferencedSegmentNumber);
+	public static final String SegmentNumberCode = getTagCode(TagFromName.SegmentNumber);
 
 	public static AttributeList readDICOMAttributeList(File dicomFile)
 	{
@@ -138,7 +140,7 @@ public class PixelMedUtils
 		try {
 			AttributeList list = readAttributeListFromDicomFile(filePath);
 			int numberOfFrames = Attribute.getSingleIntegerValueOrDefault(list, TagFromName.NumberOfFrames, 1);
-
+			log.debug("Number of frames:" + numberOfFrames + " file:" + filePath);
 			return numberOfFrames > 1;
 		} catch (Exception e) {
 			return false;
