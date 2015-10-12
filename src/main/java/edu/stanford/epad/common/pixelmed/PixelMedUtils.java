@@ -78,7 +78,8 @@ public class PixelMedUtils
 			.getFullNameFromTag(TagFromName.ReferencedSOPInstanceUID);
 	public static final String ReferencedSegmentNumberCode = getTagCode(TagFromName.ReferencedSegmentNumber);
 	public static final String SegmentNumberCode = getTagCode(TagFromName.SegmentNumber);
-
+	public static final String ROIDisplayColor = getTagCode(TagFromName.ROIDisplayColor);
+	
 	public static AttributeList readDICOMAttributeList(File dicomFile)
 	{
 		AttributeList attributeList = new AttributeList();
