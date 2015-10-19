@@ -435,6 +435,8 @@ public class TIFFMasksToDSOConverter
 //			log.info("Removing dicom " + (maskFilePaths.size() - index - 1));
 //			dicomFilePaths.remove(maskFilePaths.size() - index - 1); // DicomFiles are in reverse order for!!!
 //		}
+		if (pixels == null)
+			throw new RuntimeException("The DSO has all empty frames");
 		log.info("Number of pixels:" + pixels.length + " dicoms:" + dicomFilePaths.size());	
 		return pixels;
 	}

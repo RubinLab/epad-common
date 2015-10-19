@@ -677,7 +677,7 @@ public class EPADFileUtils
 	 */
 	public static List<File> unTar(final File inputFile, final File outputDir) throws Exception {
 
-	    log.info(String.format("Untaring %s to dir %s.", inputFile.getAbsolutePath(), outputDir.getAbsolutePath()));
+	    log.debug(String.format("Untaring %s to dir %s.", inputFile.getAbsolutePath(), outputDir.getAbsolutePath()));
 
 	    final List<File> untaredFiles = new LinkedList<File>();
 	    final InputStream is = new FileInputStream(inputFile); 
@@ -686,15 +686,15 @@ public class EPADFileUtils
 	    while ((entry = (TarArchiveEntry)debInputStream.getNextEntry()) != null) {
 	        final File outputFile = new File(outputDir, entry.getName());
 	        if (entry.isDirectory()) {
-	            log.info(String.format("Attempting to write output directory %s.", outputFile.getAbsolutePath()));
+	            log.debug(String.format("Attempting to write output directory %s.", outputFile.getAbsolutePath()));
 	            if (!outputFile.exists()) {
-	                log.info(String.format("Attempting to create output directory %s.", outputFile.getAbsolutePath()));
+	                log.debug(String.format("Attempting to create output directory %s.", outputFile.getAbsolutePath()));
 	                if (!outputFile.mkdirs()) {
 	                    throw new IllegalStateException(String.format("Couldn't create directory %s.", outputFile.getAbsolutePath()));
 	                }
 	            }
 	        } else {
-	            log.info(String.format("Creating output file %s.", outputFile.getAbsolutePath()));
+	            log.debug(String.format("Creating output file %s.", outputFile.getAbsolutePath()));
 	            final OutputStream outputFileStream = new FileOutputStream(outputFile); 
 	            IOUtils.copy(debInputStream, outputFileStream);
 	            outputFileStream.close();
@@ -721,7 +721,7 @@ public class EPADFileUtils
 	 */
 	public static File unGzip(final File inputFile, final File outputDir) throws FileNotFoundException, IOException {
 
-	    log.info(String.format("Ungzipping %s to dir %s.", inputFile.getAbsolutePath(), outputDir.getAbsolutePath()));
+	    log.debug(String.format("Ungzipping %s to dir %s.", inputFile.getAbsolutePath(), outputDir.getAbsolutePath()));
 
 	    final File outputFile = new File(outputDir, inputFile.getName().substring(0, inputFile.getName().length() - 3));
 
