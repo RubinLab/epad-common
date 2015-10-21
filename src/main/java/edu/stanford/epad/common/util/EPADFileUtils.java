@@ -736,6 +736,13 @@ public class EPADFileUtils
 	    return outputFile;
 	}
 	
+	public static File renameFile(File file, String newName) throws Exception
+	{
+		File newFile = new File(file.getParent(), newName);
+		file.renameTo(newFile);
+		return newFile;
+	}
+	
 	private static boolean isNumber(String checkForNumber)
 	{
 
