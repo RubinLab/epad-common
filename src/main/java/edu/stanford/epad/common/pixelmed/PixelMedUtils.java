@@ -79,6 +79,7 @@ public class PixelMedUtils
 	public static final String ReferencedSegmentNumberCode = getTagCode(TagFromName.ReferencedSegmentNumber);
 	public static final String SegmentNumberCode = getTagCode(TagFromName.SegmentNumber);
 	public static final String ROIDisplayColor = getTagCode(TagFromName.ROIDisplayColor);
+	public static final String BodyPartExamined = getTagCode(TagFromName.BodyPartExamined);
 	
 	public static AttributeList readDICOMAttributeList(File dicomFile)
 	{
