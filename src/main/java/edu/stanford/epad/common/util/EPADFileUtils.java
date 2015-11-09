@@ -288,6 +288,9 @@ public class EPADFileUtils
 				BufferedOutputStream bos = null;
 
 				try {
+					if (destFile.exists() && destFile.isDirectory())
+						continue;
+
 					if (!entry.isDirectory()) {
 						int currentByte;
 						byte data[] = new byte[BUFFER];
