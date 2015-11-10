@@ -220,10 +220,12 @@ public class PixelMedUtils
 		DicomInputStream dis = null;
 
 		try {
+			log.info("" + Thread.currentThread().getId() + " Opening Dicom:" + dicomFilePath);
 			dis = new DicomInputStream(new FileInputStream(dicomFilePath));
 			attributeList.read(dis);
 		} finally {
 			IOUtils.closeQuietly(dis);
+			log.info("" + Thread.currentThread().getId() + " Closed");
 		}
 		return attributeList;
 	}
