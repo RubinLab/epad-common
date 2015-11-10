@@ -128,6 +128,7 @@ public class DicomReader
 		try {
 			log.info("" + Thread.currentThread().getId() + " Opening Dicom:" + dicomFile.getName());
 			dis = new DicomInputStream(dicomFile);
+			dis.setHandler(new StopTagInputHandler(Tag.PixelData));
 			DicomObject dicomObject = dis.readDicomObject();
 			patientName = dicomObject.getString(Tag.PatientName);
 		} finally {
@@ -145,6 +146,7 @@ public class DicomReader
 		try {
 			log.info("" + Thread.currentThread().getId() + " Opening Dicom:" + dicomFile.getName());
 			dis = new DicomInputStream(dicomFile);
+			dis.setHandler(new StopTagInputHandler(Tag.PixelData));
 			DicomObject dicomObject = dis.readDicomObject();
 			patientID = dicomObject.getString(Tag.PatientID);
 		} finally {
@@ -162,7 +164,7 @@ public class DicomReader
 		try {
 			log.info("" + Thread.currentThread().getId() + " Opening Dicom:" + dicomFile.getName());
 			dis = new DicomInputStream(dicomFile);
-
+			dis.setHandler(new StopTagInputHandler(Tag.PixelData));
 			DicomObject dicomObject = dis.readDicomObject();
 			studyIUID = dicomObject.getString(Tag.StudyInstanceUID);
 		} finally {
@@ -179,7 +181,7 @@ public class DicomReader
 		try {
 			log.info("" + Thread.currentThread().getId() + " Opening Dicom:" + dicomFile.getName());
 			dis = new DicomInputStream(dicomFile);
-
+			dis.setHandler(new StopTagInputHandler(Tag.PixelData));
 			return dis.readDicomObject();
 		} finally {
 			IOUtils.closeQuietly(dis);
@@ -195,7 +197,7 @@ public class DicomReader
 		try {
 			log.info("" + Thread.currentThread().getId() + " Opening Dicom:" + dicomFile.getName());
 			dis = new DicomInputStream(dicomFile);
-
+			dis.setHandler(new StopTagInputHandler(Tag.PixelData));
 			DicomObject dicomObject = dis.readDicomObject();
 			modality = dicomObject.getString(Tag.Modality);
 		} finally {
