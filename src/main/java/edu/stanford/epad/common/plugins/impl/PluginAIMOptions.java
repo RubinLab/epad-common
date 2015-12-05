@@ -111,7 +111,7 @@ import edu.stanford.hakan.aim4api.plugin.v4.PluginV4;
 public class PluginAIMOptions
 {
 	public final String pluginName, aimUID, aimName, patientID, patientName, templateID, templateName, sessionID;
-	
+	public final String projectID; //ml
 
 	public PluginAIMOptions(String pluginName, String aimUID, String aimName, String patientID, String patientName,
 			String templateID, String templateName, String sessionID)
@@ -124,6 +124,21 @@ public class PluginAIMOptions
 		this.templateID = templateID;
 		this.templateName = templateName;
 		this.sessionID = sessionID;
+		this.projectID = ""; //ml
+	}
+	
+	public PluginAIMOptions(String pluginName, String aimUID, String aimName, String patientID, String patientName,
+			String templateID, String templateName, String sessionID, String projectID)
+	{
+		this.pluginName = pluginName;
+		this.aimUID = aimUID;
+		this.aimName = aimName;
+		this.patientID = patientID;
+		this.patientName = patientName;
+		this.templateID = templateID;
+		this.templateName = templateName;
+		this.sessionID = sessionID;
+		this.projectID = projectID; 
 	}
 	
 	public PluginAIMOptions(String pluginName, String sessionID, ImageAnnotationCollection imageAnnotationCollection)
@@ -137,6 +152,22 @@ public class PluginAIMOptions
 		this.templateID = imageAnnotationV4.getListTypeCode().get(0).getCode();
 		this.templateName = imageAnnotationV4.getListTypeCode().get(0).getCodeSystem();
 		this.sessionID = sessionID;
+		this.projectID = ""; //ml
+		
+		
+	}	
+	public PluginAIMOptions(String pluginName, String sessionID, ImageAnnotationCollection imageAnnotationCollection, String projectID)
+	{
+		edu.stanford.hakan.aim4api.base.ImageAnnotation imageAnnotationV4 = imageAnnotationCollection.getImageAnnotations().get(0);
+		this.pluginName = pluginName;
+		this.aimUID = imageAnnotationCollection.getUniqueIdentifier().getRoot();
+		this.aimName = imageAnnotationV4.getName().getValue();
+		this.patientID = imageAnnotationCollection.getPerson().getId().getValue();
+		this.patientName = imageAnnotationCollection.getPerson().getName().getValue();
+		this.templateID = imageAnnotationV4.getListTypeCode().get(0).getCode();
+		this.templateName = imageAnnotationV4.getListTypeCode().get(0).getCodeSystem();
+		this.sessionID = sessionID;
+		this.projectID = projectID; //ml
 		
 		
 	}	

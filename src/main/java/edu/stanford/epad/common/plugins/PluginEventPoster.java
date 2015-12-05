@@ -132,7 +132,8 @@ public class PluginEventPoster
 					+ java.net.URLEncoder.encode(pluginAIMOptions.patientName, "UTF-8") + "&" + "template_id="
 					+ java.net.URLEncoder.encode(pluginAIMOptions.templateID, "UTF-8") + "&" + "template_name="
 					+ java.net.URLEncoder.encode(pluginAIMOptions.templateName, "UTF-8") + "&" + "plugin_name="
-					+ java.net.URLEncoder.encode(pluginAIMOptions.pluginName, "UTF-8");
+					+ java.net.URLEncoder.encode(pluginAIMOptions.pluginName, "UTF-8") +  "&" + "project_id="
+					+ java.net.URLEncoder.encode(pluginAIMOptions.projectID, "UTF-8");  //ml
 
 			HttpClient client = new HttpClient();
 			PostMethod method = new PostMethod(urlEncoded);
