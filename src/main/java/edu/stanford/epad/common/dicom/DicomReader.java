@@ -287,6 +287,9 @@ public class DicomReader
 			dis = new DicomInputStream(dicomFile);
 			dis.setHandler(new StopTagInputHandler(Tag.PixelData));
 			return dis.readDicomObject();
+		} catch (Exception e) {
+			log.warning("Error in reading dicom object "+ e.getMessage());
+			return null;
 		} finally {
 			IOUtils.closeQuietly(dis);
 			log.info("" + Thread.currentThread().getId() + " Closed");

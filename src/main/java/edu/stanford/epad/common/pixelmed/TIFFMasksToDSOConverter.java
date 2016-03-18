@@ -341,6 +341,8 @@ public class TIFFMasksToDSOConverter
 					dicomAttributes[i] = (AttributeList) localDICOMAttributes.clone();
 				}
 				instanceNos[i] = Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.InstanceNumber, 1);
+				log.info("instance "+i+ " no:"+instanceNos[i]);
+				
 			}
 			int mininstance = instanceNos.length;
 			for (int i = 0; i < instanceNos.length; i++) {
