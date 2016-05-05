@@ -482,7 +482,7 @@ public class TIFFMasksToDSOConverter
 			boolean nonzerodata = false;
 			
 			// looks like 4 bytes/pixel, compress to 1 bit/pixel (else assume it is already 1 bit/pixel)
-			if (new_frame.length == rgbLen)
+			if (new_frame.length == rgbLen || maskImage.getType()== BufferedImage.TYPE_BYTE_INDEXED)
 			{
 				if (i%10 == 0) {
 					System.out.println("Compressing tiff mask from rgb, mask:" + i);
@@ -490,13 +490,18 @@ public class TIFFMasksToDSOConverter
 				}
 				
 //				pixel_data = ((DataBufferByte)convertRGBAToIndexed(maskImage).getRaster().getDataBuffer()).getData();
-				int numpixels = new_frame.length/4;
+				int numpixels = new_frame.length;
 				pixel_data = new byte[numpixels];
+				log.info("maskfile data");
 				for (int k = 0; k < numpixels; k++)
 				{
-					int index = k*4;
 					pixel_data[k] = 0;
-					pixel_data[k] = new_frame[index];
+					if (new_frame[k] != 0)
+					{
+						pixel_data[k] = new_frame[k];
+						nonzerodata = true;
+					}
+					
 //					byte red = (byte)((new_frame[index] * 8) / 256);
 //					byte green = (byte)((new_frame[index+1] * 8) / 256);
 //					byte blue = (byte)((new_frame[index+2] * 4) / 256);
@@ -556,9 +561,10 @@ public class TIFFMasksToDSOConverter
 							nonzerodata = true;
 						}
 					}
-//					if (pixel_data[k] != 0)
-//						log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
+					if (pixel_data[k] != 0)
+						log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
 				}
+				
 			}
 			else
 			{
@@ -573,6 +579,7 @@ public class TIFFMasksToDSOConverter
 					// Flip every odd byte. why on earth do we need to do this?
 					if (new_frame[k] != 0)
 						nonzerodata = true;
+					//flip if not indexed image (8 bit color)
 					if (k%2 != 0 && new_frame[k] != 0)
 					{
 						pixel_data[k] = 0;
@@ -621,11 +628,11 @@ public class TIFFMasksToDSOConverter
 					}
 					else
 						pixel_data[k] = new_frame[k];
-//					if (pixel_data[k] != 0)
-//						log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
+					if (pixel_data[k] != 0)
+						log.info("maskfile bw-rgb" + i + ": " + k + " pixel:" + pixel_data[k]);
 				}
 			}
-//			log.info("maskfile" + i + ": " + maskFilePaths.get(i) + " frame_length:" + pixel_data.length + " nonzero data:" + nonzerodata);
+			log.info("maskfile" + i + ": " + maskFilePaths.get(i) + " frame_length:" + pixel_data.length + " nonzero data:" + nonzerodata);
 			if (!nonzerodata && removeEmpty) {
 				log.debug("Nodata - maskfile" + i + ": " + maskFilePaths.get(i) + " frame_length:" + pixel_data.length);
 				emptyFileIndex.add(i);
