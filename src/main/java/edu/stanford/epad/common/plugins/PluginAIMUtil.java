@@ -121,6 +121,7 @@ import com.pixelmed.dicom.TagFromName;
 import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.hakan.aim4api.base.AimException;
+import edu.stanford.hakan.aim4api.base.CD;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
 import edu.stanford.hakan.aim4api.base.Person;
 import edu.stanford.hakan.aim4api.compability.aimv3.GeometricShape;
@@ -307,6 +308,11 @@ public class PluginAIMUtil
 		}
 	}
 	
+	public static ImageAnnotationCollection addFeature(ImageAnnotationCollection imageAnnotationCollection, double[] featureValue,
+			String[] featureString, double featureVersion, CD calcCD) throws edu.stanford.hakan.aim4api.base.AimException 
+	{
+		return edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, featureValue, featureString, featureVersion, calcCD);
+	}
 	public static ImageAnnotationCollection addFeature(ImageAnnotationCollection imageAnnotationCollection, double[] featureValue,
 			String[] featureString, double featureVersion) throws edu.stanford.hakan.aim4api.base.AimException 
 	{
