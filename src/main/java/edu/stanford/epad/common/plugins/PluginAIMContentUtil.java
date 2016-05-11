@@ -219,7 +219,13 @@ public class PluginAIMContentUtil
 		try {
 			iac = AnnotationGetter.getImageAnnotationCollectionFromFile(aimFile.getPath(),
 					EPADConfig.xsdFilePathV4);
-			templateOrganValue = iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getCodeSystem();
+			//ml not code system, it should be display name
+			if (iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getDisplayName()==null || iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getDisplayName().getValue().isEmpty()) {
+				templateOrganValue = iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getCodeSystem();
+			} else {
+				templateOrganValue = iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getDisplayName().getValue();
+			}
+//			templateOrganValue = iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getCodeSystem();
 
 		} catch (Exception e) {
 
