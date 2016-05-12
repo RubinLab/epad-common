@@ -121,6 +121,7 @@ import com.pixelmed.dicom.TagFromName;
 import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.hakan.aim4api.base.AimException;
+import edu.stanford.hakan.aim4api.base.CD;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
 import edu.stanford.hakan.aim4api.base.Person;
 import edu.stanford.hakan.aim4api.compability.aimv3.GeometricShape;
@@ -214,9 +215,12 @@ public class PluginAIMUtil
 		sc.AddSegmentation(new edu.stanford.hakan.aim4api.compability.aimv3.Segmentation(0, imageUID, sopClassUID, sourceImageUID, 1));
 		
 		imageAnnotation.setSegmentationCollection(sc);
-		edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference dicomImageReference = createDICOMImageReferenceV3Compability(studyUID, seriesUID,
-				imageUID);
-		imageAnnotation.addImageReference(dicomImageReference);
+
+		//ml remove adding the second image ref
+//		edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference dicomImageReference = createDICOMImageReferenceV3Compability(studyUID, seriesUID,
+//				imageUID);
+//		imageAnnotation.addImageReference(dicomImageReference);
+
 		
 		updateDSOAIMInDatabase(imageAnnotation.getUniqueIdentifier(), seriesUID);
 		return imageAnnotation.toAimV4();
@@ -234,7 +238,40 @@ public class PluginAIMUtil
 		return edu.stanford.hakan.aim4api.usage.AnnotationGetter.getImageAnnotationCollectionFromFile(getRealPath(file), xsdFilePathV4);
 	}
         
-        
+
+        //ml added sopclassuid from image		 +        
+	 public static edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference createDICOMImageReferenceV3Compability(String dsoStudyInstanceUID, String dsoSeriesInstanceUID,		
+				String dsoSOPInstanceUID, String sopClassUID) 		
+	 	{		
+	 		edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference dicomImageReference = new edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference();		
+	 		dicomImageReference.setCagridId(0);		
+	 		
+	 		edu.stanford.hakan.aim4api.compability.aimv3.ImageStudy imageStudy = new edu.stanford.hakan.aim4api.compability.aimv3.ImageStudy();		
+	 		imageStudy.setCagridId(0);		
+	 		imageStudy.setInstanceUID(dsoStudyInstanceUID);		
+	 		imageStudy.setStartDate("2012-01-01T01:01:01"); // TODO		
+	 		imageStudy.setStartTime("12:00:00"); // TODO		
+	 		
+	 		edu.stanford.hakan.aim4api.compability.aimv3.ImageSeries imageSeries = new edu.stanford.hakan.aim4api.compability.aimv3.ImageSeries();		
+	 		imageSeries.setCagridId(0);		
+	 		imageSeries.setInstanceUID(dsoSeriesInstanceUID);		
+	 		
+	 		edu.stanford.hakan.aim4api.compability.aimv3.Image image = new edu.stanford.hakan.aim4api.compability.aimv3.Image();		
+	 		image.setCagridId(0);		
+	 		log.info("written SOP Class UID=" + sopClassUID);		
+	 		log.info("written SOP Instance UID=" + dsoSOPInstanceUID);		
+	 					
+	 		image.setSopClassUID(sopClassUID); // TODO ml retrieved from parameter		
+	 		image.setSopInstanceUID(dsoSOPInstanceUID);		
+	 		
+	 		imageSeries.addImage(image); // Add Image to ImageSeries		
+	 		imageStudy.setImageSeries(imageSeries); // Add ImageSeries to ImageStudy		
+	 		dicomImageReference.setImageStudy(imageStudy); // Add ImageStudy to ImageReference		
+	 		
+	 		return dicomImageReference;		
+	 	}    
+	
+
 	public static edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference createDICOMImageReferenceV3Compability(String dsoStudyInstanceUID, String dsoSeriesInstanceUID,
 			String dsoSOPInstanceUID)
 	{
@@ -253,7 +290,8 @@ public class PluginAIMUtil
 
 		edu.stanford.hakan.aim4api.compability.aimv3.Image image = new edu.stanford.hakan.aim4api.compability.aimv3.Image();
 		image.setCagridId(0);
-		image.setSopClassUID(""); // TODO
+
+		image.setSopClassUID("NA"); // TODO
 		image.setSopInstanceUID(dsoSOPInstanceUID);
 
 		imageSeries.addImage(image); // Add Image to ImageSeries
@@ -275,6 +313,11 @@ public class PluginAIMUtil
 		}
 	}
 	
+	public static ImageAnnotationCollection addFeature(ImageAnnotationCollection imageAnnotationCollection, double[] featureValue,
+			String[] featureString, double featureVersion, CD calcCD) throws edu.stanford.hakan.aim4api.base.AimException 
+	{
+		return edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, featureValue, featureString, featureVersion, calcCD);
+	}
 	public static ImageAnnotationCollection addFeature(ImageAnnotationCollection imageAnnotationCollection, double[] featureValue,
 			String[] featureString, double featureVersion) throws edu.stanford.hakan.aim4api.base.AimException 
 	{
