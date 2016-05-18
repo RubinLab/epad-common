@@ -110,6 +110,7 @@ public class DCM4CHEEImageDescription
 	public final int instanceNumber;
 	public final String sliceLocation, contentTime, updatedTime, createdTime, classUID;
 	public boolean multiFrameImage = false;
+	public final String rescaleIntercept, rescaleSlope;
 
 	public DCM4CHEEImageDescription(String studyUID, String seriesUID, String imageUID, int instanceNumber,
 			String sliceLocation, String contentTime, String updatedTime, String createdTime, String classUID)
@@ -123,5 +124,23 @@ public class DCM4CHEEImageDescription
 		this.updatedTime = updatedTime;
 		this.createdTime = createdTime;
 		this.classUID = classUID;
+		this.rescaleIntercept = "0";
+		this.rescaleSlope = "0";
+	}
+	
+	public DCM4CHEEImageDescription(String studyUID, String seriesUID, String imageUID, int instanceNumber,
+			String sliceLocation, String contentTime, String updatedTime, String createdTime, String classUID, String rescaleIntercept, String rescaleSlope)
+	{
+		this.studyUID = studyUID;
+		this.seriesUID = seriesUID;
+		this.imageUID = imageUID;
+		this.instanceNumber = instanceNumber;
+		this.sliceLocation = sliceLocation;
+		this.contentTime = contentTime;
+		this.updatedTime = updatedTime;
+		this.createdTime = createdTime;
+		this.classUID = classUID;
+		this.rescaleIntercept = rescaleIntercept;
+		this.rescaleSlope = rescaleSlope;
 	}
 }
