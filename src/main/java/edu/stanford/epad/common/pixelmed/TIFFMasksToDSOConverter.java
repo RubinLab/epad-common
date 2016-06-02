@@ -482,35 +482,41 @@ public class TIFFMasksToDSOConverter
 			boolean nonzerodata = false;
 
 			// looks like 4 bytes/pixel, compress to 1 bit/pixel (else assume it is already 1 bit/pixel)
-			if (new_frame.length == rgbLen || maskImage.getType()== BufferedImage.TYPE_BYTE_INDEXED)
+			if (new_frame.length == rgbLen)
 			{
-				if (maskImage.getType()!= BufferedImage.TYPE_BYTE_INDEXED) { //if not indexed old version should work
-					if (i%10 == 0) {
-						System.out.println("Compressing tiff mask from rgb, mask:" + i);
-						log.debug("Compressing tiff mask from rgb, mask:" + i);
-					}
+				if (i%10 == 0) {
+					System.out.println("Compressing tiff mask from rgb, mask:" + i);
+					log.debug("Compressing tiff mask from rgb, mask:" + i);
+				}
 
-					int numpixels = new_frame.length/4;
-	  				int numbytes = numpixels/8;		  				
-	  				pixel_data = new byte[numbytes];	
-					for (int k = 0; k < numbytes; k++)
+				int numpixels = new_frame.length/4;
+  				int numbytes = numpixels/8;		  				
+  				pixel_data = new byte[numbytes];	
+				for (int k = 0; k < numbytes; k++)
+				{
+					int index = k*8*4;
+					pixel_data[k] = 0;
+					for (int l = 0; l < 4*8; l=l+4)
 					{
-						int index = k*8*4;
-						pixel_data[k] = 0;
-						for (int l = 0; l < 4*8; l=l+4)
+						if (new_frame[index + l] != 0)
 						{
-							if (new_frame[index + l] != 0)
-							{
-								int setBit =  pixel_data[k] + (1 << (l/4));
-								pixel_data[k] =(byte) setBit;
-								nonzerodata = true;
-							}
+							int setBit =  pixel_data[k] + (1 << (l/4));
+							pixel_data[k] =(byte) setBit;
+							nonzerodata = true;
 						}
-						if (pixel_data[k] != 0)
-							log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k] + " compress rgb");
 					}
-
-				} else {
+					if (pixel_data[k] != 0)
+						log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k] + " compress rgb");
+				}
+				 
+					
+					//				
+				
+			}
+			// ml if 
+			else if (new_frame.length == greyLen || maskImage.getType()== BufferedImage.TYPE_BYTE_INDEXED)
+			{
+				if (maskImage.getType()== BufferedImage.TYPE_BYTE_INDEXED) { //if not indexed old version should work
 					if (i%10 == 0) {
 						System.out.println("indexed tiff mask from rgb, mask:" + i);
 						log.debug("indexed tiff mask from rgb, mask:" + i);
@@ -547,33 +553,31 @@ public class TIFFMasksToDSOConverter
 						if (pixel_data[k] != 0)
 							log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k] +" rgb " );
 					}
-					//				
-				}
-			}
-			else if (new_frame.length == greyLen)
-			{
-				if (i%10 == 0) {
-					System.out.println("Compressing tiff mask from grey, mask:" + i);
-					log.debug("Compressing tiff mask from grey, mask:" + i);
-				}
-				int numpixels = new_frame.length;
-				int numbytes = numpixels/8;
-				pixel_data = new byte[numbytes];
-				for (int k = 0; k < numbytes; k++)
-				{
-					int index = k*8;
-					pixel_data[k] = 0;
-					for (int l = 0; l < 8; l++)
-					{
-						if (new_frame[index + l] != 0)
-						{
-							int setBit =  pixel_data[k] + (1 << l);
-							pixel_data[k] =(byte) setBit;
-							nonzerodata = true;
-						}
+
+				} else {
+					if (i%10 == 0) {
+						System.out.println("Compressing tiff mask from grey, mask:" + i);
+						log.debug("Compressing tiff mask from grey, mask:" + i);
 					}
-					if (pixel_data[k] != 0)
-						log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
+					int numpixels = new_frame.length;
+					int numbytes = numpixels/8;
+					pixel_data = new byte[numbytes];
+					for (int k = 0; k < numbytes; k++)
+					{
+						int index = k*8;
+						pixel_data[k] = 0;
+						for (int l = 0; l < 8; l++)
+						{
+							if (new_frame[index + l] != 0)
+							{
+								int setBit =  pixel_data[k] + (1 << l);
+								pixel_data[k] =(byte) setBit;
+								nonzerodata = true;
+							}
+						}
+						if (pixel_data[k] != 0)
+							log.info("maskfile" + i + ": " + k + " pixel:" + pixel_data[k]);
+					}
 				}
 
 			}
