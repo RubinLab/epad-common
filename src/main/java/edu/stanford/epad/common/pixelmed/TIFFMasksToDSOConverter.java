@@ -426,6 +426,7 @@ public class TIFFMasksToDSOConverter
 				log.info("instance "+i+ " no:"+instanceNos[i]);
 
 			}
+			//order by instance numbers
 			int mininstance = instanceNos.length;
 			for (int i = 0; i < instanceNos.length; i++) {
 				for (int j = i; j < instanceNos.length; j++) {

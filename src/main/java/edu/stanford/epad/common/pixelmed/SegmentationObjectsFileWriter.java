@@ -197,6 +197,13 @@ public class SegmentationObjectsFileWriter
 	private String seriesUID = null;
 	private String imageUID = null;
 	
+	//moved declaration from line 521 for slicer per frame
+	private String orig_class_uid;
+	//moved declaration from line 540 for slicer per frame
+	private String[] orig_inst_uids;
+	//added for slicer positions per frame
+	private double[][] seg_positions;
+	
 	/**
 	 * Initialize the list with constant attributes and inherited attributes.
 	 * 
@@ -515,7 +522,7 @@ public class SegmentationObjectsFileWriter
 
 		final DicomDictionary dicomDictionary = new DicomDictionary();
 
-		String orig_class_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SOPClassUID);
+		orig_class_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SOPClassUID);
 
 		for (AttributeTag key : original_attrs.keySet()) {
 			log.debug("ATTRIBUTE TAG: " + key);
@@ -534,7 +541,8 @@ public class SegmentationObjectsFileWriter
 		}
 
 		SequenceAttribute referencedInstanceSequence = new SequenceAttribute(TagFromName.ReferencedInstanceSequence);
-		String[] orig_inst_uids = new String[original_attrs_list.length];
+		seg_positions = new double[original_attrs_list.length][3];
+		orig_inst_uids = new String[original_attrs_list.length];
 		for (int instanceIndex = 0; instanceIndex < original_attrs_list.length; instanceIndex++) {
 			AttributeList referencedInstanceSequenceAttributes = new AttributeList();
 			{
@@ -547,6 +555,11 @@ public class SegmentationObjectsFileWriter
 				String orig_inst_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs_list[instanceIndex], TagFromName.SOPInstanceUID);
 				//log.info("" + instanceIndex + " ReferencedSOPInstanceUID:" + orig_inst_uid);
 				orig_inst_uids[instanceIndex] = orig_inst_uid;
+				
+				//get positions for segmentation frames
+				seg_positions[instanceIndex] = Attribute.getDoubleValues(original_attrs_list[instanceIndex], TagFromName.ImagePositionPatient);
+						
+				
 				a.addValue(orig_inst_uid);
 				referencedInstanceSequenceAttributes.put(a);
 			}
@@ -1023,7 +1036,7 @@ public class SegmentationObjectsFileWriter
 
 		// Sort the frames according to their positions.
 		int[] in_stack_position = sort_frames_by_position(geometry_list, positions, frame_num);
-
+		log.info("frame num " + frame_num);
 		// Generate Per-frame attributes. Refer to Table A.51-2 SEGMENTATION FUNCTIONAL GROUP MACROS
 		for (int k = 0; k < frame_num; k++) {
 			AttributeList item2 = new AttributeList();
@@ -1062,9 +1075,13 @@ public class SegmentationObjectsFileWriter
 				AttributeList item = new AttributeList();
 				Attribute a = new DecimalStringAttribute(TagFromName.ImagePositionPatient);
 				if (positions != null) {
-					a.addValue(positions[k][0]);
-					a.addValue(positions[k][1]);
-					a.addValue(positions[k][2]);
+					//for slicer get seg positions
+					a.addValue(seg_positions[k][0]);
+					a.addValue(seg_positions[k][1]);
+					a.addValue(seg_positions[k][2]);
+//					a.addValue(positions[k][0]);
+//					a.addValue(positions[k][1]);
+//					a.addValue(positions[k][2]);
 				} else {
 					a.addValue(0);
 					a.addValue(0);
@@ -1073,8 +1090,80 @@ public class SegmentationObjectsFileWriter
 				item.put(a);
 				seq.addItem(item);
 				item2.put(seq);
+				
+		}
+			//for slicer add derivation to per frame
+			{ // DerivationImageSequence - TODO - Need to verify if this is correct???
+				SequenceAttribute derivation_image_seq = new SequenceAttribute(TagFromName.DerivationImageSequence);
+				AttributeList reference = new AttributeList();
+				{
+					AttributeList item = new AttributeList();
+					{
+						Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+						a.addValue("113076");
+						item.put(a);
+					}
+					{
+						Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+						a.addValue("DCM");
+						item.put(a);
+					}
+					{
+						Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+						a.addValue("Segmentation");
+						item.put(a);
+					}
+					SequenceAttribute seq = new SequenceAttribute(TagFromName.DerivationCodeSequence);
+					seq.addItem(item);
+					reference.put(seq);
+				}
+				SequenceAttribute source_image_seq = new SequenceAttribute(TagFromName.SourceImageSequence);
+				{ // SourceImageSequence
+					AttributeList image = new AttributeList();
+					AttributeList item = new AttributeList();
+					{
+						Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+						a.addValue("121322");
+						item.put(a);
+					}
+					{
+						Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+						a.addValue("DCM");
+						item.put(a);
+					}
+					{
+						Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+						a.addValue("Source image for image processing operation");
+						item.put(a);
+					}
+					SequenceAttribute seq = new SequenceAttribute(TagFromName.PurposeOfReferenceCodeSequence);
+					seq.addItem(item);
+					image.put(seq);
+					{
+						Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
+						a.addValue(orig_class_uid);
+						image.put(a);
+					}
+					{
+						//log.info("SourceImageSequence:" + i + " ReferencedSOPInstanceUID:" + orig_inst_uids[i]);
+						Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
+						
+						a.addValue(orig_inst_uids[k]);
+						image.put(a);
+					}
+					// Need this for multiframe source DICOM???
+					{
+						Attribute a = new IntegerStringAttribute(TagFromName.ReferencedFrameNumber);
+						a.addValue("1");
+						image.put(a);
+					}
+					source_image_seq.addItem(image);
+				}
+				reference.put(source_image_seq);
+				derivation_image_seq.addItem(reference);
+				item2.put(derivation_image_seq);
 			}
-
+			
 			per_frame_functional_groups_sequence.addItem(item2);
 		}
 
@@ -1225,8 +1314,9 @@ public class SegmentationObjectsFileWriter
 			throws DicomException
 	{
 		// Check all the items in per_frame_sequence and move the common attributes to shared_group.
-		AttributeTag[] checked_attrs = new AttributeTag[] { TagFromName.SegmentIdentificationSequence,
-				TagFromName.PlanePositionSequence
+		//plane position sequence removed from check for slicer
+		AttributeTag[] checked_attrs = new AttributeTag[] { TagFromName.SegmentIdentificationSequence/*,
+				TagFromName.PlanePositionSequence*/
 		/* , TagFromName.StackID, TagFromName.PlaneOrientationSequence, TagFromName.SliceThickness, TagFromName.PixelSpacing */};
 		Hashtable<AttributeTag, SequenceAttribute> common_attrs = get_common_attributes(checked_attrs, per_frame_sequence);
 		add_attributes_to_shared_group(common_attrs, shared_group);
@@ -1272,7 +1362,6 @@ public class SegmentationObjectsFileWriter
 
 					if (seq == null)
 						seq = new SequenceAttribute(key);
-
 					attrs.put(key, seq);
 				}
 			} else {
@@ -1289,7 +1378,7 @@ public class SegmentationObjectsFileWriter
 					else
 						seq = (SequenceAttribute)l.get(key);
 					if (compare_sequence_attribute(key, attrs.get(key), seq) != true)
-						attrs.remove(key);
+					attrs.remove(key);
 				}
 			}
 		}
