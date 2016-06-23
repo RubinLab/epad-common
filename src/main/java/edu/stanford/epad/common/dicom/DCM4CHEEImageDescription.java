@@ -107,7 +107,7 @@ package edu.stanford.epad.common.dicom;
 public class DCM4CHEEImageDescription
 {
 	public final String studyUID, seriesUID, imageUID;
-	public final int instanceNumber;
+	public int instanceNumber;
 	public final String sliceLocation, contentTime, updatedTime, createdTime, classUID;
 	public boolean multiFrameImage = false;
 	public final String rescaleIntercept, rescaleSlope;

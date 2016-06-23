@@ -141,6 +141,7 @@ public class TIFFMasksToDSOConverter
 	private double[] spacing = new double[] { 0.65, 0.8 };
 	private double thickness = 0.5;
 	private double[][] positions = null;
+	private double[] sliceLocations = null;
 	private short imageWidth = 0, imageHeight = 0, numberOfFrames = 0;
 
 	private static final EPADLogger log = EPADLogger.getInstance();
@@ -409,6 +410,7 @@ public class TIFFMasksToDSOConverter
 
 		try { // Get sequence format. Get position of each frame.
 			positions = new double[numberOfFrames][3];
+			sliceLocations = new double[numberOfFrames];
 			int[] instanceNos = new int[dicomFilePaths.size()];
 			for (int i = 0; i < dicomFilePaths.size(); i++) {
 				dicomInputFile = dicomFilePaths.get(i);
@@ -418,6 +420,7 @@ public class TIFFMasksToDSOConverter
 				Attribute attribute = localDICOMAttributes.get(TagFromName.ImagePositionPatient);
 				if (attribute != null)
 					this.positions[i] = attribute.getDoubleValues();
+				sliceLocations[i] = Attribute.getSingleDoubleValueOrDefault(localDICOMAttributes, TagFromName.SliceLocation, 0);
 				if (i > 0)
 				{
 					dicomAttributes[i] = (AttributeList) localDICOMAttributes.clone();
@@ -426,6 +429,14 @@ public class TIFFMasksToDSOConverter
 				log.info("instance "+i+ " no:"+instanceNos[i]);
 
 			}
+			//added slicelocation for sorting, we should actually use position and orientation for sorting 
+			//but the defaultdcm4che operations do not have that info
+			
+			boolean fixInstanceNumbers=false;
+			// trigger logic in default dcm4chee operations is last-first+1!=size 
+			// should we do this?? as it is dso not the image 
+//			if (instanceNos[instanceNos.length-1] - instanceNos[0] +1 != instanceNos.length)
+//				fixInstanceNumbers = true;
 			//order by instance numbers
 			int mininstance = instanceNos.length;
 			for (int i = 0; i < instanceNos.length; i++) {
@@ -433,9 +444,17 @@ public class TIFFMasksToDSOConverter
 					int instance = instanceNos[i];
 					if (instance < mininstance) mininstance = instance;
 					double[] position = positions[i];
+					double sliceLocation = sliceLocations[i];
 					AttributeList alist = dicomAttributes[i];
-					if (instanceNos[j] == instance  && j != i)
-						throw new RuntimeException("Invalid source dicom, it has duplicate instances numbers: " + instance);
+					//if instance numbers are incorrect trigger fixing it, do not throw error
+					// update instance numbers when there are more than one with the same number
+					// trigger logic in default dcm4chee operations is last-first+1!=size 
+					if (instanceNos[j] == instance  && j != i){
+						fixInstanceNumbers=true;
+						i=instanceNos.length-1;
+						break;
+//						throw new RuntimeException("Invalid source dicom, it has duplicate instances numbers: " + instance);
+					}
 					if (instanceNos[j] > instance) {
 						instanceNos[i] = instanceNos[j];
 						positions[i] = positions[j];
@@ -443,8 +462,41 @@ public class TIFFMasksToDSOConverter
 						instanceNos[j] = instance;
 						positions[j] = position;
 						dicomAttributes[j] = alist;
+						sliceLocations[i] = sliceLocations[j];
+						sliceLocations[j] = sliceLocation;
+						
 					}
 				}
+			}
+			
+			if (fixInstanceNumbers) {
+				//order by slice location in descending order
+				for (int i = 0; i < instanceNos.length; i++) {
+					for (int j = i; j < instanceNos.length; j++) {
+						int instance = instanceNos[i];
+						double[] position = positions[i];
+						double sliceLocation = sliceLocations[i];
+						AttributeList alist = dicomAttributes[i];
+						
+						if (sliceLocations[j] <= sliceLocation) {
+							instanceNos[i] = instanceNos[j];
+							positions[i] = positions[j];
+							dicomAttributes[i] = dicomAttributes[j];
+							instanceNos[j] = instance;
+							positions[j] = position;
+							dicomAttributes[j] = alist;
+							sliceLocations[i] = sliceLocations[j];
+							sliceLocations[j] = sliceLocation;
+							
+						}
+					}
+				}
+				//go through the ordered list and fix instance numbers
+				for (int i = 0; i < instanceNos.length; i++) {
+					instanceNos[i] = i+1;
+				}
+				mininstance = 1;
+				
 			}
 			return mininstance;
 		} finally {
