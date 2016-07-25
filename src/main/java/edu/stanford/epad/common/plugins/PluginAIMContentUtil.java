@@ -225,13 +225,12 @@ public class PluginAIMContentUtil
 			} else {
 				templateOrganValue = iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getDisplayName().getValue();
 			}
-//			templateOrganValue = iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getCodeSystem();
 
 		} catch (Exception e) {
 
 			throw new PluginServletException("Invalid input.", "Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac));
 		}
-
+		log.info("organ name " + templateOrganValue);
 		if (templateOrganValue.toLowerCase().contains("liver")) {
 			return "Liver";
 		} else if (templateOrganValue.toLowerCase().contains("lung")) {
@@ -240,8 +239,17 @@ public class PluginAIMContentUtil
 			return "Breast";
 		} else if (templateOrganValue.toLowerCase().contains("bone")) {
 			return "Bone";
+		} 
+		//missing organ types (removing ifs doesn't work as the data coming from template is not just liver, it is Liver CT)
+		else if (templateOrganValue.toLowerCase().contains("brain")) {
+			return "Brain";
+		} else if (templateOrganValue.toLowerCase().contains("rats")) {
+			return "Rats";
+		} else if (templateOrganValue.toLowerCase().contains("knee")) {
+			return "Knee";
 		}
 		throw new PluginServletException("Invalid input.", "Invalid input: templateOrganValue=" + templateOrganValue);
+		
 	}
 
 	private static String getUIDFromAIM(String tag, String attribute, String aimFileContents)
