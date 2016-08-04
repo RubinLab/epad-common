@@ -133,6 +133,10 @@ import edu.stanford.hakan.aim4api.compability.aimv3.SpatialCoordinate;
 import edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate;
 import edu.stanford.hakan.aim4api.usage.AnnotationBuilder;
 import edu.stanford.hakan.aim4api.usage.AnnotationExtender;
+//import edu.stanford.hakan.aim4api.compability.aimv3.Lexicon;
+import edu.stanford.epad.common.util.Lexicon;
+
+
 
 public class PluginAIMUtil
 {
@@ -312,17 +316,47 @@ public class PluginAIMUtil
 			this.yData = yData;
 		}
 	}
-	
+	//old version
 	public static ImageAnnotationCollection addFeature(ImageAnnotationCollection imageAnnotationCollection, double[] featureValue,
 			String[] featureString, double featureVersion, CD calcCD) throws edu.stanford.hakan.aim4api.base.AimException 
 	{
 		return edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, featureValue, featureString, featureVersion, calcCD);
+	
 	}
+	//old version
 	public static ImageAnnotationCollection addFeature(ImageAnnotationCollection imageAnnotationCollection, double[] featureValue,
 			String[] featureString, double featureVersion) throws edu.stanford.hakan.aim4api.base.AimException 
 	{
 		return edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, featureValue, featureString, featureVersion);
 	}
+	
+	//new version. uses lexicon and adds as seperate calculation entities
+	public static ImageAnnotationCollection addFeatures(ImageAnnotationCollection imageAnnotationCollection, double[] featureValue,
+			String[] featureString, double featureVersion, CD calcCD) throws edu.stanford.hakan.aim4api.base.AimException 
+	{
+		
+		if (featureValue.length != featureString.length) {
+            throw new AimException("AimException: lenght of featureValue and featureString must be equal");
+        }
+
+		 for (int i = 0; i < featureValue.length; i++) {
+	            if (featureString[i] == null) {
+	                continue;
+	            }  
+	            CD featureCD = Lexicon.getInstance().getLex(featureString[i]);
+		
+		
+	            imageAnnotationCollection = edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, featureValue[i], featureCD, featureVersion, calcCD);
+		}
+		 return imageAnnotationCollection;
+	}
+	
+    //new version. uses lexicon and adds as seperate calculation entities
+//	public static ImageAnnotationCollection addFeatures(ImageAnnotationCollection imageAnnotationCollection, double[] featureValue,
+//			String[] featureString, double featureVersion) throws edu.stanford.hakan.aim4api.base.AimException 
+//	{
+//		return edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, featureValue, featureString, featureVersion);
+//	}
 	
 	public static String getPersonName(ImageAnnotationCollection imageAnnotationCollection)
 	{
