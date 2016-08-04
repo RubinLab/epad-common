@@ -191,7 +191,8 @@ public class EPADConfig
 	public static String mongoUser = EPADConfig.getInstance().getParam("MongoUser");
 	public static String mongoPassword = EPADConfig.getInstance().getParam("MongoPassword");
 	public static String webAuthPassword = EPADConfig.getInstance().getParamValue("WebAuthPassword", null);
-	
+	//delete studies not accessed in ? days
+	public static String deleteStudiesNotAccessedIn = EPADConfig.getInstance().getParamValue("deleteStudiesNotAccessedIn", "0");
 	
 	public static String pluginMaxtime = EPADConfig.getInstance().getParamValue("pluginMaxtime", null);
 	
