@@ -165,6 +165,26 @@ public class PluginAIMUtil
 		return aim;
 	}
 	
+	
+	public static void sendImageAnnotationToServer(ImageAnnotationCollection imageAnnotation, String projectID, String oldAimID) throws edu.stanford.hakan.aim4api.base.AimException
+	{
+	    String collectionName = eXistCollectionV4;
+	    if (projectID != null && projectID.length() > 0)
+	    	collectionName = collectionName + "/" + projectID;
+		edu.stanford.hakan.aim4api.usage.AnnotationBuilder.saveToServer(imageAnnotation, eXistServerUrl, aim4Namespace,
+				collectionName, xsdFilePathV4, eXistUsername, eXistPassword);
+
+		String result = AnnotationBuilder.getAimXMLsaveResult();
+		try {
+			cloneAIMXmlInDatabase(imageAnnotation.getUniqueIdentifier().getRoot(),imageAnnotation.getImageAnnotation().getName().getValue(),
+					edu.stanford.hakan.aim4api.usage.AnnotationBuilder.convertToString(imageAnnotation), oldAimID);
+		} catch (Exception e) {
+			throw new edu.stanford.hakan.aim4api.base.AimException(e.getMessage());
+		}
+
+		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
+	}
+	
 	public static void sendImageAnnotationToServer(ImageAnnotationCollection imageAnnotation, String projectID) throws edu.stanford.hakan.aim4api.base.AimException
 	{
 	    String collectionName = eXistCollectionV4;
@@ -329,6 +349,26 @@ public class PluginAIMUtil
 	{
 		return edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, featureValue, featureString, featureVersion);
 	}
+	
+	//new version. uses lexicon and adds as seperate calculation entities
+		public static ImageAnnotationCollection addFeatures(ImageAnnotationCollection imageAnnotationCollection, ArrayList<String[]> features, double featureVersion, CD calcCD) throws edu.stanford.hakan.aim4api.base.AimException 
+		{
+			
+			 for (int i = 0; i < features.size(); i++) {
+		            if (features.get(i).length != 2) {
+		            	log.info("Not a feature pair, what is it?");
+		                continue;
+		            }  
+		            CD featureCD = Lexicon.getInstance().getLex(features.get(i)[0]);
+			
+		            try {
+		            	imageAnnotationCollection = edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, Double.parseDouble(features.get(i)[1]), featureCD, featureVersion, calcCD);
+		            }catch (NumberFormatException ne) {
+		            	log.info("Could not parse the feature value to a double. feature name:"+features.get(i)[0]+" value:"+ features.get(i)[1]);
+		            }
+		     }
+			 return imageAnnotationCollection;
+		}
 	
 	//new version. uses lexicon and adds as seperate calculation entities
 	public static ImageAnnotationCollection addFeatures(ImageAnnotationCollection imageAnnotationCollection, double[] featureValue,
@@ -557,6 +597,31 @@ public class PluginAIMUtil
 			con = DriverManager.getConnection(epadDatabaseURL, username, password);
     	    String sql = "UPDATE annotations set DSOSeriesUID = '" + dsoSeriesUID + "' where AnnotationUID = '" + annotationID + "'";
             log.info("DSO AIM update:" + sql);
+			statement = con.createStatement();
+			statement.executeUpdate(sql);
+		}
+		finally
+		{
+			if (statement != null) statement.close();
+			if (con != null) con.close();
+		}
+	}
+	
+	
+	private static void cloneAIMXmlInDatabase(String annotationID,String annotationName,String xml, String oldAnnotationID) throws Exception
+	{
+		String username = EPADConfig.epadDatabaseUsername;
+		String password = EPADConfig.epadDatabasePassword;
+		String epadDatabaseURL = EPADConfig.epadDatabaseURL;
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con = null;
+		Statement statement = null;
+		try
+		{
+			con = DriverManager.getConnection(epadDatabaseURL, username, password);
+    	    String sql = "insert into annotations(UserLoginName,PatientID,SeriesUID,DSOSeriesUID,StudyUID,ImageUID,FrameID,AnnotationUID,ProjectUID,XML, DELETED, DSOFRAMENO, TEMPLATECODE, SHAREDPROJECTS, NAME,AIMCOLOR ) " +
+			"(select UserLoginName,PatientID,SeriesUID,DSOSeriesUID,StudyUID,ImageUID,FrameID,'"+annotationID +"',ProjectUID,'"+ xml+"', DELETED, DSOFRAMENO, TEMPLATECODE, SHAREDPROJECTS, '"+annotationName +"',AIMCOLOR from annotations where AnnotationUID='"+oldAnnotationID+"')";
+    	    log.info("sql:"+sql);
 			statement = con.createStatement();
 			statement.executeUpdate(sql);
 		}

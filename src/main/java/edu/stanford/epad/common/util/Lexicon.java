@@ -146,7 +146,7 @@ public class Lexicon extends HashMap<String, CD> {
 		
 		String algPrefix="99EPADA";
 		String dtPrefix="99EPADD";
-		
+		String pluginPrefix="99EPADP";
 		
 		try {
 			this.put("G-D7FE", new CD("G-D7FE","Length","SRT"));
@@ -155,7 +155,6 @@ public class Lexicon extends HashMap<String, CD> {
 			
 			//algorithms, start with 99EPADA
 			this.put(algPrefix+"2", new CD(algPrefix+"2","Plugin",ePadDesignator,ePadLexVersion));
-			this.put(algPrefix+"3", new CD(algPrefix+"3","JJVector",ePadDesignator,ePadLexVersion));
 			this.put(algPrefix+"4", new CD(algPrefix+"4","Area",ePadDesignator,ePadLexVersion));
 			this.put(algPrefix+"5", new CD(algPrefix+"5","StandardDeviation",ePadDesignator,ePadLexVersion));
 			this.put(algPrefix+"6", new CD(algPrefix+"6","Min",ePadDesignator,ePadLexVersion));
@@ -164,6 +163,10 @@ public class Lexicon extends HashMap<String, CD> {
 			
 			//datatypes, start with 99EPADD
 			this.put(dtPrefix+"1", new CD(dtPrefix+"1","Double",ePadDesignator,ePadLexVersion));
+			
+			//plugins,  start with 99EPADP
+			this.put(pluginPrefix+"1", new CD(pluginPrefix+"1","JJVector",ePadDesignator,ePadLexVersion));
+			this.put(pluginPrefix+"2", new CD(pluginPrefix+"2","Qifp3D",ePadDesignator,ePadLexVersion));
 			
 			
 		} catch (Exception e) {
