@@ -110,7 +110,8 @@ import edu.stanford.hakan.aim4api.plugin.v4.PluginV4;
 
 public class PluginAIMOptions
 {
-	public final String pluginName, aimUID, aimName, patientID, patientName, templateID, templateName, sessionID;
+	public final String pluginName, aimUID, aimName, patientID, patientName, templateID, sessionID;
+	public String templateName;
 	public final String projectID; //ml
 
 	public PluginAIMOptions(String pluginName, String aimUID, String aimName, String patientID, String patientName,
@@ -156,7 +157,9 @@ public class PluginAIMOptions
 		} else {
 			this.templateName = imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName();
 		}
-		
+		if (this.templateName==null || this.templateName.equals("")) {
+			this.templateName = imageAnnotationV4.getListTypeCode().get(0).getDisplayName().getValue();
+		}
 		this.sessionID = sessionID;
 		this.projectID = ""; //ml
 		
