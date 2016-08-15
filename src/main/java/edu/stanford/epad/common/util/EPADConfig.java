@@ -203,6 +203,7 @@ public class EPADConfig
 	
 	
 	public static String pluginMaxtime = EPADConfig.getInstance().getParamValue("pluginMaxtime", null);
+	public static int olderThan_Days = EPADConfig.getInstance().getIntegerPropertyValue("olderThan_Days", 360);
 	
 	private Properties properties;
 
