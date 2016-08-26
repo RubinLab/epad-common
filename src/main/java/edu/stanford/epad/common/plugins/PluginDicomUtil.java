@@ -164,6 +164,8 @@ public class PluginDicomUtil
 	public static int getPositionOfImageInDicomSeries(String studyUID, String seriesUID, String imageUID, String sessionID, String username)
 			throws Exception
 	{ 		
+		if (studyUID==null || studyUID.equals(""))
+			studyUID="*";
 		String url = EPADConfig.getParamValue("serverProxy", "http://localhost:8080") + EPADConfig.getParamValue("webserviceBase", "/epad") + "/v2" +
 				"/studies/" + studyUID + "/series/" + seriesUID + "/images/?username=" + username;
 		log.info("url for getPositionOfImageInDicomSeries: " + url);
