@@ -486,6 +486,39 @@ public class EPADFileUtils
 	}
 
 	/**
+	 * Delete all of a directory's contents.
+	 * 
+	 * @param directoryToDelete File
+	 * @return boolean true if everything deleted.
+	 */
+	public static boolean deleteDirectoryContents(File directoryToDelete)
+	{
+		try {
+			List<File> dirs = getDirectoriesIn(directoryToDelete);
+			for (File currDir : dirs) {
+				if (!deleteDirectoryAndContents(currDir)) {
+					throw new IllegalStateException("Filed to delete dir=" + directoryToDelete.getAbsolutePath());
+				}
+			}
+			File[] files = directoryToDelete.listFiles();
+			for (File currFile : files) {
+				if (!currFile.delete()) {
+					throw new IllegalStateException("Could not delete file=" + currFile.getAbsolutePath());
+				}
+			}
+			
+			return true;
+
+		} catch (IllegalStateException ise) {
+			log.warning("Warning: error deleting directory " + directoryToDelete.getAbsolutePath(), ise);
+			return false;
+		} catch (Exception e) {
+			log.warning("Warning: error deleting directory " + directoryToDelete.getAbsolutePath(), e);
+			return false;
+		}
+	}
+
+	/**
 	 * Delete a directory and all of its contents.
 	 * 
 	 * @param directoryToDelete File
