@@ -189,12 +189,16 @@ public class DCM4CHEEUtil
 		BufferedReader br = null;
 
 		try {
-			String dcmServerTitlePort = aeTitle + "@localhost:" + dicomServerPort;
+			String dcmServerTitlePort = aeTitle + "@"+EPADConfig.dicomServerIP +":" + dicomServerPort;
 			dcmServerTitlePort = dcmServerTitlePort.trim();
 			log.info("Sending file - command: ./dcmsnd " + dcmServerTitlePort + " " + inputPathFile);
 			String[] command = { "./dcmsnd", dcmServerTitlePort, inputPathFile };
 			ProcessBuilder pb = new ProcessBuilder(command);
-			String dicomBinDirectoryPath = EPADConfig.getEPADWebServerDICOMBinDir();
+			
+			String dicomBinDirectoryPath = EPADConfig.getEPADWebServerDICOMScriptsDir() + "bin/";
+			File script = new File(dicomBinDirectoryPath, "dcmsnd");
+			if (!script.exists())
+				dicomBinDirectoryPath = EPADConfig.getEPADWebServerDICOMBinDir();
 			log.info("DICOM binary directory: " + dicomBinDirectoryPath);
 			pb.directory(new File(dicomBinDirectoryPath));
 			Process process = pb.start();
