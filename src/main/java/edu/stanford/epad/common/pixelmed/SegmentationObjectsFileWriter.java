@@ -677,76 +677,80 @@ public class SegmentationObjectsFileWriter
 		// Following attributes are inherited.
 
 		// Generate Shared Functional Groups Sequence
-		{ // DerivationImageSequence - TODO - Need to verify if this is correct???
-			SequenceAttribute derivation_image_seq = new SequenceAttribute(TagFromName.DerivationImageSequence);
-			AttributeList reference = new AttributeList();
-			{
-				AttributeList item = new AttributeList();
-				{
-					Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
-					a.addValue("113076");
-					item.put(a);
-				}
-				{
-					Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
-					a.addValue("DCM");
-					item.put(a);
-				}
-				{
-					Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
-					a.addValue("Segmentation");
-					item.put(a);
-				}
-				SequenceAttribute seq = new SequenceAttribute(TagFromName.DerivationCodeSequence);
-				seq.addItem(item);
-				reference.put(seq);
-			}
-			SequenceAttribute source_image_seq = new SequenceAttribute(TagFromName.SourceImageSequence);
-			for (int i = 0; i < orig_inst_uids.length; i++)
-			{ // SourceImageSequence
-				AttributeList image = new AttributeList();
-				AttributeList item = new AttributeList();
-				{
-					Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
-					a.addValue("121322");
-					item.put(a);
-				}
-				{
-					Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
-					a.addValue("DCM");
-					item.put(a);
-				}
-				{
-					Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
-					a.addValue("Source image for image processing operation");
-					item.put(a);
-				}
-				SequenceAttribute seq = new SequenceAttribute(TagFromName.PurposeOfReferenceCodeSequence);
-				seq.addItem(item);
-				image.put(seq);
-				{
-					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
-					a.addValue(orig_class_uid);
-					image.put(a);
-				}
-				{
-					//log.info("SourceImageSequence:" + i + " ReferencedSOPInstanceUID:" + orig_inst_uids[i]);
-					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
-					a.addValue(orig_inst_uids[i]);
-					image.put(a);
-				}
-				// Need this for multiframe source DICOM???
-				{
-					Attribute a = new IntegerStringAttribute(TagFromName.ReferencedFrameNumber);
-					a.addValue("1");
-					image.put(a);
-				}
-				source_image_seq.addItem(image);
-			}
-			reference.put(source_image_seq);
-			derivation_image_seq.addItem(reference);
-			shared_functional_groups_item.put(derivation_image_seq);
-		}
+		
+		//dciodvfy fails with Error - Functional Group Sequence already used in Shared Functional Groups Sequence - (0x0008,0x9124) Derivation Image Sequence - in Per-frame Functional Groups Sequence Item #1
+		//try removing this (DerivationImageSequence from shared) and test with dciodvfy, slicer and epad. Test is ok. Worked with all
+//		{ // DerivationImageSequence - TODO - Need to verify if this is correct???
+//			SequenceAttribute derivation_image_seq = new SequenceAttribute(TagFromName.DerivationImageSequence);
+//			AttributeList reference = new AttributeList();
+//			{
+//				AttributeList item = new AttributeList();
+//				{
+//					Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+//					a.addValue("113076");
+//					item.put(a);
+//				}
+//				{
+//					Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+//					a.addValue("DCM");
+//					item.put(a);
+//				}
+//				{
+//					Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+//					a.addValue("Segmentation");
+//					item.put(a);
+//				}
+//				SequenceAttribute seq = new SequenceAttribute(TagFromName.DerivationCodeSequence);
+//				seq.addItem(item);
+//				reference.put(seq);
+//			}
+//			SequenceAttribute source_image_seq = new SequenceAttribute(TagFromName.SourceImageSequence);
+//			for (int i = 0; i < orig_inst_uids.length; i++)
+//			{ // SourceImageSequence
+//				AttributeList image = new AttributeList();
+//				AttributeList item = new AttributeList();
+//				{
+//					Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+//					a.addValue("121322");
+//					item.put(a);
+//				}
+//				{
+//					Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+//					a.addValue("DCM");
+//					item.put(a);
+//				}
+//				{
+//					Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+//					a.addValue("Source image for image processing operation");
+//					item.put(a);
+//				}
+//				SequenceAttribute seq = new SequenceAttribute(TagFromName.PurposeOfReferenceCodeSequence);
+//				seq.addItem(item);
+//				image.put(seq);
+//				{
+//					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
+//					a.addValue(orig_class_uid);
+//					image.put(a);
+//				}
+//				{
+//					//log.info("SourceImageSequence:" + i + " ReferencedSOPInstanceUID:" + orig_inst_uids[i]);
+//					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
+//					a.addValue(orig_inst_uids[i]);
+//					image.put(a);
+//				}
+//				// Need this for multiframe source DICOM???
+//				{
+//					Attribute a = new IntegerStringAttribute(TagFromName.ReferencedFrameNumber);
+//					a.addValue("1");
+//					image.put(a);
+//				}
+//				source_image_seq.addItem(image);
+//			}
+//			reference.put(source_image_seq);
+//			derivation_image_seq.addItem(reference);
+//			//added to per frame for slicer
+//			shared_functional_groups_item.put(derivation_image_seq);
+//		}
 		{ // PlaneOrientationSequence
 			SequenceAttribute plane_orientation_seq = new SequenceAttribute(TagFromName.PlaneOrientationSequence);
 			AttributeList item = new AttributeList();
@@ -817,72 +821,72 @@ public class SegmentationObjectsFileWriter
 			a.addValue(ManufacturerModelName + SoftwareVersion);
 			list.put(a);
 		}
-		{
-			String[] context = parse_context(category);
-			AttributeList item = new AttributeList();
-			{
-				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
-				a.addValue(context[0]);
-				item.put(a);
-			}
-			{
-				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
-				a.addValue(context[1]);
-				item.put(a);
-			}
-			{
-				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
-				a.addValue(context[2]);
-				item.put(a);
-			}
-			SequenceAttribute seq = new SequenceAttribute(TagFromName.AnatomicRegionSequence);
-			seq.addItem(item);
-			list.put(seq);
-		}
-		{
-			String[] context = parse_context(category);
-			AttributeList item = new AttributeList();
-			{
-				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
-				a.addValue(context[0]);
-				item.put(a);
-			}
-			{
-				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
-				a.addValue(context[1]);
-				item.put(a);
-			}
-			{
-				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
-				a.addValue(context[2]);
-				item.put(a);
-			}
-			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyCategoryCodeSequence);
-			seq.addItem(item);
-			list.put(seq);
-		}
-		{
-			String[] context = parse_context(type);
-			AttributeList item = new AttributeList();
-			{
-				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
-				a.addValue(context[0]);
-				item.put(a);
-			}
-			{
-				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
-				a.addValue(context[1]);
-				item.put(a);
-			}
-			{
-				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
-				a.addValue(context[2]);
-				item.put(a);
-			}
-			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyTypeCodeSequence);
-			seq.addItem(item);
-			list.put(seq);
-		}
+//		{
+//			String[] context = parse_context(category);
+//			AttributeList item = new AttributeList();
+//			{
+//				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+//				a.addValue(context[0]);
+//				item.put(a);
+//			}
+//			{
+//				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+//				a.addValue(context[1]);
+//				item.put(a);
+//			}
+//			{
+//				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+//				a.addValue(context[2]);
+//				item.put(a);
+//			}
+//			SequenceAttribute seq = new SequenceAttribute(TagFromName.AnatomicRegionSequence);
+//			seq.addItem(item);
+//			list.put(seq);
+//		}
+//		{
+//			String[] context = parse_context(category);
+//			AttributeList item = new AttributeList();
+//			{
+//				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+//				a.addValue(context[0]);
+//				item.put(a);
+//			}
+//			{
+//				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+//				a.addValue(context[1]);
+//				item.put(a);
+//			}
+//			{
+//				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+//				a.addValue(context[2]);
+//				item.put(a);
+//			}
+//			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyCategoryCodeSequence);
+//			seq.addItem(item);
+//			list.put(seq);
+//		}
+//		{
+//			String[] context = parse_context(type);
+//			AttributeList item = new AttributeList();
+//			{
+//				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+//				a.addValue(context[0]);
+//				item.put(a);
+//			}
+//			{
+//				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+//				a.addValue(context[1]);
+//				item.put(a);
+//			}
+//			{
+//				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+//				a.addValue(context[2]);
+//				item.put(a);
+//			}
+//			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyTypeCodeSequence);
+//			seq.addItem(item);
+//			list.put(seq);
+//		}
 
 		SequenceItem item = new SequenceItem(list);
 		segment_sequence.addItem(item);
@@ -1152,11 +1156,14 @@ public class SegmentationObjectsFileWriter
 						image.put(a);
 					}
 					// Need this for multiframe source DICOM???
-					{
-						Attribute a = new IntegerStringAttribute(TagFromName.ReferencedFrameNumber);
-						a.addValue("1");
-						image.put(a);
-					}
+					//dciodvfy throw error 
+					//Error - May not be present for Referenced SOP Class that is not multi-frame - attribute <ReferencedFrameNumber>
+
+//					{
+//						Attribute a = new IntegerStringAttribute(TagFromName.ReferencedFrameNumber);
+//						a.addValue("1");
+//						image.put(a);
+//					}
 					source_image_seq.addItem(image);
 				}
 				reference.put(source_image_seq);
