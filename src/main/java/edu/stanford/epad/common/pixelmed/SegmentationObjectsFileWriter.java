@@ -821,72 +821,72 @@ public class SegmentationObjectsFileWriter
 			a.addValue(ManufacturerModelName + SoftwareVersion);
 			list.put(a);
 		}
-//		{
-//			String[] context = parse_context(category);
-//			AttributeList item = new AttributeList();
-//			{
-//				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
-//				a.addValue(context[0]);
-//				item.put(a);
-//			}
-//			{
-//				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
-//				a.addValue(context[1]);
-//				item.put(a);
-//			}
-//			{
-//				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
-//				a.addValue(context[2]);
-//				item.put(a);
-//			}
-//			SequenceAttribute seq = new SequenceAttribute(TagFromName.AnatomicRegionSequence);
-//			seq.addItem(item);
-//			list.put(seq);
-//		}
-//		{
-//			String[] context = parse_context(category);
-//			AttributeList item = new AttributeList();
-//			{
-//				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
-//				a.addValue(context[0]);
-//				item.put(a);
-//			}
-//			{
-//				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
-//				a.addValue(context[1]);
-//				item.put(a);
-//			}
-//			{
-//				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
-//				a.addValue(context[2]);
-//				item.put(a);
-//			}
-//			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyCategoryCodeSequence);
-//			seq.addItem(item);
-//			list.put(seq);
-//		}
-//		{
-//			String[] context = parse_context(type);
-//			AttributeList item = new AttributeList();
-//			{
-//				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
-//				a.addValue(context[0]);
-//				item.put(a);
-//			}
-//			{
-//				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
-//				a.addValue(context[1]);
-//				item.put(a);
-//			}
-//			{
-//				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
-//				a.addValue(context[2]);
-//				item.put(a);
-//			}
-//			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyTypeCodeSequence);
-//			seq.addItem(item);
-//			list.put(seq);
-//		}
+		{
+			String[] context = parse_context(category);
+			AttributeList item = new AttributeList();
+			{
+				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+				a.addValue(context[0]);
+				item.put(a);
+			}
+			{
+				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+				a.addValue(context[1]);
+				item.put(a);
+			}
+			{
+				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+				a.addValue(context[2]);
+				item.put(a);
+			}
+			SequenceAttribute seq = new SequenceAttribute(TagFromName.AnatomicRegionSequence);
+			seq.addItem(item);
+			list.put(seq);
+		}
+		{
+			String[] context = parse_context(category);
+			AttributeList item = new AttributeList();
+			{
+				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+				a.addValue(context[0]);
+				item.put(a);
+			}
+			{
+				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+				a.addValue(context[1]);
+				item.put(a);
+			}
+			{
+				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+				a.addValue(context[2]);
+				item.put(a);
+			}
+			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyCategoryCodeSequence);
+			seq.addItem(item);
+			list.put(seq);
+		}
+		{
+			String[] context = parse_context(type);
+			AttributeList item = new AttributeList();
+			{
+				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+				a.addValue(context[0]);
+				item.put(a);
+			}
+			{
+				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+				a.addValue(context[1]);
+				item.put(a);
+			}
+			{
+				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+				a.addValue(context[2]);
+				item.put(a);
+			}
+			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyTypeCodeSequence);
+			seq.addItem(item);
+			list.put(seq);
+		}
 
 		SequenceItem item = new SequenceItem(list);
 		segment_sequence.addItem(item);
