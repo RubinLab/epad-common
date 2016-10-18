@@ -364,19 +364,65 @@ public class TIFFMasksToDSOConverter
 	DicomException
 	{
 		AttributeList localDICOMAttributes = new AttributeList();
+		AttributeList lastLocalDICOMAttributes = new AttributeList();
 		String dicomInputFile = dicomFilePaths.get(0);
 
+		short firstImageWidth = 0, firstImageHeight = 0, lastImageWidth = 0, lastImageHeight = 0, largestImageWidth = 0, largestImageHeight = 0, mImageWidth = 0, mImageHeight = 0;
 		DicomInputStream dicomInputStream = null;
 		try {
 			dicomInputStream = new DicomInputStream(new FileInputStream(dicomInputFile));
 			localDICOMAttributes.read(dicomInputStream);
+			firstImageWidth = (short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Columns, 1);
+			firstImageHeight = (short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Rows, 1);
 		} finally {
 			IOUtils.closeQuietly(dicomInputStream);
 		}
+		
+		String lastDicomInputFile = dicomFilePaths.get(dicomFilePaths.size()-1);
+
+		DicomInputStream lastDicomInputStream = null;
+		try {
+			lastDicomInputStream = new DicomInputStream(new FileInputStream(lastDicomInputFile));
+			lastLocalDICOMAttributes.read(lastDicomInputStream);
+			firstImageWidth = (short)Attribute.getSingleIntegerValueOrDefault(lastLocalDICOMAttributes, TagFromName.Columns, 1);
+			firstImageHeight = (short)Attribute.getSingleIntegerValueOrDefault(lastLocalDICOMAttributes, TagFromName.Rows, 1);
+		} finally {
+			IOUtils.closeQuietly(lastDicomInputStream);
+		}
+		
+		if (firstImageHeight!=lastImageHeight || firstImageWidth!=lastImageWidth) { //get all the images
+			largestImageHeight= (firstImageHeight>lastImageHeight)? firstImageHeight : lastImageHeight;
+			largestImageWidth= (firstImageWidth>lastImageWidth)? firstImageWidth : lastImageWidth;
+			AttributeList mLocalDICOMAttributes = new AttributeList();
+			//check the other images for largest
+			for (int i=1; i<dicomFilePaths.size()-1;i++) { //already checked first and last
+				String mDicomInputFile = dicomFilePaths.get(i);
+
+				DicomInputStream mDicomInputStream = null;
+				try {
+					mDicomInputStream = new DicomInputStream(new FileInputStream(mDicomInputFile));
+					mLocalDICOMAttributes.read(mDicomInputStream);
+					mImageWidth = (short)Attribute.getSingleIntegerValueOrDefault(mLocalDICOMAttributes, TagFromName.Columns, 1);
+					mImageHeight = (short)Attribute.getSingleIntegerValueOrDefault(mLocalDICOMAttributes, TagFromName.Rows, 1);
+					largestImageHeight= (mImageHeight>largestImageHeight)? mImageHeight : largestImageHeight;
+					largestImageWidth= (mImageWidth>largestImageWidth)? mImageWidth : largestImageWidth;
+					
+				} finally {
+					IOUtils.closeQuietly(lastDicomInputStream);
+				}
+			}
+		}
+		else {
+			largestImageHeight= firstImageHeight;
+			largestImageWidth= firstImageWidth;
+		}
+			
+		log.info("largest image height:"+largestImageHeight + " width:"+ largestImageWidth);
+		
 		if (dicomAttributes == null) dicomAttributes = new AttributeList[dicomFilePaths.size()];
 		this.dicomAttributes[0] = (AttributeList)localDICOMAttributes.clone();
-		this.imageWidth = (short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Columns, 1);
-		this.imageHeight = (short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Rows, 1);
+		this.imageWidth = largestImageWidth;//(short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Columns, 1);
+		this.imageHeight = largestImageHeight;//(short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Rows, 1);
 		this.numberOfFrames = (short)dicomFilePaths.size();
 		log.info("Number of frames in DICOM file " + this.numberOfFrames);
 
