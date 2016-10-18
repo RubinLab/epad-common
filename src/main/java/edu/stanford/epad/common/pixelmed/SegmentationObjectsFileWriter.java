@@ -558,7 +558,6 @@ public class SegmentationObjectsFileWriter
 				
 				//get positions for segmentation frames
 				seg_positions[instanceIndex] = Attribute.getDoubleValues(original_attrs_list[instanceIndex], TagFromName.ImagePositionPatient);
-						
 				
 				a.addValue(orig_inst_uid);
 				referencedInstanceSequenceAttributes.put(a);
@@ -929,6 +928,7 @@ public class SegmentationObjectsFileWriter
 			 log.warning("type:" + type + " frames.length " + frames.length + " width:" + image_width + " height:" + image_height + " frames:" + frame_num);
 			 log.warning("image_width * image_height * frame_num - 1) / 8 + 1 :"
 					 + ((image_width * image_height * frame_num - 1) / 8 + 1));
+			
 			 throw (new DicomException("Image size or type is not correct!"));
 		 }
 
@@ -1074,7 +1074,7 @@ public class SegmentationObjectsFileWriter
 				SequenceAttribute seq = new SequenceAttribute(TagFromName.PlanePositionSequence);
 				AttributeList item = new AttributeList();
 				Attribute a = new DecimalStringAttribute(TagFromName.ImagePositionPatient);
-				if (positions != null) {
+				if (seg_positions[k] != null) {
 					//for slicer get seg positions
 					a.addValue(seg_positions[k][0]);
 					a.addValue(seg_positions[k][1]);
