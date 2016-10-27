@@ -282,7 +282,7 @@ public class DicomQR extends ApplicationFrame {
 				String                        queryHost = presentationAddress.getHostname();
 				int			      queryPort = presentationAddress.getPort();
 				String                       queryModel = networkApplicationInformation.getApplicationEntityMap().getQueryModel(queryCalledAETitle);
-				int                     queryDebugLevel = networkApplicationProperties.getQueryDebugLevel();
+				int                     queryDebugLevel = 0;//networkApplicationProperties.getQueryDebugLevel();
 
 				if (NetworkApplicationProperties.isStudyRootQueryModel(queryModel) || queryModel == null) {
 					currentRemoteQueryInformationModel=new StudyRootQueryInformationModel(queryHost,queryPort,queryCalledAETitle,queryCallingAETitle,queryDebugLevel);
@@ -384,8 +384,8 @@ public class DicomQR extends ApplicationFrame {
 				ourCalledAETitle = networkApplicationProperties.getCalledAETitle();
 				ApplicationEventDispatcher.getApplicationEventDispatcher().processEvent(new StatusChangeEvent("Starting up DICOM association listener on port "+port+" AET "+ourCalledAETitle));
 				System.err.println("Starting up DICOM association listener on port "+port+" AET "+ourCalledAETitle);
-				int storageSCPDebugLevel = networkApplicationProperties.getStorageSCPDebugLevel();
-				int queryDebugLevel = networkApplicationProperties.getQueryDebugLevel();
+				int storageSCPDebugLevel = 0;//networkApplicationProperties.getStorageSCPDebugLevel();
+				int queryDebugLevel = 0;//networkApplicationProperties.getQueryDebugLevel();
 				storageSOPClassSCPDispatcher = new StorageSOPClassSCPDispatcher(port,ourCalledAETitle,savedImagesFolder,StoredFilePathStrategy.BYSOPINSTANCEUIDINSINGLEFOLDER,new OurReceivedObjectHandler(),
 						srcDatabase == null ? null : srcDatabase.getQueryResponseGeneratorFactory(queryDebugLevel),
 								srcDatabase == null ? null : srcDatabase.getRetrieveResponseGeneratorFactory(queryDebugLevel),
@@ -484,6 +484,12 @@ public class DicomQR extends ApplicationFrame {
 			}
 			//System.err.println("DownloadOrTransmit.OurTransferSyntaxSelectionPolicy.applyTransferSyntaxSelectionPolicy(): accepted "+presentationContexts);
 			return presentationContexts;
+		}
+
+		@Override
+		public LinkedList applyTransferSyntaxSelectionPolicy(LinkedList arg0, int arg1) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
