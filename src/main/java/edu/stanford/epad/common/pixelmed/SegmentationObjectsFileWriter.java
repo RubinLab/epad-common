@@ -781,6 +781,18 @@ public class SegmentationObjectsFileWriter
 	 */
 	public void addOneSegment(String description, CodedConcept category, CodedConcept type) throws DicomException
 	{
+		addOneSegment(description, category, type, null);
+	}
+	/**
+	 * Add a segment.
+	 * 
+	 * @param description is the user defined string which may be the purpose of segmenting.
+	 * @param category should be a value defined in future SegmentationPropertyCategories.
+	 * @param type should be a value defined in future SegmentationPropertyTypes.
+	 * @throws DicomException
+	 */
+	public void addOneSegment(String description, CodedConcept category, CodedConcept type, String color) throws DicomException
+	{
 		// Validate the parameters.
 		current_segment++;
 
@@ -790,6 +802,15 @@ public class SegmentationObjectsFileWriter
 
 		// SegmentSequence attribute
 		AttributeList list = new AttributeList();
+		if (color==null){ //test case
+			Attribute a = new UnsignedShortAttribute(TagFromName.RecommendedDisplayCIELabValue);
+			double[] rgb=new double[]{128,174,128};
+			int[] scaledLab=DSOColorHelper.rgb2ScaledLab(rgb);
+			a.addValue(scaledLab[0]);
+			a.addValue(scaledLab[1]);
+			a.addValue(scaledLab[2]);
+			list.put(a);
+		}
 		{
 			Attribute a = new UnsignedShortAttribute(TagFromName.SegmentNumber);
 			a.addValue(current_segment);
