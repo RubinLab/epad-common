@@ -5,7 +5,10 @@ import java.util.Map;
 
 import com.pixelmed.anatproc.CodedConcept;
 
+import edu.stanford.epad.common.util.EPADLogger;
+
 public class SegmentedPropertyHelper {
+	
 	class SegmentedProperty {
 		CodedConcept category;
 		CodedConcept type;
@@ -22,6 +25,8 @@ public class SegmentedPropertyHelper {
 	}
 	
 	CodedConcept str2cc(String s){
+		if (s==null)
+			return null;
 		//input (T-D000A;SRT;Anatomical Structure)
 		s=s.replace("(", "").replace(")", "");
 		String[] str=s.split(";");
@@ -329,8 +334,18 @@ public class SegmentedPropertyHelper {
 	}
 	
 	SegmentedProperty getSegmentProperty(String idStr) {
-		int id=Integer.parseInt(idStr);
-		if (idStr == null || properties.get(id) == null){
+
+		if (idStr == null){
+			return properties.get(1);
+		}
+		int id=0;
+		try{
+			id=Integer.parseInt(idStr);
+		}catch(NumberFormatException ne){
+			return properties.get(1);
+		}
+		
+		if (properties.get(id) == null){
 			return properties.get(1);
 		}
 		return properties.get(id);

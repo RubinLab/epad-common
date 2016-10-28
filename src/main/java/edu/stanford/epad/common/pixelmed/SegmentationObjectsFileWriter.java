@@ -1287,12 +1287,12 @@ public class SegmentationObjectsFileWriter
 	}
 	
 	/**
-	 * @param Output color as a double array which is a string like (255;255;255) r,g,b should be in range 0-255
+	 * @param Output color as a double array which is a string like rgb(255;255;255) r,g,b should be in range 0-255
 	 */
 	private double[] parse_color(String color)
 	{
 		double[] val = new double[3];
-		color=color.replace("(", "").replace(")", "");
+		color=color.replace("(", "").replace(")", "").replace("rgb", "");
 		String[] colorStr=color.split(";");
 		try {
 			val[0] = Double.parseDouble(colorStr[0]);
