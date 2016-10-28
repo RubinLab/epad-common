@@ -118,7 +118,7 @@ public class MailUtil {
 	
 	private static final EPADLogger log = EPADLogger.getInstance();
 
-	String host = "localhost";
+	String host = EPADConfig.xnatServer;// do not use "localhost"; 
 	String port = "25";
 	String username = null;
 	String password = null;
