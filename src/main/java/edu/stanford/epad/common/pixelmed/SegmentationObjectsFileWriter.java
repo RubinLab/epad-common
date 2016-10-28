@@ -781,7 +781,7 @@ public class SegmentationObjectsFileWriter
 	 */
 	public void addOneSegment(String description, CodedConcept category, CodedConcept type) throws DicomException
 	{
-		addOneSegment(description, category, type, null);
+		addOneSegment(description, category, type, null, null);
 	}
 	/**
 	 * Add a segment.
@@ -789,9 +789,11 @@ public class SegmentationObjectsFileWriter
 	 * @param description is the user defined string which may be the purpose of segmenting.
 	 * @param category should be a value defined in future SegmentationPropertyCategories.
 	 * @param type should be a value defined in future SegmentationPropertyTypes.
+	 * @param modifier should be a value defined in future SegmentationPropertyModifiers.
+	 * @param color recommended color for the segmentation in rgb as a text (255,255,255) r,g,b should be in range 0-255
 	 * @throws DicomException
 	 */
-	public void addOneSegment(String description, CodedConcept category, CodedConcept type, String color) throws DicomException
+	public void addOneSegment(String description, CodedConcept category, CodedConcept type, CodedConcept modifier, String color) throws DicomException
 	{
 		// Validate the parameters.
 		current_segment++;
@@ -802,9 +804,10 @@ public class SegmentationObjectsFileWriter
 
 		// SegmentSequence attribute
 		AttributeList list = new AttributeList();
-		if (color==null){ //test case
+		if (color!=null){ 
 			Attribute a = new UnsignedShortAttribute(TagFromName.RecommendedDisplayCIELabValue);
-			double[] rgb=new double[]{128,174,128};
+			
+			double[] rgb=parse_color(color);
 			int[] scaledLab=DSOColorHelper.rgb2ScaledLab(rgb);
 			a.addValue(scaledLab[0]);
 			a.addValue(scaledLab[1]);
@@ -902,6 +905,31 @@ public class SegmentationObjectsFileWriter
 			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyTypeCodeSequence);
 			seq.addItem(item);
 			list.put(seq);
+			
+		}
+		
+		if (modifier!=null){
+			String[] context = parse_context(modifier);
+			AttributeList item = new AttributeList();
+			{
+				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+				a.addValue(context[0]);
+				item.put(a);
+			}
+			{
+				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+				a.addValue(context[1]);
+				item.put(a);
+			}
+			{
+				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+				a.addValue(context[2]);
+				item.put(a);
+			}
+			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyTypeModifierCodeSequence);
+			seq.addItem(item);
+			list.put(seq);
+			
 		}
 
 		SequenceItem item = new SequenceItem(list);
@@ -1246,6 +1274,27 @@ public class SegmentationObjectsFileWriter
 			val[0] = "Unknown Scheme";
 			val[1] = "Unknown Value";
 			val[2] = "Unknown Meaning";
+		}
+
+		return val;
+	}
+	
+	/**
+	 * @param Output color as a double array which is a string like (255;255;255) r,g,b should be in range 0-255
+	 */
+	private double[] parse_color(String color)
+	{
+		double[] val = new double[3];
+		color=color.replace("(", "").replace(")", "");
+		String[] colorStr=color.split(";");
+		try {
+			val[0] = Double.parseDouble(colorStr[0]);
+			val[1] = Double.parseDouble(colorStr[1]);
+			val[2] = Double.parseDouble(colorStr[2]);
+			
+		} catch (Exception e) {
+			System.err.println("The property is not a valid color!");
+			
 		}
 
 		return val;

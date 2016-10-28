@@ -126,6 +126,7 @@ import com.pixelmed.dicom.DicomException;
 import com.pixelmed.dicom.DicomInputStream;
 import com.pixelmed.dicom.TagFromName;
 
+import edu.stanford.epad.common.pixelmed.SegmentedPropertyHelper.SegmentedProperty;
 import edu.stanford.epad.common.util.EPADLogger;
 
 /**
@@ -275,16 +276,10 @@ public class TIFFMasksToDSOConverter
 			if (dicomAttributes == null) getAttributesFromDICOMFiles(dicomFilePaths);
 			SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(dicomAttributes, orientation,
 					spacing, thickness, dsoSeriesDescription, dsoSeriesUID, dsoInstanceUID);
-			CodedConcept category = new CodedConcept("C0085089" /* conceptUniqueIdentifier */, "260787004" /* SNOMED CID */,
-					"SRT" /* codingSchemeDesignator */, "SNM3" /* legacyCodingSchemeDesignator */,
-					null /* codingSchemeVersion */, "A-00004" /* codeValue */, "Physical Object" /* codeMeaning */,
-					null /* codeStringEquivalent */, null /* synonynms */);
-			CodedConcept type = new CodedConcept("C0018787" /* conceptUniqueIdentifier */, "80891009" /* SNOMED CID */,
-					"SRT" /* codingSchemeDesignator */, null /* legacyCodingSchemeDesignator */,
-					null /* codingSchemeVersion */, "T-32000" /* codeValue */, "Heart" /* codeMeaning */,
-					null /* codeStringEquivalent */, null /* synonynms */);
 			log.info("Adding One Segment...");
-			dsoWriter.addOneSegment("Segment No.1 is for ...", category, type);
+			SegmentedPropertyHelper sph=new SegmentedPropertyHelper();
+			SegmentedProperty sp=sph.getSegmentProperty(null);
+			dsoWriter.addOneSegment("Segment No.1 is for ...", sp.category, sp.type, sp.modifier, sp.defColor);
 			log.info("Adding All Frames...");
 			dsoWriter.addAllFrames(pixeldata, numberOfFrames, imageWidth, imageHeight, imgType, (short)0, positions);
 			log.info("Saving Dicom File...");
