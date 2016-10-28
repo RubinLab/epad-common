@@ -163,6 +163,7 @@ import com.pixelmed.geometry.GeometryOfSlice;
 import com.pixelmed.utils.CopyStream;
 
 import edu.stanford.epad.common.util.EPADLogger;
+import edu.stanford.epad.common.util.EPadWebServerVersion;
 
 /**
  * A class for saving segmentation results.
@@ -175,7 +176,7 @@ public class SegmentationObjectsFileWriter
 	public static final String Manufacturer = "Stanford University";
 	public static final String ManufacturerModelName = "ePAD";
 	public static final String DeviceSerialNumber = "SN123456";
-	public static final String SoftwareVersion = "2.0.1";
+	public static final String SoftwareVersion = new EPadWebServerVersion().getVersion();
 	public static final String SeriesDescription = "ePAD Generated DSO";
 	public static final String prefix = "ePAD DSO";
 	public static final String SourceApplicationEntityTitle = "Default title";
