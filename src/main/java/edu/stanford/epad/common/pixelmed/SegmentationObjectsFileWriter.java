@@ -163,6 +163,7 @@ import com.pixelmed.geometry.GeometryOfSlice;
 import com.pixelmed.utils.CopyStream;
 
 import edu.stanford.epad.common.util.EPADLogger;
+import edu.stanford.epad.common.util.EPadWebServerVersion;
 
 /**
  * A class for saving segmentation results.
@@ -175,7 +176,7 @@ public class SegmentationObjectsFileWriter
 	public static final String Manufacturer = "Stanford University";
 	public static final String ManufacturerModelName = "ePAD";
 	public static final String DeviceSerialNumber = "SN123456";
-	public static final String SoftwareVersion = "2.0.1";
+	public static final String SoftwareVersion = new EPadWebServerVersion().getVersion();
 	public static final String SeriesDescription = "ePAD Generated DSO";
 	public static final String prefix = "ePAD DSO";
 	public static final String SourceApplicationEntityTitle = "Default title";
@@ -785,6 +786,20 @@ public class SegmentationObjectsFileWriter
 	 */
 	public void addOneSegment(String description, CodedConcept category, CodedConcept type) throws DicomException
 	{
+		addOneSegment(description, category, type, null, null);
+	}
+	/**
+	 * Add a segment.
+	 * 
+	 * @param description is the user defined string which may be the purpose of segmenting.
+	 * @param category should be a value defined in future SegmentationPropertyCategories.
+	 * @param type should be a value defined in future SegmentationPropertyTypes.
+	 * @param modifier should be a value defined in future SegmentationPropertyModifiers.
+	 * @param color recommended color for the segmentation in rgb as a text (255,255,255) r,g,b should be in range 0-255
+	 * @throws DicomException
+	 */
+	public void addOneSegment(String description, CodedConcept category, CodedConcept type, CodedConcept modifier, String color) throws DicomException
+	{
 		// Validate the parameters.
 		current_segment++;
 
@@ -794,6 +809,16 @@ public class SegmentationObjectsFileWriter
 
 		// SegmentSequence attribute
 		AttributeList list = new AttributeList();
+		if (color!=null){ 
+			Attribute a = new UnsignedShortAttribute(TagFromName.RecommendedDisplayCIELabValue);
+			
+			double[] rgb=parse_color(color);
+			int[] scaledLab=DSOColorHelper.rgb2ScaledLab(rgb);
+			a.addValue(scaledLab[0]);
+			a.addValue(scaledLab[1]);
+			a.addValue(scaledLab[2]);
+			list.put(a);
+		}
 		{
 			Attribute a = new UnsignedShortAttribute(TagFromName.SegmentNumber);
 			a.addValue(current_segment);
@@ -885,6 +910,31 @@ public class SegmentationObjectsFileWriter
 			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyTypeCodeSequence);
 			seq.addItem(item);
 			list.put(seq);
+			
+		}
+		
+		if (modifier!=null){
+			String[] context = parse_context(modifier);
+			AttributeList item = new AttributeList();
+			{
+				Attribute a = new ShortStringAttribute(TagFromName.CodingSchemeDesignator);
+				a.addValue(context[0]);
+				item.put(a);
+			}
+			{
+				Attribute a = new ShortStringAttribute(TagFromName.CodeValue);
+				a.addValue(context[1]);
+				item.put(a);
+			}
+			{
+				Attribute a = new LongStringAttribute(TagFromName.CodeMeaning);
+				a.addValue(context[2]);
+				item.put(a);
+			}
+			SequenceAttribute seq = new SequenceAttribute(TagFromName.SegmentedPropertyTypeModifierCodeSequence);
+			seq.addItem(item);
+			list.put(seq);
+			
 		}
 
 		SequenceItem item = new SequenceItem(list);
@@ -1232,6 +1282,27 @@ public class SegmentationObjectsFileWriter
 			val[0] = "Unknown Scheme";
 			val[1] = "Unknown Value";
 			val[2] = "Unknown Meaning";
+		}
+
+		return val;
+	}
+	
+	/**
+	 * @param Output color as a double array which is a string like rgb(255;255;255) r,g,b should be in range 0-255
+	 */
+	private double[] parse_color(String color)
+	{
+		double[] val = new double[3];
+		color=color.replace("(", "").replace(")", "").replace("rgb", "");
+		String[] colorStr=color.split(";");
+		try {
+			val[0] = Double.parseDouble(colorStr[0]);
+			val[1] = Double.parseDouble(colorStr[1]);
+			val[2] = Double.parseDouble(colorStr[2]);
+			
+		} catch (Exception e) {
+			System.err.println("The property is not a valid color!");
+			
 		}
 
 		return val;
