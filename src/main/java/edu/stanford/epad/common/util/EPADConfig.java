@@ -135,8 +135,8 @@ public class EPADConfig
 	
 	
 	// dcm4chee configuration
-	public static final String jmxUserName = EPADConfig.getInstance().getParamValue("jmxUserName",null);
-	public static final String jmxUserPass = EPADConfig.getInstance().getParamValue("jmxUserPassword",null);
+	public static final String jmxUserName = EPADConfig.getInstance().getParamValue("jmxUserName","admin");
+	public static final String jmxUserPass = EPADConfig.getInstance().getParamValue("jmxUserPassword","admin");
 	public static final String dcm4CheeServer = EPADConfig.getInstance().getStringPropertyValue("NameServer");
 	public static final int dcm4cheeServerWadoPort = EPADConfig.getInstance().getIntegerPropertyValue(
 			"DicomServerWadoPort");
