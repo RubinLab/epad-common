@@ -185,6 +185,12 @@ public class PixelMedUtils
 	public static final String ROIDisplayColor = getTagCode(TagFromName.ROIDisplayColor);
 	public static final String BodyPartExamined = getTagCode(TagFromName.BodyPartExamined);
 	
+	//added for getting segmentation category
+	public static final String CodeValueCode = getTagCode(TagFromName.CodeValue);
+	public static final String CodeMeaningCode = getTagCode(TagFromName.CodeMeaning);
+	public static final String CodingSchemeDesignatorCode = getTagCode(TagFromName.CodingSchemeDesignator);
+	
+	
 	public static AttributeList readDICOMAttributeList(File dicomFile)
 	{
 		AttributeList attributeList = new AttributeList();
