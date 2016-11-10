@@ -60,6 +60,9 @@ public class SegmentedPropertyHelper {
 	static Map<Integer,SegmentedProperty> properties=new HashMap<Integer,SegmentedProperty>();
 	
 	public SegmentedPropertyHelper() {
+		
+		//segmentation category and types terminology that is retrieved from 
+		//https://github.com/Slicer/Slicer/blob/eefeac9286f48552e8418a11f412b2823a09b407/Base/Logic/Resources/ColorFiles/Terminology/GenericAnatomyColors-SNOMED.csv
 		if (properties.isEmpty()) {		
 			properties.put(1,new SegmentedProperty(1,"tissue","(T-D0050;SRT;Tissue)","(T-D0050;SRT;Tissue)",null,"rgb(128;174;128)"));
 			properties.put(2,new SegmentedProperty(2,"bone","(T-D0050;SRT;Tissue)","(T-D016E;SRT;Bone)",null,"rgb(241;214;145)"));
