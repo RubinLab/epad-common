@@ -185,6 +185,25 @@ public class PixelMedUtils
 	public static final String ROIDisplayColor = getTagCode(TagFromName.ROIDisplayColor);
 	public static final String BodyPartExamined = getTagCode(TagFromName.BodyPartExamined);
 	
+	//added for getting segmentation category
+	public static final String CodeValueCode = getTagCode(TagFromName.CodeValue);
+	public static final String CodeMeaningCode = getTagCode(TagFromName.CodeMeaning);
+	public static final String CodingSchemeDesignatorCode = getTagCode(TagFromName.CodingSchemeDesignator);
+	public static final String SOPClassUIDCode = getTagCode(TagFromName.SOPClassUID);
+	public static final String PatientIDCode = getTagCode(TagFromName.PatientID);
+	
+	//required for suv
+	//injected, acqDate, acqTime, radioPhStartTime, radioPhHalfTime, weight, units
+	public static final String TotalDoseCode = getTagCode(TagFromName.RadionuclideTotalDose);
+	public static final String SeriesDateCode = getTagCode(TagFromName.SeriesDate);
+	public static final String SeriesTimeCode = getTagCode(TagFromName.SeriesTime);
+	public static final String RadiopharmaceuticalStartTimeCode = getTagCode(TagFromName.RadiopharmaceuticalStartTime);
+	public static final String RadionuclideHalfLifeCode = getTagCode(TagFromName.RadionuclideHalfLife);
+	public static final String PatientWeightCode = getTagCode(TagFromName.PatientWeight);
+	public static final String UnitsCode = getTagCode(TagFromName.Units);
+	public static final String SmallestImagePixelValueCode = getTagCode(TagFromName.SmallestImagePixelValue);
+	public static final String LargestImagePixelValueCode = getTagCode(TagFromName.LargestImagePixelValue);
+	
 	public static AttributeList readDICOMAttributeList(File dicomFile)
 	{
 		AttributeList attributeList = new AttributeList();
@@ -250,6 +269,18 @@ public class PixelMedUtils
 			int numberOfFrames = Attribute.getSingleIntegerValueOrDefault(list, TagFromName.NumberOfFrames, 1);
 			log.debug("Number of frames:" + numberOfFrames + " file:" + filePath);
 			return numberOfFrames > 1;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public static boolean isDicomSR(String filePath)
+	{
+		try {
+			AttributeList list = readAttributeListFromDicomFile(filePath);
+			String modality = Attribute.getSingleStringValueOrEmptyString(list, TagFromName.Modality);
+			log.info("Modality:" + modality + " file:" + filePath);
+			return modality.trim().equals("SR");
 		} catch (Exception e) {
 			return false;
 		}

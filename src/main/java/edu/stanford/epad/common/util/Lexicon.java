@@ -151,14 +151,21 @@ public class Lexicon extends HashMap<String, CD> {
 		try {
 			this.put("G-D7FE", new CD("G-D7FE","Length","SRT"));
 			this.put("RID12780", new CD("RID12780","Calculation","RadLex","3.2"));
-			this.put("RID39224", new CD("RID39224","Mean value calculation","RadLex","3.12"));
+			
+			//update with Andrey's list
+			this.put("R-00317", new CD("R-00317","Mean","SRT"));
+			this.put("R-404FB", new CD("R-404FB","Minimum","SRT"));
+			this.put("G-A437", new CD("G-A437","Maximum","SRT"));
+			this.put("R-10047", new CD("R-10047","Standard Deviation","SRT"));
+			
+//			this.put("RID39224", new CD("RID39224","Mean value calculation","RadLex","3.12"));
 			
 			//algorithms, start with 99EPADA
 			this.put(algPrefix+"2", new CD(algPrefix+"2","Plugin",ePadDesignator,ePadLexVersion));
 			this.put(algPrefix+"4", new CD(algPrefix+"4","Area",ePadDesignator,ePadLexVersion));
-			this.put(algPrefix+"5", new CD(algPrefix+"5","StandardDeviation",ePadDesignator,ePadLexVersion));
-			this.put(algPrefix+"6", new CD(algPrefix+"6","Min",ePadDesignator,ePadLexVersion));
-			this.put(algPrefix+"7", new CD(algPrefix+"7","Max",ePadDesignator,ePadLexVersion));
+//			this.put(algPrefix+"5", new CD(algPrefix+"5","StandardDeviation",ePadDesignator,ePadLexVersion));
+//			this.put(algPrefix+"6", new CD(algPrefix+"6","Min",ePadDesignator,ePadLexVersion));
+//			this.put(algPrefix+"7", new CD(algPrefix+"7","Max",ePadDesignator,ePadLexVersion));
 			
 			
 			//datatypes, start with 99EPADD
