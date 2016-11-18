@@ -201,6 +201,8 @@ public class PixelMedUtils
 	public static final String RadionuclideHalfLifeCode = getTagCode(TagFromName.RadionuclideHalfLife);
 	public static final String PatientWeightCode = getTagCode(TagFromName.PatientWeight);
 	public static final String UnitsCode = getTagCode(TagFromName.Units);
+	public static final String SmallestImagePixelValueCode = getTagCode(TagFromName.SmallestImagePixelValue);
+	public static final String LargestImagePixelValueCode = getTagCode(TagFromName.LargestImagePixelValue);
 	
 	public static AttributeList readDICOMAttributeList(File dicomFile)
 	{

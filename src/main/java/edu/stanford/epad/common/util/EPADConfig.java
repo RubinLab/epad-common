@@ -302,6 +302,14 @@ public class EPADConfig
 	{
 		return getEPADWebServerResourcesDir() + "upload/";
 	}
+	public static String getEPADWebServerDownloadDir()
+	{
+		return getEPADWebServerResourcesDir() + "download/";
+	}
+	public static String getEPADWebServerDownloadWSDir()
+	{
+		return getEPADWebServerResourcesDir() + "downloadWS/";
+	}
 
 	public static String getEPADWebServerFileUploadDir()
 	{
