@@ -335,9 +335,9 @@ public class TIFFMasksToDSOConverter
 			//do not use color for now
 			//uncomment later
 			//null check and use sp.defColor if null
-//			if (color==null || color.equals("")) {
-//				color=sp.defColor;
-//			}
+			if (color==null || color.equals("")) {
+				color=sp.defColor;
+			}
 			dsoWriter.addOneSegment("Segment No.1 is for ...", sp.category, sp.type, sp.modifier, color);
 			log.info("Adding All Frames...");
 			dsoWriter.addAllFrames(pixeldata, numberOfFrames, imageWidth, imageHeight, imgType, (short)0, positions);
