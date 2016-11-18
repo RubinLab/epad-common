@@ -287,7 +287,7 @@ public class TIFFMasksToDSOConverter
 				this.numberOfFrames = (short)dicomFilePaths.size();
 			}
 			log.debug("Dicom Files:" + dicomFilePaths.size() + " attributeLists:" + dicomAttributes.length);
-			return generateDSO(pixels, dicomFilePaths, outputFilePath, dsoSeriesDescription, dsoSeriesUID, dsoInstanceUID, imgType);
+			return generateDSO(pixels, dicomFilePaths, outputFilePath, dsoSeriesDescription, dsoSeriesUID, dsoInstanceUID, imgType, property, color);
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.warning("Error generating DSO: " + e);
