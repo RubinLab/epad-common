@@ -204,6 +204,11 @@ public class PixelMedUtils
 	public static final String SmallestImagePixelValueCode = getTagCode(TagFromName.SmallestImagePixelValue);
 	public static final String LargestImagePixelValueCode = getTagCode(TagFromName.LargestImagePixelValue);
 	
+	//added for pf migration
+	public static final String StudyInstanceUIDCode = getTagCode(TagFromName.StudyInstanceUID);
+	public static final String SeriesInstanceUIDCode = getTagCode(TagFromName.SeriesInstanceUID);
+	
+	
 	public static AttributeList readDICOMAttributeList(File dicomFile)
 	{
 		AttributeList attributeList = new AttributeList();
