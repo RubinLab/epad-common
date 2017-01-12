@@ -148,7 +148,20 @@ public class TIFFMasksToDSOConverter
 
 	private static final EPADLogger log = EPADLogger.getInstance();
 	public static HashMap<String,Integer> firstFrames= new HashMap<>();
+	
+	public void setDicomAttributes(AttributeList[] attributes) {
+		dicomAttributes=attributes;
+	}
+	public AttributeList[] getDicomAttributes() {
+		return dicomAttributes;
+	}
 
+	public short getNumberOfFrames() {
+		return numberOfFrames;
+	}
+	public void setNumberOfFrames(int numberOfFrames) {
+		this.numberOfFrames = (short) numberOfFrames;
+	}
 	/**
 	 * @param maskFiles: Array of the TIFF files which contain the masks.
 	 * @param dicomFiles: Array of the original DICOM files.
@@ -315,7 +328,7 @@ public class TIFFMasksToDSOConverter
 			throws DicomException
 	{
 		try {
-			if (dicomAttributes == null) getAttributesFromDICOMFiles(dicomFilePaths);
+			if (dicomAttributes == null || dicomAttributes.length==0) getAttributesFromDICOMFiles(dicomFilePaths);
 			SegmentationObjectsFileWriter dsoWriter = new SegmentationObjectsFileWriter(dicomAttributes, orientation,
 					spacing, thickness, dsoSeriesDescription, dsoSeriesUID, dsoInstanceUID);
 			log.info("Adding One Segment...");
@@ -419,9 +432,10 @@ public class TIFFMasksToDSOConverter
 		return fileList;
 	}
 
-	private int getAttributesFromDICOMFiles(List<String> dicomFilePaths) throws FileNotFoundException, IOException,
+	public int getAttributesFromDICOMFiles(List<String> dicomFilePaths) throws FileNotFoundException, IOException,
 	DicomException
 	{
+		log.info("Getting DICOM attributes for Image files");
 		AttributeList localDICOMAttributes = new AttributeList();
 		AttributeList lastLocalDICOMAttributes = new AttributeList();
 		String dicomInputFile = dicomFilePaths.get(0);
