@@ -274,39 +274,39 @@ public class RealWorldValueMapFileWriter
 			throw (new DicomException("The original attributes must not be null!"));
 
 
-//		/*********************************************************************
-//		 * Add constant attributes of rwvm objects.
-//		 *********************************************************************/
-//		{
-//			Attribute a = new UniqueIdentifierAttribute(TagFromName.MediaStorageSOPClassUID);
-//			a.addValue(SOPClass.SegmentationStorage);
-//			list.put(a);
-//		}
-//		{
-//			Attribute a = new UniqueIdentifierAttribute(TagFromName.TransferSyntaxUID);
-//			a.addValue(TransferSyntax.ExplicitVRLittleEndian);
-//			list.put(a);
-//		}
-//		{
-//			Attribute a = new UniqueIdentifierAttribute(TagFromName.ImplementationClassUID);
-//			a.addValue(SOPClass.SegmentationStorage);
-//			list.put(a);
-//		}
-//		{
-//			Attribute a = new UniqueIdentifierAttribute(TagFromName.SOPClassUID);
-//			a.addValue(SOPClass.SegmentationStorage);
-//			list.put(a);
-//		}
-//		{
-//			Attribute a = new CodeStringAttribute(TagFromName.Modality);
-//			a.addValue("SEG");
-//			list.put(a);
-//		}
-//		{
-//			Attribute a = new CodeStringAttribute(TagFromName.ContentLabel);
-//			a.addValue("ROI");
-//			list.put(a);
-//		}
+		/*********************************************************************
+		 * Add constant attributes of rwvm objects.
+		 *********************************************************************/
+		{
+			Attribute a = new UniqueIdentifierAttribute(TagFromName.MediaStorageSOPClassUID);
+			a.addValue(SOPClass.RealWorldValueMappingStorage);
+			list.put(a);
+		}
+		{
+			Attribute a = new UniqueIdentifierAttribute(TagFromName.TransferSyntaxUID);
+			a.addValue(TransferSyntax.ExplicitVRLittleEndian);
+			list.put(a);
+		}
+		{
+			Attribute a = new UniqueIdentifierAttribute(TagFromName.ImplementationClassUID);
+			a.addValue(SOPClass.RealWorldValueMappingStorage);
+			list.put(a);
+		}
+		{
+			Attribute a = new UniqueIdentifierAttribute(TagFromName.SOPClassUID);
+			a.addValue(SOPClass.RealWorldValueMappingStorage);
+			list.put(a);
+		}
+		{
+			Attribute a = new CodeStringAttribute(TagFromName.Modality);
+			a.addValue("RWV");
+			list.put(a);
+		}
+		{
+			Attribute a = new CodeStringAttribute(TagFromName.ContentLabel);
+			a.addValue("RWV");
+			list.put(a);
+		}
 //		{
 //			Attribute a = new UnsignedShortAttribute(TagFromName.SamplesPerPixel);
 //			a.addValue(1);
@@ -351,11 +351,11 @@ public class RealWorldValueMapFileWriter
 				a.addValue(date);
 				list.put(a);
 			}
-			{
-				Attribute a = new DateAttribute(TagFromName.AcquisitionDate);
-				a.addValue(date);
-				list.put(a);
-			}
+//			{
+//				Attribute a = new DateAttribute(TagFromName.AcquisitionDate);
+//				a.addValue(date);
+//				list.put(a);
+//			}
 			{
 				Attribute a = new DateAttribute(TagFromName.ContentDate);
 				a.addValue(date);
@@ -371,11 +371,11 @@ public class RealWorldValueMapFileWriter
 				a.addValue(time);
 				list.put(a);
 			}
-			{
-				Attribute a = new TimeAttribute(TagFromName.AcquisitionTime);
-				a.addValue(time);
-				list.put(a);
-			}
+//			{
+//				Attribute a = new TimeAttribute(TagFromName.AcquisitionTime);
+//				a.addValue(time);
+//				list.put(a);
+//			}
 			{
 				Attribute a = new TimeAttribute(TagFromName.ContentTime);
 				a.addValue(time);
@@ -465,9 +465,9 @@ public class RealWorldValueMapFileWriter
 				seriesUID = uid;
 			}
 			list.put(a);
-			a = new UniqueIdentifierAttribute(TagFromName.FrameOfReferenceUID);
-			a.addValue(uid);
-			list.put(a);
+//			a = new UniqueIdentifierAttribute(TagFromName.FrameOfReferenceUID);
+//			a.addValue(uid);
+//			list.put(a);
 		}
 		{
 			Attribute a = new UniqueIdentifierAttribute(TagFromName.SOPInstanceUID);
@@ -513,6 +513,7 @@ public class RealWorldValueMapFileWriter
 			log.debug("VALUE " + original_attrs.get(key));
 		}
 
+		
 		SequenceAttribute referencedSeriesSequence = new SequenceAttribute(TagFromName.ReferencedSeriesSequence);
 		AttributeList referencedSeriesSequenceAttributes = new AttributeList();
 		
@@ -523,8 +524,8 @@ public class RealWorldValueMapFileWriter
 			referencedSeriesSequenceAttributes.put(siu);
 		}
 
+		//TODO we need to put all the instances, not just one. should this get a series instead of an instance?
 		SequenceAttribute referencedInstanceSequence = new SequenceAttribute(TagFromName.ReferencedInstanceSequence);
-		seg_positions = new double[original_attrs_list.length][3];
 		orig_inst_uids = new String[original_attrs_list.length];
 		for (int instanceIndex = 0; instanceIndex < original_attrs_list.length; instanceIndex++) {
 			AttributeList referencedInstanceSequenceAttributes = new AttributeList();
@@ -539,8 +540,6 @@ public class RealWorldValueMapFileWriter
 				//log.info("" + instanceIndex + " ReferencedSOPInstanceUID:" + orig_inst_uid);
 				orig_inst_uids[instanceIndex] = orig_inst_uid;
 				
-				//get positions for segmentation frames
-				seg_positions[instanceIndex] = Attribute.getDoubleValues(original_attrs_list[instanceIndex], TagFromName.ImagePositionPatient);
 				
 				a.addValue(orig_inst_uid);
 				referencedInstanceSequenceAttributes.put(a);
@@ -559,8 +558,8 @@ public class RealWorldValueMapFileWriter
 		list.put(referencedSeriesSequence);
 
 		// Add meta information header.
-		FileMetaInformation.addFileMetaInformation(list, TransferSyntax.ExplicitVRLittleEndian,
-				SourceApplicationEntityTitle);
+//		FileMetaInformation.addFileMetaInformation(list, TransferSyntax.ExplicitVRLittleEndian,
+//				SourceApplicationEntityTitle);
 
 		/*********************************************************************
 		 * Extract attributes from the original attributes list.
@@ -574,90 +573,10 @@ public class RealWorldValueMapFileWriter
 		list.remove(TagFromName.ClinicalTrialSiteID);
 		list.remove(TagFromName.ClinicalTrialSubjectID);
 		list.remove(TagFromName.SliceThickness); // Not useful per Andriy, Sandy,  Clunie
-		
-		{ // Define dimensions as (stack id, in-stack position, segment number).
-			SequenceAttribute seq = new SequenceAttribute(TagFromName.DimensionOrganizationSequence);
-			AttributeList a = SequenceAttribute.getAttributeListFromWithinSequenceWithSingleItem(original_attrs,
-					TagFromName.DimensionOrganizationSequence);
-			Attribute org_uid = new UniqueIdentifierAttribute(TagFromName.DimensionOrganizationUID);
-			if (a == null) {
-				a = new AttributeList();
-				org_uid.addValue(u.getNewUID());
-				a.put(org_uid);
-			} else {
-				org_uid
-						.addValue(Attribute.getSingleStringValueOrDefault(a, TagFromName.DimensionOrganizationUID, u.getNewUID()));
-			}
-			seq.addItem(a);
-			list.put(seq);
-
-			seq = new SequenceAttribute(TagFromName.DimensionIndexSequence);
-			a = SequenceAttribute.getAttributeListFromWithinSequenceWithSingleItem(original_attrs,
-					TagFromName.DimensionIndexSequence);
-			if (a == null) {
-				a = new AttributeList();
-				a.put(org_uid);
-				AttributeTagAttribute t = new AttributeTagAttribute(TagFromName.DimensionIndexPointer);
-				t.addValue(0x0020, 0x9056); // Stack ID as a dimension
-				a.put(t);
-				t = new AttributeTagAttribute(TagFromName.FunctionalGroupPointer);
-				t.addValue(0x0020, 0x9111); // Frame Content Sequence
-				a.put(t);
-				LongStringAttribute lo = new LongStringAttribute(TagFromName.DimensionDescriptionLabel);
-				lo.addValue("Stack ID");
-				a.put(t);
-				seq.addItem(a);
-
-				a = new AttributeList();
-				a.put(org_uid);
-				t = new AttributeTagAttribute(TagFromName.DimensionIndexPointer);
-				t.addValue(0x0020, 0x9057); // In-Stack Position Number as a dimension
-				a.put(t);
-				t = new AttributeTagAttribute(TagFromName.FunctionalGroupPointer);
-				t.addValue(0x0020, 0x9111); // Frame Content Sequence
-				a.put(t);
-				lo = new LongStringAttribute(TagFromName.DimensionDescriptionLabel);
-				lo.addValue("In-Stack Position Number");
-				a.put(t);
-				seq.addItem(a);
-
-				/*
-				 * Temporal dimension is rarely used, so it is not supported here. a = new AttributeList(); a.put(org_uid); t =
-				 * new AttributeTagAttribute(TagFromName.DimensionIndexPointer); t.addValue(0x0020, 0x9128); // Temporal
-				 * Position Index as a dimension a.put(t); t= new AttributeTagAttribute(TagFromName.FunctionalGroupPointer);
-				 * t.addValue(0x0020, 0x9111); // Frame Content Sequence a.put(t); lo = new
-				 * LongStringAttribute(TagFromName.DimensionDescriptionLabel); lo.addValue("Temporal Position Index"); a.put(t);
-				 * seq.addItem(a);
-				 */
-
-				a = new AttributeList();
-				a.put(org_uid);
-				t = new AttributeTagAttribute(TagFromName.DimensionIndexPointer);
-				t.addValue(0x0062, 0x000b); // Referenced Segment Number as a dimension
-				a.put(t);
-				t = new AttributeTagAttribute(TagFromName.FunctionalGroupPointer);
-				t.addValue(0x0062, 0x000a); // Segment Identification Sequence
-				a.put(t);
-				lo = new LongStringAttribute(TagFromName.DimensionDescriptionLabel);
-				lo.addValue("Referenced Segment Number");
-				a.put(t);
-				seq.addItem(a);
-			} else {
-				seq.addItem(a);
-			}
-			list.put(seq);
-		}
-
-		// Attributes below are not mandatory, so special check needs to be done.
-		{
-			String temp = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.PositionReferenceIndicator);
-			Attribute a = new LongStringAttribute(TagFromName.PositionReferenceIndicator);
-			a.addValue(temp);
-			list.put(a);
-		}
+	
 
 		
-
+		insertRWVM2AttrList();
 		
 	
 	}
@@ -1065,7 +984,7 @@ public class RealWorldValueMapFileWriter
 			
 			AttributeList[] lists = new AttributeList[1];
 			lists[0] = list;
-			obj = new RealWorldValueMapFileWriter(lists,"0" ,"32761","","0.000375","SUV calculated by ePAD","", "126401","DCM","","SUVbw");
+			obj = new RealWorldValueMapFileWriter(lists,"0" ,"32761","0","0.000375","SUV calculated by ePAD","", "126401","DCM","","SUVbw");
 //			obj = new RealWorldValueMapFileWriter(lists,min ,max,intercept,slope,"SUV calculated by ePAD","", "126401","DCM","","SUVbw");
 
 			
