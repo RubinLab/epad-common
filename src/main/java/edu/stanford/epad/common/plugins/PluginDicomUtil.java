@@ -201,4 +201,26 @@ public class PluginDicomUtil
 		}
 		return positionOfImageInSeries;
 	}
+
+	public static void fixPngGeneration(String seriesUID, String sessionID)
+	{
+		HttpClient client = new HttpClient(); // TODO Get rid of localhost
+        String url = EPADConfig.getParamValue("serverProxy", "http://localhost:8080") 
+        		+ EPADConfig.getParamValue("webserviceBase", "/epad") + "/imagecheck/" +"/?seriesUID="  
+        		+  seriesUID ;
+        GetMethod method = new GetMethod(url);
+        
+        
+        method.setRequestHeader("Cookie", "JSESSIONID=" + sessionID);
+        try {
+            int statusCode = client.executeMethod(method);
+            log.info("Status code returned from plugin " + statusCode);
+        } catch (Exception e) {
+            log.warning("Error calling imagecheck on series " + seriesUID, e);
+    		
+        } finally {
+            method.releaseConnection();
+        }
+
+	}
 }
