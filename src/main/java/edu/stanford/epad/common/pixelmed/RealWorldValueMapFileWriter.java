@@ -104,70 +104,36 @@
  *******************************************************************************/
 package edu.stanford.epad.common.pixelmed;
 
-import java.io.DataInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.apache.commons.io.IOUtils;
-
-import com.pixelmed.anatproc.CodedConcept;
-import com.pixelmed.apps.InsertRealWorldValueMap;
 import com.pixelmed.dicom.Attribute;
 import com.pixelmed.dicom.AttributeList;
 import com.pixelmed.dicom.AttributeTag;
-import com.pixelmed.dicom.AttributeTagAttribute;
 import com.pixelmed.dicom.CodeStringAttribute;
 import com.pixelmed.dicom.CodedSequenceItem;
 import com.pixelmed.dicom.CodingSchemeIdentification;
 import com.pixelmed.dicom.CompositeInstanceContext;
-import com.pixelmed.dicom.ContentItem;
 import com.pixelmed.dicom.DateAttribute;
-import com.pixelmed.dicom.DecimalStringAttribute;
 import com.pixelmed.dicom.DicomDictionary;
 import com.pixelmed.dicom.DicomException;
 import com.pixelmed.dicom.DicomInputStream;
-import com.pixelmed.dicom.DicomOutputStream;
 import com.pixelmed.dicom.FileMetaInformation;
 import com.pixelmed.dicom.FloatDoubleAttribute;
-import com.pixelmed.dicom.GeometryOfSliceFromAttributeList;
 import com.pixelmed.dicom.IntegerStringAttribute;
 import com.pixelmed.dicom.LongStringAttribute;
-import com.pixelmed.dicom.OtherByteAttribute;
-import com.pixelmed.dicom.OtherByteAttributeOnDisk;
 import com.pixelmed.dicom.PersonNameAttribute;
 import com.pixelmed.dicom.SOPClass;
 import com.pixelmed.dicom.SequenceAttribute;
 import com.pixelmed.dicom.SequenceItem;
 import com.pixelmed.dicom.ShortStringAttribute;
-import com.pixelmed.dicom.ShortTextAttribute;
 import com.pixelmed.dicom.SignedShortAttribute;
 import com.pixelmed.dicom.TagFromName;
 import com.pixelmed.dicom.TimeAttribute;
 import com.pixelmed.dicom.TransferSyntax;
 import com.pixelmed.dicom.UIDGenerator;
 import com.pixelmed.dicom.UniqueIdentifierAttribute;
-import com.pixelmed.dicom.UnsignedLongAttribute;
-import com.pixelmed.dicom.UnsignedShortAttribute;
-import com.pixelmed.dicom.VersionAndConstants;
-import com.pixelmed.geometry.GeometryOfSlice;
-import com.pixelmed.utils.CopyStream;
-
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.epad.common.util.EPadWebServerVersion;
 
@@ -205,50 +171,50 @@ public class RealWorldValueMapFileWriter
 	private String orig_class_uid;
 	//moved declaration from line 540 for slicer per frame
 	private String[] orig_inst_uids;
-	//added for slicer positions per frame
-	private double[][] seg_positions;
 	
 	
 	/**
 	 * default values for suv
+	 * @param instanceUIDs is the array of instance uids in the series
 	 * @param original_attrs_list
 	 * @param firstValueMapped
 	 * @param lastValueMapped
 	 * @param intercept
 	 * @param slope
 	 * @param explanation
-	 * @param label
 	 * @throws DicomException
 	 */
-	public RealWorldValueMapFileWriter(AttributeList[] original_attrs_list, String firstValueMapped,String lastValueMapped,String intercept,String slope,String explanation,String label) throws DicomException
+	public RealWorldValueMapFileWriter(String[] instanceUIDs,AttributeList[] original_attrs_list, String firstValueMapped,String lastValueMapped,String intercept,String slope,String explanation) throws DicomException
 	{
-		this(original_attrs_list, firstValueMapped, lastValueMapped, intercept, slope, explanation, label, "126401","DCM","","SUVbw", null, null, null);
+		this(instanceUIDs,original_attrs_list, firstValueMapped, lastValueMapped, intercept, slope, explanation, "{SUVbw}q/ml}", "{SUVbw}q/ml}","UCUM","","Standardized Uptake Value body weight", null, null, null);
 	}
 	
 	/**
 	 * Initialize the list with constant attributes and inherited attributes.
 	 * 
+	 * @param instanceUIDs is the array of instance uids in the series
 	 * @param original_attrs is the whole attributes list.
 	 * @param patient_orientation
 	 * @param pixel_spacing
 	 * @param slice_thickness
 	 * @throws DicomException
 	 */
-	public RealWorldValueMapFileWriter(AttributeList[] original_attrs_list, String firstValueMapped,String lastValueMapped,String intercept,String slope,String explanation,String label,String unitsCodeValue,String unitsCodingSchemeDesignator,String unitsCodingSchemeVersion,String unitsCodeMeaning) throws DicomException
+	public RealWorldValueMapFileWriter(String[] instanceUIDs,AttributeList[] original_attrs_list, String firstValueMapped,String lastValueMapped,String intercept,String slope,String explanation,String label,String unitsCodeValue,String unitsCodingSchemeDesignator,String unitsCodingSchemeVersion,String unitsCodeMeaning) throws DicomException
 	{
-		this(original_attrs_list, firstValueMapped, lastValueMapped, intercept, slope, explanation, label, unitsCodeValue, unitsCodingSchemeDesignator, unitsCodingSchemeVersion, unitsCodeMeaning, null, null, null);
+		this(instanceUIDs,original_attrs_list, firstValueMapped, lastValueMapped, intercept, slope, explanation, label, unitsCodeValue, unitsCodingSchemeDesignator, unitsCodingSchemeVersion, unitsCodeMeaning, null, null, null);
 	}
 
 	/**
 	 * Initialize the list with constant attributes and inherited attributes.
 	 * 
+	 * @param instanceUIDs is the array of instance uids in the series
 	 * @param original_attrs is the whole attributes list.
 	 * @param patient_orientation
 	 * @param pixel_spacing
 	 * @param slice_thickness
 	 * @throws DicomException
 	 */
-	public RealWorldValueMapFileWriter(AttributeList[] original_attrs_list,String firstValueMapped,String lastValueMapped,String intercept,String slope,String explanation,String label,String unitsCodeValue,String unitsCodingSchemeDesignator,String unitsCodingSchemeVersion,String unitsCodeMeaning, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID) throws DicomException
+	public RealWorldValueMapFileWriter(String[] instanceUIDs,AttributeList[] original_attrs_list,String firstValueMapped,String lastValueMapped,String intercept,String slope,String explanation,String label,String unitsCodeValue,String unitsCodingSchemeDesignator,String unitsCodingSchemeVersion,String unitsCodeMeaning, String dsoSeriesDescription, String dsoSeriesUID, String dsoInstanceUID) throws DicomException
 	{
 		log.info("Generating DICOM attributes for rwvm");
 		this.firstValueMapped=firstValueMapped;
@@ -307,32 +273,7 @@ public class RealWorldValueMapFileWriter
 			a.addValue("RWV");
 			list.put(a);
 		}
-//		{
-//			Attribute a = new UnsignedShortAttribute(TagFromName.SamplesPerPixel);
-//			a.addValue(1);
-//			list.put(a);
-//		}
-//		{
-//			Attribute a = new CodeStringAttribute(TagFromName.PhotometricInterpretation);
-//			a.addValue("MONOCHROME2");
-//			list.put(a);
-//		}
-//		{
-//			Attribute a = new CodeStringAttribute(TagFromName.ImageType);
-//			a.addValue("DERIVED");
-//			a.addValue("PRIMARY");
-//			list.put(a);
-//		}
-//		{
-//			Attribute a = new UnsignedShortAttribute(TagFromName.PixelRepresentation);
-//			a.addValue(0);
-//			list.put(a);
-//		}
-//		{
-//			Attribute a = new CodeStringAttribute(TagFromName.LossyImageCompression);
-//			a.addValue("00");
-//			list.put(a);
-//		}
+
 
 		/*********************************************************************
 		 * Other attributes.
@@ -346,16 +287,7 @@ public class RealWorldValueMapFileWriter
 				a.addValue(date);
 				list.put(a);
 			}
-			{
-				Attribute a = new DateAttribute(TagFromName.SeriesDate);
-				a.addValue(date);
-				list.put(a);
-			}
-//			{
-//				Attribute a = new DateAttribute(TagFromName.AcquisitionDate);
-//				a.addValue(date);
-//				list.put(a);
-//			}
+			
 			{
 				Attribute a = new DateAttribute(TagFromName.ContentDate);
 				a.addValue(date);
@@ -366,61 +298,38 @@ public class RealWorldValueMapFileWriter
 				a.addValue(time);
 				list.put(a);
 			}
-			{
-				Attribute a = new TimeAttribute(TagFromName.SeriesTime);
-				a.addValue(time);
-				list.put(a);
-			}
-//			{
-//				Attribute a = new TimeAttribute(TagFromName.AcquisitionTime);
-//				a.addValue(time);
-//				list.put(a);
-//			}
+			
 			{
 				Attribute a = new TimeAttribute(TagFromName.ContentTime);
 				a.addValue(time);
 				list.put(a);
 			}
 		}
-		// Device specific information.
-		{
-			Attribute a = new UniqueIdentifierAttribute(TagFromName.InstanceCreatorUID);
-			a.addValue(VersionAndConstants.instanceCreatorUID);
-			list.put(a);
-		}
+		
 		{
 			Attribute a = new ShortStringAttribute(TagFromName.AccessionNumber);
 			list.put(a);
 		}
-		{
-			Attribute a = new LongStringAttribute(TagFromName.SeriesDescription);
-			if (dsoSeriesDescription == null || dsoSeriesDescription.trim().length() == 0 || dsoSeriesDescription.startsWith(SeriesDescription))
-			{
-				a.addValue(SeriesDescription + " " +  timestamp.format(new Date()));
-			}
-			else	
-			{
-				if (!dsoSeriesDescription.startsWith(prefix))
-					dsoSeriesDescription = prefix + "-" + dsoSeriesDescription;
-				a.addValue(dsoSeriesDescription);
-			}
-			list.put(a);
-		}
+//		{
+//			Attribute a = new LongStringAttribute(TagFromName.SeriesDescription);
+//			if (dsoSeriesDescription == null || dsoSeriesDescription.trim().length() == 0 || dsoSeriesDescription.startsWith(SeriesDescription))
+//			{
+//				a.addValue(SeriesDescription + " " +  timestamp.format(new Date()));
+//			}
+//			else	
+//			{
+//				if (!dsoSeriesDescription.startsWith(prefix))
+//					dsoSeriesDescription = prefix + "-" + dsoSeriesDescription;
+//				a.addValue(dsoSeriesDescription);
+//			}
+//			list.put(a);
+//		}
 		{
 			Attribute a = new LongStringAttribute(TagFromName.Manufacturer);
 			a.addValue(Manufacturer);
 			list.put(a);
 		}
-		{
-			Attribute a = new LongStringAttribute(TagFromName.ManufacturerModelName);
-			a.addValue(ManufacturerModelName);
-			list.put(a);
-		}
-		{
-			Attribute a = new LongStringAttribute(TagFromName.DeviceSerialNumber);
-			a.addValue(DeviceSerialNumber);
-			list.put(a);
-		}
+		
 		{
 			Attribute a = new LongStringAttribute(TagFromName.SoftwareVersion);
 			a.addValue(SoftwareVersion);
@@ -439,7 +348,7 @@ public class RealWorldValueMapFileWriter
 
 		UIDGenerator u = new UIDGenerator();
 		String study_id = "1"; // Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.StudyID);
-		String series_number = "1000"; // Attribute.getSingleStringValueOrEmptyString(original_attrs,
+		String series_number = "1002"; // for rwvms so that they are different from segmentation // Attribute.getSingleStringValueOrEmptyString(original_attrs,
 																		// TagFromName.SeriesNumber);
 		String instance_number = "1"; // Attribute.getSingleStringValueOrEmptyString(original_attrs,
 																	// TagFromName.InstanceNumber);
@@ -450,6 +359,10 @@ public class RealWorldValueMapFileWriter
 			Attribute a = new UniqueIdentifierAttribute(TagFromName.StudyInstanceUID);
 			a.addValue(u.getNewStudyInstanceUID(study_id));
 			list.put(a);
+			//does not work. why?
+//			a = new UniqueIdentifierAttribute(TagFromName.StudyID);
+//			a.addValue(uid);
+//			list.put(a);
 		}
 		{
 			uid = u.getNewSeriesInstanceUID(study_id, series_number);
@@ -465,9 +378,7 @@ public class RealWorldValueMapFileWriter
 				seriesUID = uid;
 			}
 			list.put(a);
-//			a = new UniqueIdentifierAttribute(TagFromName.FrameOfReferenceUID);
-//			a.addValue(uid);
-//			list.put(a);
+			
 		}
 		{
 			Attribute a = new UniqueIdentifierAttribute(TagFromName.SOPInstanceUID);
@@ -522,35 +433,57 @@ public class RealWorldValueMapFileWriter
 			String origSeriesInstanceUid = Attribute.getSingleStringValueOrEmptyString(original_attrs, TagFromName.SeriesInstanceUID);
 			siu.addValue(origSeriesInstanceUid);
 			referencedSeriesSequenceAttributes.put(siu);
+		
+			
 		}
+		
 
 		//TODO we need to put all the instances, not just one. should this get a series instead of an instance?
+		
 		SequenceAttribute referencedInstanceSequence = new SequenceAttribute(TagFromName.ReferencedInstanceSequence);
-		orig_inst_uids = new String[original_attrs_list.length];
-		for (int instanceIndex = 0; instanceIndex < original_attrs_list.length; instanceIndex++) {
-			AttributeList referencedInstanceSequenceAttributes = new AttributeList();
-			{
-				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
-				a.addValue(orig_class_uid);
-				referencedInstanceSequenceAttributes.put(a);
+		if (instanceUIDs==null) {
+			orig_inst_uids = new String[original_attrs_list.length];
+			for (int instanceIndex = 0; instanceIndex < original_attrs_list.length; instanceIndex++) {
+				AttributeList referencedInstanceSequenceAttributes = new AttributeList();
+				{
+					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
+					a.addValue(orig_class_uid);
+					referencedInstanceSequenceAttributes.put(a);
+				}
+				{
+					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
+					String orig_inst_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs_list[instanceIndex], TagFromName.SOPInstanceUID);
+					//log.info("" + instanceIndex + " ReferencedSOPInstanceUID:" + orig_inst_uid);
+					orig_inst_uids[instanceIndex] = orig_inst_uid;
+					
+					
+					a.addValue(orig_inst_uid);
+					referencedInstanceSequenceAttributes.put(a);
+				}
+				// Need this for multiframe source DICOM
+	//			{
+	//				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedFrameNumber);
+	//				a.addValue(0);
+	//				referencedInstanceSequenceAttributes.put(a);
+	//			}
+				referencedInstanceSequence.addItem(referencedInstanceSequenceAttributes);
 			}
-			{
-				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
-				String orig_inst_uid = Attribute.getSingleStringValueOrEmptyString(original_attrs_list[instanceIndex], TagFromName.SOPInstanceUID);
-				//log.info("" + instanceIndex + " ReferencedSOPInstanceUID:" + orig_inst_uid);
-				orig_inst_uids[instanceIndex] = orig_inst_uid;
-				
-				
-				a.addValue(orig_inst_uid);
-				referencedInstanceSequenceAttributes.put(a);
+		}else { //use the sent list
+			orig_inst_uids = instanceUIDs.clone(); //in case we use it elsewhere
+			for (int instanceIndex = 0; instanceIndex < orig_inst_uids.length; instanceIndex++) {
+				AttributeList referencedInstanceSequenceAttributes = new AttributeList();
+				{
+					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
+					a.addValue(orig_class_uid);
+					referencedInstanceSequenceAttributes.put(a);
+				}
+				{
+					Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
+					a.addValue(orig_inst_uids[0]);
+					referencedInstanceSequenceAttributes.put(a);
+				}
+				referencedInstanceSequence.addItem(referencedInstanceSequenceAttributes);
 			}
-			// Need this for multiframe source DICOM
-//			{
-//				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedFrameNumber);
-//				a.addValue(0);
-//				referencedInstanceSequenceAttributes.put(a);
-//			}
-			referencedInstanceSequence.addItem(referencedInstanceSequenceAttributes);
 		}
 		referencedSeriesSequenceAttributes.put(referencedInstanceSequence);
 		referencedSeriesSequence.addItem(referencedSeriesSequenceAttributes);
@@ -600,12 +533,41 @@ public class RealWorldValueMapFileWriter
 		}
 	
 		// reuse (add to) existing sequence if present
+		SequenceAttribute aReferencedRealWorldValueMappingSequence = (SequenceAttribute)(list.get(TagFromName.ReferencedImageRealWorldValueMappingSequence));
+		if (aReferencedRealWorldValueMappingSequence == null) {
+			aReferencedRealWorldValueMappingSequence = new SequenceAttribute(TagFromName.ReferencedImageRealWorldValueMappingSequence);
+			listToAddRealWorldValueMappingSequenceTo.put(aReferencedRealWorldValueMappingSequence);
+		}
+		
+		AttributeList rwvmReferenceList = new AttributeList();
+		aReferencedRealWorldValueMappingSequence.addItem(rwvmReferenceList);
+		
+		// reuse (add to) existing sequence if present
 		SequenceAttribute aRealWorldValueMappingSequence = (SequenceAttribute)(list.get(TagFromName.RealWorldValueMappingSequence));
 		if (aRealWorldValueMappingSequence == null) {
 			aRealWorldValueMappingSequence = new SequenceAttribute(TagFromName.RealWorldValueMappingSequence);
-			listToAddRealWorldValueMappingSequenceTo.put(aRealWorldValueMappingSequence);
+			rwvmReferenceList.put(aRealWorldValueMappingSequence);
 		}
 		
+		SequenceAttribute referencedImageSequence = new SequenceAttribute(TagFromName.ReferencedImageSequence);
+		
+		for (int instanceIndex = 0; instanceIndex < orig_inst_uids.length; instanceIndex++) {
+			AttributeList referencedImageSequenceAttributes = new AttributeList();
+			{
+				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPClassUID);
+				a.addValue(orig_class_uid);
+				referencedImageSequenceAttributes.put(a);
+			}
+			{
+				Attribute a = new UniqueIdentifierAttribute(TagFromName.ReferencedSOPInstanceUID);
+				a.addValue(orig_inst_uids[0]);
+				referencedImageSequenceAttributes.put(a);
+			}
+			referencedImageSequence.addItem(referencedImageSequenceAttributes);
+		}
+		rwvmReferenceList.put(referencedImageSequence);
+		
+
 		AttributeList rwvmList = new AttributeList();
 		aRealWorldValueMappingSequence.addItem(rwvmList);
 		
@@ -651,8 +613,22 @@ public class RealWorldValueMapFileWriter
 										
 		list.removeGroupLengthAttributes();
 		list.removeMetaInformationHeaderAttributes();
-
+		list.removePrivateAttributes();
+		SequenceAttribute performedProcedureSequence = (SequenceAttribute)(list.get(TagFromName.PerformedProcedureCodeSequence));
+		if (performedProcedureSequence != null) {
+			performedProcedureSequence.removeValues();
+			list.remove(performedProcedureSequence.getTag());
+			
+		}
+		SequenceAttribute procedureSequence = (SequenceAttribute)(list.get(TagFromName.ProcedureCodeSequence));
+		if (procedureSequence != null) {
+			procedureSequence.removeValues();
+			list.remove(procedureSequence.getTag());
+		}
+		list.remove(TagFromName.FrameOfReferenceUID);
+		list.remove(TagFromName.PositionReferenceIndicator);
 		list.remove(TagFromName.DataSetTrailingPadding);
+		
 		String ourAETitle = "OURAETITLE";
 		FileMetaInformation.addFileMetaInformation(list,TransferSyntax.ExplicitVRLittleEndian,ourAETitle);
 		
@@ -689,278 +665,6 @@ public class RealWorldValueMapFileWriter
 	}
 
 	/**
-	 * @param Output strings in scheme, value, meaning order.
-	 */
-	private String[] parse_context(CodedConcept prop)
-	{
-		String[] val = { "Unknown Scheme", "Unknown Value", "Unknown Meaning" };
-
-		try {
-			val[0] = prop.getCodingSchemeDesignator();
-			val[1] = prop.getCodeValue();
-			val[2] = prop.getCodeMeaning();
-		} catch (Exception e) {
-			System.err.println("The property is not a valid CodedConcept object!");
-			val[0] = "Unknown Scheme";
-			val[1] = "Unknown Value";
-			val[2] = "Unknown Meaning";
-		}
-
-		return val;
-	}
-	
-	/**
-	 * @param Output color as a double array which is a string like rgb(255;255;255) r,g,b should be in range 0-255
-	 */
-	private double[] parse_color(String color)
-	{
-		double[] val = new double[3];
-		color=color.replace("(", "").replace(")", "").replace("rgb", "");
-		String[] colorStr=color.split(";");
-		try {
-			val[0] = Double.parseDouble(colorStr[0]);
-			val[1] = Double.parseDouble(colorStr[1]);
-			val[2] = Double.parseDouble(colorStr[2]);
-			
-		} catch (Exception e) {
-			System.err.println("The property is not a valid color!");
-			
-		}
-
-		return val;
-	}
-
-	
-	/**
-	 * Moved common attributes from per-frame functional group to shared functional group.
-	 * 
-	 * @param shared_group contains the attributes in SharedFunctionalGroup.
-	 * @param per_frame_sequence is the attribute sequence of PerFrameFunctionalGroup.
-	 * @throws DicomException
-	 */
-	private void combine_shared_attributes(AttributeList shared_group, SequenceAttribute per_frame_sequence)
-			throws DicomException
-	{
-		// Check all the items in per_frame_sequence and move the common attributes to shared_group.
-		//plane position sequence removed from check for slicer
-		AttributeTag[] checked_attrs = new AttributeTag[] { TagFromName.SegmentIdentificationSequence/*,
-				TagFromName.PlanePositionSequence*/
-		/* , TagFromName.StackID, TagFromName.PlaneOrientationSequence, TagFromName.SliceThickness, TagFromName.PixelSpacing */};
-		Hashtable<AttributeTag, SequenceAttribute> common_attrs = get_common_attributes(checked_attrs, per_frame_sequence);
-		add_attributes_to_shared_group(common_attrs, shared_group);
-		remove_attributes_from_sequence(common_attrs.keySet(), per_frame_sequence);
-	}
-
-	/**
-	 * Test if the attribute is common to all frames.
-	 * 
-	 * @param tags provides the TagName of the attributes to be checked.
-	 * @param sequence is the attribute sequence of all frames.
-	 * @return Return (key, value) of common attributes.
-	 * @throws DicomException
-	 */
-	private Hashtable<AttributeTag, SequenceAttribute> get_common_attributes(AttributeTag[] tags,
-			SequenceAttribute sequence) throws DicomException
-	{
-		Hashtable<AttributeTag, SequenceAttribute> attrs = new Hashtable<AttributeTag, SequenceAttribute>();
-		for (AttributeTag tag : tags) {
-			attrs.put(tag, new SequenceAttribute(tag));
-		}
-
-		@SuppressWarnings("unchecked")
-		Iterator<SequenceItem> it = sequence.iterator();
-		boolean initial = true;
-		while (it.hasNext()) {
-			AttributeList l = it.next().getAttributeList();
-			if (initial) {
-				// Initialize the attributes.
-				initial = false;
-				Enumeration<AttributeTag> i = attrs.keys();
-				while (i.hasMoreElements()) {
-					AttributeTag key = i.nextElement();
-					SequenceAttribute seq = null;
-					// Since some keys are not the top-level attributes, get their parent sequence attributes instead.
-					if (key.equals(TagFromName.StackID)) {
-						seq = (SequenceAttribute)l.get(TagFromName.FrameContentSequence);
-					} else if (key.equals(TagFromName.SliceThickness) || key.equals(TagFromName.PixelSpacing)) {
-						seq = (SequenceAttribute)l.get(TagFromName.PixelMeasuresSequence);
-					} else {
-						seq = (SequenceAttribute)l.get(key);
-					}
-
-					if (seq == null)
-						seq = new SequenceAttribute(key);
-					attrs.put(key, seq);
-				}
-			} else {
-				// Check if the values are equal.
-				Enumeration<AttributeTag> i = attrs.keys();
-				while (i.hasMoreElements()) {
-					AttributeTag key = i.nextElement();
-					SequenceAttribute seq = null;
-					// Since some keys are not the top-level attributes, get their parent sequence attributes instead.
-					if (key.equals(TagFromName.StackID))
-						seq = (SequenceAttribute)l.get(TagFromName.FrameContentSequence);
-					else if (key.equals(TagFromName.SliceThickness) || key.equals(TagFromName.PixelSpacing))
-						seq = (SequenceAttribute)l.get(TagFromName.PixelMeasuresSequence);
-					else
-						seq = (SequenceAttribute)l.get(key);
-					if (compare_sequence_attribute(key, attrs.get(key), seq) != true)
-					attrs.remove(key);
-				}
-			}
-		}
-
-		return attrs;
-	}
-
-	private boolean compare_sequence_attribute(AttributeTag tag, SequenceAttribute s1, SequenceAttribute s2)
-			throws DicomException
-	{
-		if (s1 == null || s2 == null)
-			return false;
-
-		boolean equal = false;
-
-		if (tag.equals(TagFromName.SegmentIdentificationSequence)) {
-			Attribute a1 = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(s1,
-					TagFromName.ReferencedSegmentNumber);
-			Attribute a2 = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(s2,
-					TagFromName.ReferencedSegmentNumber);
-			short[] val1 = a1.getShortValues();
-			short[] val2 = a2.getShortValues();
-			for (int i = 0; i < val1.length; i++) {
-				equal = val1[i] == val2[i];
-				if (!equal)
-					break;
-			}
-		} else if (tag.equals(TagFromName.StackID)) {
-			Attribute a1 = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(s1, TagFromName.StackID);
-			Attribute a2 = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(s2, TagFromName.StackID);
-			short[] val1 = a1.getShortValues();
-			short[] val2 = a2.getShortValues();
-			for (int i = 0; i < val1.length; i++) {
-				equal = val1[i] == val2[i];
-				if (!equal)
-					break;
-			}
-		} else if (tag.equals(TagFromName.PlanePositionSequence)) {
-			Attribute a1 = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(s1,
-					TagFromName.ImagePositionPatient);
-			Attribute a2 = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(s2,
-					TagFromName.ImagePositionPatient);
-			double[] val1 = a1.getDoubleValues();
-			double[] val2 = a2.getDoubleValues();
-			for (int i = 0; i < val1.length; i++) {
-				equal = val1[i] == val2[i];
-				if (!equal)
-					break;
-			}
-		} else if (tag.equals(TagFromName.PlaneOrientationSequence)) {
-			Attribute a1 = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(s1,
-					TagFromName.ImageOrientationPatient);
-			Attribute a2 = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(s2,
-					TagFromName.ImageOrientationPatient);
-			short[] val1 = a1.getShortValues();
-			short[] val2 = a2.getShortValues();
-			for (int i = 0; i < val1.length; i++) {
-				equal = val1[i] == val2[i];
-				if (!equal)
-					break;
-			}
-		} else if (tag.equals(TagFromName.SliceThickness)) {
-			Attribute a1 = SequenceAttribute
-					.getNamedAttributeFromWithinSequenceWithSingleItem(s1, TagFromName.SliceThickness);
-			Attribute a2 = SequenceAttribute
-					.getNamedAttributeFromWithinSequenceWithSingleItem(s2, TagFromName.SliceThickness);
-			double[] val1 = a1.getDoubleValues();
-			double[] val2 = a2.getDoubleValues();
-			for (int i = 0; i < val1.length; i++) {
-				equal = val1[i] == val2[i];
-				if (!equal)
-					break;
-			}
-		} else if (tag.equals(TagFromName.PixelSpacing)) {
-			Attribute a1 = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(s1, TagFromName.PixelSpacing);
-			Attribute a2 = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(s2, TagFromName.PixelSpacing);
-			double[] val1 = a1.getDoubleValues();
-			double[] val2 = a2.getDoubleValues();
-			for (int i = 0; i < val1.length; i++) {
-				equal = val1[i] == val2[i];
-				if (!equal)
-					break;
-			}
-		}
-
-		return equal;
-	}
-
-	private void remove_attributes_from_sequence(Set<AttributeTag> tags, SequenceAttribute sequence)
-	{
-		@SuppressWarnings("unchecked")
-		Iterator<SequenceItem> it = sequence.iterator();
-		while (it.hasNext()) {
-			AttributeList l = it.next().getAttributeList();
-			Iterator<AttributeTag> i = tags.iterator();
-			while (i.hasNext()) {
-				AttributeTag tag = i.next();
-				if (tag.equals(TagFromName.StackID)) {
-					AttributeList seq = SequenceAttribute.getAttributeListFromWithinSequenceWithSingleItem(l,
-							TagFromName.FrameContentSequence);
-					seq.remove(tag);
-				} else if (tag.equals(TagFromName.SliceThickness) || tag.equals(TagFromName.PixelSpacing)) {
-					AttributeList seq = SequenceAttribute.getAttributeListFromWithinSequenceWithSingleItem(l,
-							TagFromName.PixelMeasuresSequence);
-					seq.remove(tag);
-					if (seq.isEmpty())
-						l.remove(TagFromName.PixelMeasuresSequence); // Delete this attribute if it is empty.
-				} else
-					l.remove(tag);
-			}
-		}
-	}
-
-	private void add_attributes_to_shared_group(Hashtable<AttributeTag, SequenceAttribute> attrs, AttributeList shared)
-	{
-		/*
-		 * {TagFromName.SegmentIdentificationSequence, TagFromName.StackID, TagFromName.PlanePositionSequence,
-		 * TagFromName.PlaneOrientationSequence, TagFromName.SliceThickness, TagFromName.PixelSpacing}
-		 */
-		Enumeration<AttributeTag> i = attrs.keys();
-		while (i.hasMoreElements()) {
-			AttributeTag tag = i.nextElement();
-			if (tag.equals(TagFromName.StackID)) {
-				Attribute a = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(attrs.get(tag), tag);
-				if (a == null)
-					continue;
-				SequenceAttribute seq = new SequenceAttribute(TagFromName.FrameContentSequence);
-				AttributeList item = new AttributeList();
-				item.put(a);
-				seq.addItem(item);
-				shared.put(seq);
-			} else if (tag.equals(TagFromName.SliceThickness) || tag.equals(TagFromName.PixelSpacing)) {
-				Attribute a = SequenceAttribute.getNamedAttributeFromWithinSequenceWithSingleItem(attrs.get(tag), tag);
-				if (a == null)
-					continue;
-				SequenceAttribute pixel_measures_seq = (SequenceAttribute)shared.get(TagFromName.PixelMeasuresSequence);
-				if (pixel_measures_seq != null) { // If PixelMeasuresSequence is already there, add one attribute to it instead
-																					// of rewriting it.
-					AttributeList l = SequenceAttribute.getAttributeListFromWithinSequenceWithSingleItem(pixel_measures_seq);
-					l.put(a);
-				} else {
-					SequenceAttribute seq = new SequenceAttribute(TagFromName.PixelMeasuresSequence);
-					AttributeList item = new AttributeList();
-					item.put(a);
-					seq.addItem(item);
-					shared.put(seq);
-				}
-			} else
-				shared.put(attrs.get(tag));
-		}
-	}
-
-	
-	/**
 	 * This demo gets a dicom image and creates a rwvm using image file's tags.
 	 * 
 	 * @param args: java RealWorldValueMapFileWriter dicom_file output_file min max intercept slope 
@@ -984,7 +688,7 @@ public class RealWorldValueMapFileWriter
 			
 			AttributeList[] lists = new AttributeList[1];
 			lists[0] = list;
-			obj = new RealWorldValueMapFileWriter(lists,"0" ,"32761","0","0.000375","SUV calculated by ePAD","", "126401","DCM","","SUVbw");
+			obj = new RealWorldValueMapFileWriter(new String[]{"1.3.6.1.4.1.14519.5.2.1.2744.7002.463147699317075738502572594868","1.3.6.1.4.1.14519.5.2.1.2744.7002.227680709104748625337095358807","1.3.6.1.4.1.14519.5.2.1.2744.7002.112252575599131280286405914020"},lists,"0" ,"32761","0","0.000375","SUV calculated by ePAD","{SUVbw}q/ml}", "{SUVbw}q/ml}","UCUM","","Standardized Uptake Value body weight");
 //			obj = new RealWorldValueMapFileWriter(lists,min ,max,intercept,slope,"SUV calculated by ePAD","", "126401","DCM","","SUVbw");
 
 			
