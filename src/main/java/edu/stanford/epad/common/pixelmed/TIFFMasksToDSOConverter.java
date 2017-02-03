@@ -126,7 +126,7 @@ import com.pixelmed.dicom.DicomException;
 import com.pixelmed.dicom.DicomInputStream;
 import com.pixelmed.dicom.TagFromName;
 
-import edu.stanford.epad.common.pixelmed.SegmentedPropertyHelper.SegmentedProperty;
+import edu.stanford.epad.common.pixelmed.SegmentedProperty;
 import edu.stanford.epad.common.util.EPADLogger;
 
 /**
