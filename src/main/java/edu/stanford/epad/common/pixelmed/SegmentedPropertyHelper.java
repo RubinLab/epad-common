@@ -4,59 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-
 import com.google.gson.Gson;
-import com.pixelmed.anatproc.CodedConcept;
-
-import edu.stanford.epad.common.util.EPADLogger;
 
 public class SegmentedPropertyHelper {
 	
-	class SegmentedProperty {
-		int id;
-		String name;
-		CodedConcept category;
-		CodedConcept type;
-		CodedConcept modifier;
-		String defColor;
-		SegmentedProperty(String n,String c,String t,String m, String defColor) {
-			this.name=n;
-			this.category=str2cc(c);
-			this.type=str2cc(t);
-			this.modifier=str2cc(m);
-			this.defColor=defColor;
-		}
-		SegmentedProperty(int id,String n,String c,String t,String m, String defColor) {
-			this.id=id;
-			this.name=n;
-			this.category=str2cc(c);
-			this.type=str2cc(t);
-			this.modifier=str2cc(m);
-			this.defColor=defColor;
-		}
-		
-		public String toJSON()
-		{
-			Gson gson = new Gson();
-
-			return gson.toJson(this);
-		}
-		
-	}
 	
-	CodedConcept str2cc(String s){
-		if (s==null)
-			return null;
-		//input (T-D000A;SRT;Anatomical Structure)
-		s=s.replace("(", "").replace(")", "");
-		String[] str=s.split(";");
-		return new CodedConcept(null /* conceptUniqueIdentifier */, null /* SNOMED CID */,
-				str[1] /* codingSchemeDesignator */, null /* legacyCodingSchemeDesignator */,
-				null /* codingSchemeVersion */, str[0] /* codeValue */, str[2] /* codeMeaning */,
-				null /* codeStringEquivalent */, null /* synonynms */);
-
-	}
+	
+	
 	static Map<Integer,SegmentedProperty> properties=new HashMap<Integer,SegmentedProperty>();
 	
 	public SegmentedPropertyHelper() {
@@ -387,6 +341,18 @@ public class SegmentedPropertyHelper {
 		}
 		Gson gson = new Gson();
 		return gson.toJson(jpl);
+	}
+	
+	public SegmentedProperty getProperty(String categoryCode,String typeCode) {
+		for(Map.Entry<Integer, SegmentedProperty> entry : properties.entrySet()) {
+			SegmentedProperty prop=entry.getValue();
+			if (prop.category.getCodeValue().equalsIgnoreCase(categoryCode) && prop.type.getCodeValue().equalsIgnoreCase(typeCode)) {
+				return prop;
+			}
+		   
+
+		}
+		return null;
 	}
 	
 }
