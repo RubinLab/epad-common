@@ -610,9 +610,30 @@ public class SegmentationObjectsFileWriter
 			list.put(seq);
 
 			seq = new SequenceAttribute(TagFromName.DimensionIndexSequence);
-			a = SequenceAttribute.getAttributeListFromWithinSequenceWithSingleItem(original_attrs,
-					TagFromName.DimensionIndexSequence);
-			if (a == null) {
+			SequenceAttribute dimensionSeq = (SequenceAttribute)original_attrs.get(TagFromName.DimensionIndexSequence);
+//			a = SequenceAttribute.getAttributeListFromWithinSequenceWithSingleItem(original_attrs,
+//					TagFromName.DimensionIndexSequence);
+			if (dimensionSeq!=null) {
+				log.info("DimensionIndexSequence "+  dimensionSeq.toString());
+				//add segment number
+				a = new AttributeList();
+				a.put(org_uid);
+				AttributeTagAttribute t = new AttributeTagAttribute(TagFromName.DimensionIndexPointer);
+				t = new AttributeTagAttribute(TagFromName.DimensionIndexPointer);
+				t.addValue(0x0062, 0x000b); // Referenced Segment Number as a dimension
+				a.put(t);
+				t = new AttributeTagAttribute(TagFromName.FunctionalGroupPointer);
+				t.addValue(0x0062, 0x000a); // Segment Identification Sequence
+				a.put(t);
+				LongStringAttribute lo = new LongStringAttribute(TagFromName.DimensionDescriptionLabel);
+				lo = new LongStringAttribute(TagFromName.DimensionDescriptionLabel);
+				lo.addValue("Referenced Segment Number");
+				a.put(t);
+				dimensionSeq.addItem(a);
+				list.put(dimensionSeq);
+			}
+			
+			if (dimensionSeq == null) {
 				a = new AttributeList();
 				a.put(org_uid);
 				AttributeTagAttribute t = new AttributeTagAttribute(TagFromName.DimensionIndexPointer);
@@ -640,13 +661,18 @@ public class SegmentationObjectsFileWriter
 				seq.addItem(a);
 
 				/*
-				 * Temporal dimension is rarely used, so it is not supported here. a = new AttributeList(); a.put(org_uid); t =
-				 * new AttributeTagAttribute(TagFromName.DimensionIndexPointer); t.addValue(0x0020, 0x9128); // Temporal
-				 * Position Index as a dimension a.put(t); t= new AttributeTagAttribute(TagFromName.FunctionalGroupPointer);
-				 * t.addValue(0x0020, 0x9111); // Frame Content Sequence a.put(t); lo = new
-				 * LongStringAttribute(TagFromName.DimensionDescriptionLabel); lo.addValue("Temporal Position Index"); a.put(t);
-				 * seq.addItem(a);
-				 */
+				 * Temporal dimension is rarely used, so it is not supported here. */
+				//get it back. causing trouble for mr
+				a = new AttributeList(); a.put(org_uid); 
+				t = new AttributeTagAttribute(TagFromName.DimensionIndexPointer); 
+				t.addValue(0x0020, 0x9128); // Temporal Position Index as a dimension 
+				a.put(t); t= new AttributeTagAttribute(TagFromName.FunctionalGroupPointer);
+				t.addValue(0x0020, 0x9111); // Frame Content Sequence 
+				a.put(t); lo = new LongStringAttribute(TagFromName.DimensionDescriptionLabel); 
+				lo.addValue("Temporal Position Index"); 
+				a.put(t);
+				seq.addItem(a);
+				
 
 				a = new AttributeList();
 				a.put(org_uid);
@@ -660,10 +686,12 @@ public class SegmentationObjectsFileWriter
 				lo.addValue("Referenced Segment Number");
 				a.put(t);
 				seq.addItem(a);
+				
+				list.put(seq);
 			} else {
-				seq.addItem(a);
+//				seq.addItem(a);
 			}
-			list.put(seq);
+			
 		}
 
 		// Attributes below are not mandatory, so special check needs to be done.
@@ -941,6 +969,7 @@ public class SegmentationObjectsFileWriter
 		segment_sequence.addItem(item);
 	}
 
+	
 	/**
 	 * Add a sequence of frames to current segment.
 	 * 
@@ -953,6 +982,12 @@ public class SegmentationObjectsFileWriter
 	 */
 	public void addAllFrames(byte[] frames, int frame_num, int image_width, int image_height, String type,
 			short stack_id, double[][] positions) throws DicomException, IOException
+	{
+		addAllFrames(frames, frame_num, image_width, image_height, type, stack_id, positions,(short)0);
+	}
+	
+	public void addAllFrames(byte[] frames, int frame_num, int image_width, int image_height, String type,
+			short stack_id, double[][] positions, short temporal_position) throws DicomException, IOException
 	{
 		if (frames == null)
 			throw (new DicomException("There is no pixel data!"));
@@ -1110,6 +1145,7 @@ public class SegmentationObjectsFileWriter
 				AttributeList item = new AttributeList();
 				Attribute a = new ShortStringAttribute(TagFromName.StackID);
 				stack_id = stack_id > 0 ? stack_id : 1;
+				
 				a.addValue(Integer.toString(stack_id));
 				item.put(a);
 				a = new UnsignedLongAttribute(TagFromName.InStackPositionNumber);
@@ -1118,6 +1154,9 @@ public class SegmentationObjectsFileWriter
 				a = new UnsignedLongAttribute(TagFromName.DimensionIndexValues);
 				a.addValue(stack_id);
 				a.addValue(in_stack_position[k]);
+				//put temporal position (actually for mr, but put it in all images anyway)
+				temporal_position = temporal_position > 0 ? temporal_position : 1;
+				a.addValue(temporal_position);
 				a.addValue(current_segment);
 				item.put(a);
 				seq.addItem(item);
