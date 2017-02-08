@@ -207,6 +207,7 @@ public class PixelMedUtils
 	//added for pf migration
 	public static final String StudyInstanceUIDCode = getTagCode(TagFromName.StudyInstanceUID);
 	public static final String SeriesInstanceUIDCode = getTagCode(TagFromName.SeriesInstanceUID);
+	public static final String ImagePositionPatientCode = getTagCode(TagFromName.ImagePositionPatient);
 	
 	
 	public static AttributeList readDICOMAttributeList(File dicomFile)
