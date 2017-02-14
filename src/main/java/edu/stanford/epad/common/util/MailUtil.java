@@ -197,6 +197,7 @@ public class MailUtil {
 	    } catch (MessagingException mex) {
 	    	log.warning("Error sending message to: " + to + " Subject:" + subject + " host:" + host + " port:" + port + " tls:" + tls, mex);
 	    	log.debug("username: " + username + " password:" + password);
+	    	throw mex;
 	    }
     }
 }
