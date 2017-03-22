@@ -222,6 +222,29 @@ public class DicomReader
 		}
 		return packedImage;
 	}
+	
+	/**
+	 * Gets Number of frames from the header. Returns 0 if tag does not exist
+	 * @return
+	 * @throws IOException
+	 */
+	public Integer getNumberOfFrames() throws IOException
+	{
+		DicomInputStream dis = null;
+		Integer numberOfFrames = 0;
+
+		try {
+			log.info("" + Thread.currentThread().getId() + " Opening Dicom:" + dicomFile.getName());
+			dis = new DicomInputStream(dicomFile);
+			dis.setHandler(new StopTagInputHandler(Tag.PixelData));
+			DicomObject dicomObject = dis.readDicomObject();
+			numberOfFrames = dicomObject.getInt(Tag.NumberOfFrames,0);
+		} finally {
+			IOUtils.closeQuietly(dis);
+			log.info("" + Thread.currentThread().getId() + " Closed");
+		}
+		return numberOfFrames;
+	}
 
 	// See http://forums.dcm4che.org/jiveforums/message.jspa?messageID=21407 for various ways of reading a DICOM file.
 	public static String getPatientName(File dicomFile) throws IOException
