@@ -130,9 +130,11 @@ public class PluginDicomUtil
 	{
 		if (studyUID==null || studyUID.equals(""))
 			studyUID="*";
-        String url = EPADConfig.getParamValue("serverProxy", "http://localhost:8080") 
+		String url = EPADConfig.getParamValue("serverProxy", "http://localhost:8080") 
         		+ EPADConfig.getParamValue("webserviceBase", "/epad") + "/v2" +
-				"/studies/" + studyUID + "/series/" + seriesUID + "/images/?username=" + username;
+				"/studies/" + studyUID + "/series/" + seriesUID + "/images/";
+		if (username!=null) 
+			url+="?username=" + username;
 		log.info("url for getDicomImageUIDsInSeries: " + url);
 		
 //		String url = "TODO" + "?series_iuid=" + seriesUID; // TODO Use new RESTful /images/ route.
