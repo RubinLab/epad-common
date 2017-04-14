@@ -108,12 +108,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.hakan.aim4api.base.AimException;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
+import edu.stanford.hakan.aim4api.base.TwoDimensionGeometricShapeEntity;
 import edu.stanford.hakan.aim4api.plugin.PluginParameter;
 import edu.stanford.hakan.aim4api.plugin.v4.PluginV4;
 import edu.stanford.hakan.aim4api.usage.AnnotationBuilder;
@@ -202,6 +204,63 @@ public class PluginAIMContentUtil
 		return getUIDFromAIM("<Image ", "sopInstanceUID", aimFileContents, 2);
 	}
 
+	/**
+	 * Get shapes from an aim file
+	 * 
+	 * 
+	 * @param aimFileContents String
+	 * @return List<String> A list of shape xsi types 
+	 * Possible values are TwoDimensionPolyline, TwoDimensionSpline, TwoDimensionMultiPoint, TwoDimensionPoint, TwoDimensionCircle, TwoDimensionEllipse 
+	 * for two dimension
+	 * @throws edu.stanford.epad.common.plugins.PluginServletException
+	 */
+	public static List<String> getShapesFromAimFile(File aimFile) throws Exception
+	{
+	
+		List<String> shapeXsis=new ArrayList<>();
+		ImageAnnotationCollection iac = null;
+		try {
+			iac = AnnotationGetter.getImageAnnotationCollectionFromFile(aimFile.getPath(),
+					EPADConfig.xsdFilePathV4);
+			for (TwoDimensionGeometricShapeEntity ge:iac.getImageAnnotations().get(0).getTwoDimensionShapes()){
+				shapeXsis.add(ge.getXsiType());
+			}
+			return shapeXsis;
+			
+			
+		} catch (Exception e) {
+
+			throw new PluginServletException("Invalid input.", "Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac));
+		}
+			
+	}
+	
+	
+	/**
+	 * Check if aim has closed shape
+	 * 
+	 * 
+	 * @param aimFileContents String
+	 * @return boolean
+	 * @throws edu.stanford.epad.common.plugins.PluginServletException
+	 */
+	public static boolean hasClosedShape(File aimFile) throws Exception
+	{
+		
+		List<String> shapes=getShapesFromAimFile(aimFile);
+		
+		for (String ge:shapes){
+			if (ge.equals("TwoDimensionPolyline") || ge.equals("TwoDimensionSpline") || ge.equals("TwoDimensionCircle")) {
+				return true;
+			}
+            
+		}
+		return false;
+			
+	}
+	
+	
+	
 	/**
 	 * This data comes from a AIM-Template.
 	 * 
