@@ -174,9 +174,9 @@ public class EPADConfig
 	public static final String xsdFile = EPADConfig.getInstance().getStringPropertyValue("xsdFile");
 	public static final String xsdFilePath = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir") + xsdFile;
 	public static final String useV4 = EPADConfig.getInstance().getStringPropertyValue("useV4");
-	public static final String aim4Namespace = EPADConfig.getInstance().getStringPropertyValue("namespaceV4");
+	public static final String aim4Namespace = EPADConfig.getParamValue("namespaceV4","gme://caCORE.caCORE/4.4/edu.northwestern.radiology.AIM");
 	public static final String eXistCollectionV4 = EPADConfig.getInstance().getStringPropertyValue("collectionV4");
-	public static final String xsdFileV4 = EPADConfig.getInstance().getStringPropertyValue("xsdFileV4");
+	public static final String xsdFileV4 = EPADConfig.getParamValue("xsdFileV4","AIM_v4_XMLStanford.xsd");
 	public static final String xsdFilePathV4 = EPADConfig.getInstance().getStringPropertyValue("baseSchemaDir")
 			+ xsdFileV4;
 	public static final String baseAnnotationDir = EPADConfig.getInstance().getStringPropertyValue("baseAnnotationDir");
