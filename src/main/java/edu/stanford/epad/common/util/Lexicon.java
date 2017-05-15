@@ -58,6 +58,7 @@ public class Lexicon extends HashMap<String, CD> {
 //     calculation.setCodeMeaning("Feature Extraction");
 //     calculation.setCodingSchemeDesignator("99EPAD");
 	
+	
 
 	
 	public CD getLex(String lex){
@@ -92,6 +93,70 @@ public class Lexicon extends HashMap<String, CD> {
 //			return new CD("99EPADD0","NA",this.ePadDesignator,ePadLexVersion);
 			return new CD("99EPADD0",lex,this.ePadDesignator, ePadLexVersion);
 		return cd;
+	}
+	
+	
+	public CD createLex(String lex,String description, CD parent, String codevalue){
+		//get from db
+		if (conn==null) {
+			try {
+				conn = createConnection();
+			} catch (SQLException e) {
+				
+				logger.warning("Create connection failed; debugInfo=" + e);
+			}
+		
+		}
+		
+		Connection c = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		if (codevalue==null) {
+			int maxFeatVal=0;
+			String sqlMaxfeatVal = "select max(convert(substring(code_value,8),signed)) from lexicon where code_value like '99EPADF%'";
+			try {
+				ps = conn.prepareStatement(sqlMaxfeatVal);
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					maxFeatVal=rs.getInt(0);
+				}
+			} catch (SQLException sqle) {
+				logger.warning("Database operation failed; debugInfo=" + sqle);
+			} finally {
+				close(c, ps, rs);
+			}
+		
+			codevalue="99EPADF"+ (maxFeatVal++);
+		}
+		String parentId="NULL";
+		if (parent!=null){
+			
+			String sqlParent = "select ID from lexicon where code_value = '" + parent.getCode()+"'";
+			try {
+				ps = conn.prepareStatement(sqlParent);
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					parentId=String.valueOf(rs.getInt(0));
+				}
+			} catch (SQLException sqle) {
+				logger.warning("Database operation failed; debugInfo=" + sqle);
+			} finally {
+				close(c, ps, rs);
+			}
+		}
+		
+		String sqlInsert = "INSERT INTO lexicon(CODE_VALUE,CODE_MEANING,DESCRIPTION,SCHEMA_DESIGNATOR,SCHEMA_VERSION, PARENT_ID) Values( '" + codevalue + "','" + lex + "','" + description + "','" + this.ePadDesignator + "','" + this.ePadLexVersion + "', " +parentId+" )";
+		try {
+			ps = conn.prepareStatement(sqlInsert);
+			rs = ps.executeQuery();
+			
+		} catch (SQLException sqle) {
+			logger.warning("Database operation failed; debugInfo=" + sqle);
+		} finally {
+			close(c, ps, rs);
+		}
+		
+		return getLex(lex);
 	}
 	private void close(Connection c, PreparedStatement ps, ResultSet rs)
 	{
