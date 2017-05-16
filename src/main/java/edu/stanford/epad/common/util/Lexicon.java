@@ -10,12 +10,9 @@ import java.sql.SQLException;
 //import java.io.FileReader;
 //import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import edu.stanford.hakan.aim4api.base.CD;
-import edu.stanford.hakan.aim4api.utility.EPADConfig;
 
 
 /* author Emel Alkim
@@ -30,9 +27,9 @@ public class Lexicon extends HashMap<String, CD> {
 	private static final Logger logger = Logger.getLogger("Aim");
 	private final String ePadDesignator="99EPAD", ePadLexVersion="1";
 	
-	String username = EPADConfig.getInstance().getStringPropertyValue("epadDatabaseUsername");
-	String password = EPADConfig.getInstance().getStringPropertyValue("epadDatabasePassword");
-	String epadDatabaseURL = EPADConfig.getInstance().getStringPropertyValue("epadDatabaseURL");
+	String username = EPADConfig.epadDatabaseUsername;
+	String password = EPADConfig.epadDatabasePassword;
+	String epadDatabaseURL = EPADConfig.epadDatabaseURL;
 	
 	
 	Connection conn ;
@@ -118,16 +115,18 @@ public class Lexicon extends HashMap<String, CD> {
 				ps = conn.prepareStatement(sqlMaxfeatVal);
 				rs = ps.executeQuery();
 				while (rs.next()) {
-					maxFeatVal=rs.getInt(0);
+					maxFeatVal=rs.getInt(1);
 				}
 			} catch (SQLException sqle) {
 				logger.warning("Database operation failed; debugInfo=" + sqle);
 			} finally {
-				close(c, ps, rs);
+				close(ps);
+				close(rs);
 			}
 		
-			codevalue="99EPADF"+ (maxFeatVal++);
+			codevalue="99EPADF"+ (++maxFeatVal);
 		}
+		logger.info("Code value is "+codevalue);
 		String parentId="NULL";
 		if (parent!=null){
 			
@@ -136,24 +135,26 @@ public class Lexicon extends HashMap<String, CD> {
 				ps = conn.prepareStatement(sqlParent);
 				rs = ps.executeQuery();
 				while (rs.next()) {
-					parentId=String.valueOf(rs.getInt(0));
+					parentId=String.valueOf(rs.getInt(1));
 				}
 			} catch (SQLException sqle) {
 				logger.warning("Database operation failed; debugInfo=" + sqle);
 			} finally {
-				close(c, ps, rs);
+				close(ps);
+				close(rs);
 			}
 		}
-		
+		logger.info("parent id is "+ parentId);
 		String sqlInsert = "INSERT INTO lexicon(CODE_VALUE,CODE_MEANING,DESCRIPTION,SCHEMA_DESIGNATOR,SCHEMA_VERSION, PARENT_ID) Values( '" + codevalue + "','" + lex + "','" + description + "','" + this.ePadDesignator + "','" + this.ePadLexVersion + "', " +parentId+" )";
 		try {
 			ps = conn.prepareStatement(sqlInsert);
-			rs = ps.executeQuery();
+			ps.executeUpdate();
 			
 		} catch (SQLException sqle) {
 			logger.warning("Database operation failed; debugInfo=" + sqle);
 		} finally {
-			close(c, ps, rs);
+			close(ps);
+			close(c);
 		}
 		
 		return getLex(lex);
