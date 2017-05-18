@@ -362,12 +362,21 @@ public class PluginAIMUtil
 		return new String[]{cd,label};
 	}
 	
+	
+	
 	//new version. uses lexicon and adds as seperate calculation entities
 	public static ImageAnnotationCollection addFeatures(ImageAnnotationCollection imageAnnotationCollection, ArrayList<String[]> features, double featureVersion, CD calcCD) throws edu.stanford.hakan.aim4api.base.AimException 
 	{
+		return addFeatures(imageAnnotationCollection, features, featureVersion, calcCD, false);
+	}
+	public static ImageAnnotationCollection addFeatures(ImageAnnotationCollection imageAnnotationCollection, ArrayList<String[]> features, double featureVersion, CD calcCD, boolean createIfNoCD) throws edu.stanford.hakan.aim4api.base.AimException 
+	{
 		
 		 for (int i = 0; i < features.size(); i++) {
-	            if (features.get(i).length != 2) {
+			 	String unit=null;
+	            if (features.get(i).length == 3) {
+	            	unit=features.get(i)[2];
+	            }else if (features.get(i).length !=2){
 	            	log.info("Not a feature pair, what is it?");
 	                continue;
 	            }  
@@ -375,9 +384,11 @@ public class PluginAIMUtil
 	            String[] parsedFeature = parseFeature(features.get(i)[0]);
 	            
 	            CD featureCD = Lexicon.getInstance().getLex(parsedFeature[0]);
-	           
+	            if (featureCD.getCode().equals("99EPADD0") && createIfNoCD){
+	            	featureCD = Lexicon.getInstance().createLex(parsedFeature[0],parsedFeature[1],calcCD,null);
+	            }
 	            try {
-	            	imageAnnotationCollection = edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, Double.parseDouble(features.get(i)[1]), featureCD, featureVersion, calcCD, parsedFeature[1]);
+	            	imageAnnotationCollection = edu.stanford.hakan.aim4api.usage.AnnotationExtender.addFeature(imageAnnotationCollection, Double.parseDouble(features.get(i)[1]), featureCD, featureVersion, calcCD, parsedFeature[1],unit);
 	            }catch (NumberFormatException ne) {
 	            	log.info("Could not parse the feature value to a double. feature name:"+features.get(i)[0]+" value:"+ features.get(i)[1]);
 	            }

@@ -10,12 +10,9 @@ import java.sql.SQLException;
 //import java.io.FileReader;
 //import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import edu.stanford.hakan.aim4api.base.CD;
-import edu.stanford.hakan.aim4api.utility.EPADConfig;
 
 
 /* author Emel Alkim
@@ -30,9 +27,9 @@ public class Lexicon extends HashMap<String, CD> {
 	private static final Logger logger = Logger.getLogger("Aim");
 	private final String ePadDesignator="99EPAD", ePadLexVersion="1";
 	
-	String username = EPADConfig.getInstance().getStringPropertyValue("epadDatabaseUsername");
-	String password = EPADConfig.getInstance().getStringPropertyValue("epadDatabasePassword");
-	String epadDatabaseURL = EPADConfig.getInstance().getStringPropertyValue("epadDatabaseURL");
+	String username = EPADConfig.epadDatabaseUsername;
+	String password = EPADConfig.epadDatabasePassword;
+	String epadDatabaseURL = EPADConfig.epadDatabaseURL;
 	
 	
 	Connection conn ;
@@ -57,6 +54,7 @@ public class Lexicon extends HashMap<String, CD> {
 //     calculation.setCodeValue("99EPADF0");
 //     calculation.setCodeMeaning("Feature Extraction");
 //     calculation.setCodingSchemeDesignator("99EPAD");
+	
 	
 
 	
@@ -92,6 +90,74 @@ public class Lexicon extends HashMap<String, CD> {
 //			return new CD("99EPADD0","NA",this.ePadDesignator,ePadLexVersion);
 			return new CD("99EPADD0",lex,this.ePadDesignator, ePadLexVersion);
 		return cd;
+	}
+	
+	
+	public CD createLex(String lex,String description, CD parent, String codevalue){
+		//get from db
+		if (conn==null) {
+			try {
+				conn = createConnection();
+			} catch (SQLException e) {
+				
+				logger.warning("Create connection failed; debugInfo=" + e);
+			}
+		
+		}
+		
+		Connection c = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		if (codevalue==null) {
+			int maxFeatVal=0;
+			String sqlMaxfeatVal = "select max(convert(substring(code_value,8),signed)) from lexicon where code_value like '99EPADF%'";
+			try {
+				ps = conn.prepareStatement(sqlMaxfeatVal);
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					maxFeatVal=rs.getInt(1);
+				}
+			} catch (SQLException sqle) {
+				logger.warning("Database operation failed; debugInfo=" + sqle);
+			} finally {
+				close(ps);
+				close(rs);
+			}
+		
+			codevalue="99EPADF"+ (++maxFeatVal);
+		}
+		logger.info("Code value is "+codevalue);
+		String parentId="NULL";
+		if (parent!=null){
+			
+			String sqlParent = "select ID from lexicon where code_value = '" + parent.getCode()+"'";
+			try {
+				ps = conn.prepareStatement(sqlParent);
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					parentId=String.valueOf(rs.getInt(1));
+				}
+			} catch (SQLException sqle) {
+				logger.warning("Database operation failed; debugInfo=" + sqle);
+			} finally {
+				close(ps);
+				close(rs);
+			}
+		}
+		logger.info("parent id is "+ parentId);
+		String sqlInsert = "INSERT INTO lexicon(CODE_VALUE,CODE_MEANING,DESCRIPTION,SCHEMA_DESIGNATOR,SCHEMA_VERSION, PARENT_ID) Values( '" + codevalue + "','" + lex + "','" + description + "','" + this.ePadDesignator + "','" + this.ePadLexVersion + "', " +parentId+" )";
+		try {
+			ps = conn.prepareStatement(sqlInsert);
+			ps.executeUpdate();
+			
+		} catch (SQLException sqle) {
+			logger.warning("Database operation failed; debugInfo=" + sqle);
+		} finally {
+			close(ps);
+			close(c);
+		}
+		
+		return getLex(lex);
 	}
 	private void close(Connection c, PreparedStatement ps, ResultSet rs)
 	{
