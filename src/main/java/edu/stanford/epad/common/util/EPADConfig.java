@@ -126,7 +126,8 @@ public class EPADConfig
 
 	// The port that the ePAD server is sitting on
 	public static final int epadPort = EPADConfig.getInstance().getIntegerPropertyValue("ePadClientPort");
-
+	// Tomcat related config
+	public static String tomcatLocation = EPADConfig.getInstance().getParamValue("tomcatLocation", "/usr/share/tomcat71");
 	//qifp data
 	public static final String qifpServer = EPADConfig.getInstance().getParamValue("qifpServer","epad-prod8.stanford.edu");
 	public static final int qifpPort = EPADConfig.getInstance().getIntegerPropertyValue("qifpPort",8090);
