@@ -114,6 +114,7 @@ import java.io.OutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
 public class FTPUtil {
@@ -215,6 +216,37 @@ public class FTPUtil {
 
 		return success;
 	}
+
+	//cav switch to defined remote folder to work with
+	public boolean setFolder(String remoteFolder)  {
+		this.ftpFolder = remoteFolder;
+		return false;
+		
+	}
+	//cav get all files from defined remote folder
+	public  FTPFile[]  getFiles(String inFolder) throws Exception {
+	  	
+		FTPClient ftpClient = new FTPClient();
+		 
+		
+		OutputStream outputStream = null;
+	    try {	
+	        ftpClient.connect(ftpHost, ftpPort);
+	        ftpClient.enterLocalPassiveMode();
+	        ftpClient.changeWorkingDirectory(inFolder);
+	        if (ftpUser != null && ftpUser.length() > 0)
+	        	ftpClient.login(ftpUser, ftpPassword);
+	        else
+	        	ftpClient.login("anonymous", "");
+	        ftpClient.enterLocalPassiveMode();
+	        ftpClient.changeWorkingDirectory(inFolder);
+	        FTPFile[] ftpAllFiles = ftpClient.listFiles(); 
+	        return ftpAllFiles;
+	    } finally {	    	
+	        ftpClient.disconnect();
+	    }		
+	}
+	
 
 	
  }
