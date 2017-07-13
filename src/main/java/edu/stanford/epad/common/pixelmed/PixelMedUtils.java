@@ -291,6 +291,20 @@ public class PixelMedUtils
 			return false;
 		}
 	}
+	
+	public static boolean isDicom(String filePath)
+	{
+		try {
+			AttributeList list = readAttributeListFromDicomFile(filePath);
+			if (list!=null && list.size()>0){
+				log.info("Can read the attribute list. It is dicom");
+				return true;
+			}
+		} catch (Exception e) {
+			return false;
+		}
+		return false;
+	}
 
 	public static boolean isEnhancedMultiframeImage(String filePath)
 	{
