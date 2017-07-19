@@ -25,4 +25,6 @@ public class EventMessageCodes {
 	public static final String PLUGIN_COMPLETED = "Plugin Completed";
 	public static final String PLUGIN_FAILED = "Plugin Failed";
 
+	public static final String AIM_VALIDATION_ERROR = "Aim couldn't be saved. Please verify that you use AIM_v4_XMLStanford.xsd. xsdFileV4 value in proxy-config should be AIM_v4_XMLStanford.xsd";
+
 }
