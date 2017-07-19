@@ -25,4 +25,6 @@ public class EventMessageCodes {
 	public static final String PLUGIN_COMPLETED = "Plugin Completed";
 	public static final String PLUGIN_FAILED = "Plugin Failed";
 
+	public static final String AIM_VALIDATION_ERROR = "Please verify that you use current aim schema (xsdFileV4 in proxy-config should be AIM_v4_XMLStanford.xsd)";
+
 }
