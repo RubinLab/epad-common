@@ -140,6 +140,8 @@ public class PixelMedUtils
 	public static final String StudyDateTagName = dicomDictionary.getFullNameFromTag(TagFromName.StudyDate);
 	public static final String StudyTimeCode = getTagCode(TagFromName.StudyTime);
 	public static final String StudyTimeTagName = dicomDictionary.getFullNameFromTag(TagFromName.StudyTime);
+	public static final String AccessionNumberCode = getTagCode(TagFromName.AccessionNumber);
+	public static final String AccessionNumberTagName = dicomDictionary.getFullNameFromTag(TagFromName.AccessionNumber);
 	public static final String RescaleSlopeCode = getTagCode(TagFromName.RescaleSlope);
 	public static final String RescaleSlopeTagName = dicomDictionary.getFullNameFromTag(TagFromName.RescaleSlope);
 	public static final String RescaleInterceptCode = getTagCode(TagFromName.RescaleIntercept);
