@@ -154,6 +154,13 @@ public class EPADConfig
 	public static final String epadDatabasePassword = EPADConfig.getInstance().getStringPropertyValue(
 			"epadDatabasePassword");
 	public static final String epadDatabaseURL = EPADConfig.getInstance().getStringPropertyValue("epadDatabaseURL");
+	
+	// ePAD's MySQL database configuration
+	public static final String arrDatabaseUsername = EPADConfig.getInstance().getParamValue(
+			"arrDatabaseUsername","arr");
+	public static final String arrDatabasePassword = EPADConfig.getInstance().getParamValue(
+			"arrDatabasePassword","arr");
+	public static final String arrDatabaseURL = EPADConfig.getInstance().getParamValue("arrDatabaseURL","jdbc:mysql://localhost:3306/arrdb?autoReconnect=true");
 
 	// dcm4chee's MySQL database configuration
 	public static final String dcm4CheeDatabaseUsername = EPADConfig.getInstance().getStringPropertyValue(
@@ -205,6 +212,7 @@ public class EPADConfig
 	
 	public static String pluginMaxtime = EPADConfig.getInstance().getParamValue("pluginMaxtime", null);
 	public static int olderThan_Days = EPADConfig.getInstance().getIntegerPropertyValue("olderThan_Days", 360);
+	public static int logOlderThan_Days = EPADConfig.getInstance().getIntegerPropertyValue("logOlderThan_Days", 30);
 	
 	private Properties properties;
 
