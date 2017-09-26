@@ -7,7 +7,7 @@ public class EventMessageCodes {
 	
 	public static final String STUDY_NOT_DELETED = "Study Not Deleted From System";
 	
-	public static final String UPLOAD_TYPE_ERROR = "No Dicom Files in Upload Directory";
+	public static final String UPLOAD_TYPE_ERROR = "No Dicom/Aim Files in Upload Directory";
 	public static final String UPLOAD_ERROR = "Error Processing Uploaded File";
 	public static final String DCM4CHEE_ERROR = "Error Sending Files To DCM4CHEE";
 	public static final String INVALID_PATIENT_ID_IN_UPLOAD  = "Invalid Patient ID in Upload";
@@ -28,4 +28,7 @@ public class EventMessageCodes {
 
 	public static final String AIM_VALIDATION_ERROR = "Please verify that you use current aim schema (xsdFileV4 in proxy-config should be AIM_v4_XMLStanford.xsd)";
 
+	public static final String NO_PATIENT = "Patient doesn't exist in ePAD";
+	public static final String STUDY_ALREADY_IN_EPAD = "Study already in ePAD";
+	
 }
