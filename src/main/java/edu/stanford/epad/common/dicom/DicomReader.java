@@ -185,6 +185,12 @@ public class DicomReader
 	{
 		return getPackedImage(0);
 	}
+	
+	
+	public BufferedImage getPackedMask() throws IOException
+	{
+		return getPackedMask(0);
+	}
 
 	/**
 	 * Generate a buffered image with the high order bits of PixelData in the red channel and low order bits in the green
@@ -214,6 +220,41 @@ public class DicomReader
 			DicomImageReadParam param = (DicomImageReadParam)codec.getDefaultReadParam();
 			Raster raster = codec.readRaster(frameValue, param);
 			packedImage = rasterProcessor.buildPng(raster);
+		} finally {
+			IOUtils.closeQuietly(dis);
+			if (fis != null)
+				fis.close();
+			log.info("" + Thread.currentThread().getId() + " Closed");
+		}
+		return packedImage;
+	}
+	
+	/**
+	 * generates a binary mask
+	 * @param frameValue
+	 * @return
+	 * @throws IOException
+	 */
+	public BufferedImage getPackedMask(int frameValue) throws IOException
+	{
+		FileImageInputStream fis = null;
+		DicomInputStream dis = null;
+		BufferedImage packedImage = null;
+
+		try {
+			StopTagInputHandler stop = new StopTagInputHandler(Tag.PixelData);
+			log.info("" + Thread.currentThread().getId() + " Opening Dicom:" + dicomFile.getName());
+			dis = new DicomInputStream(dicomFile);
+			dis.setHandler(stop);
+			DicomObject object = dis.readDicomObject();
+			RasterProcessor rasterProcessor = new RasterProcessor(object);
+			dis.close();
+			fis = new FileImageInputStream(dicomFile);
+			DicomImageReader codec = (DicomImageReader)new DicomImageReaderSpi().createReaderInstance();
+			codec.setInput(fis);
+			DicomImageReadParam param = (DicomImageReadParam)codec.getDefaultReadParam();
+			Raster raster = codec.readRaster(frameValue, param);
+			packedImage = rasterProcessor.buildMask(raster);
 		} finally {
 			IOUtils.closeQuietly(dis);
 			if (fis != null)

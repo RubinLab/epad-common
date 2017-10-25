@@ -930,6 +930,81 @@ public class RasterProcessor
 		return pngImage;
 	}
 
+	
+	/**
+	 * Builds a binary mask for the raster. anything that is not 0 is 1
+	 * @param raster
+	 * @return
+	 */
+	public BufferedImage buildMask(Raster raster)
+	{
+		BufferedImage pngImage = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+		// BufferedImage pngImage = new BufferedImage(raster.getWidth(), raster.getHeight(),
+		// BufferedImage.TYPE_USHORT_GRAY);
+		WritableRaster writablePNGRaster = pngImage.getRaster();
+		Distribution rawValuesDistribution = null;
+		Distribution highOrderBitsDistribution = null;
+		Distribution lowOrderBitsDistribution = null;
+		int[] grayInputArray = new int[1];
+		int[] grayArray = new int[1];
+		int[] bgrArray = new int[3];
+		// int[] pngGrayArray = new int[2];
+
+		if (debugLevel > 0) {
+			// if (pixelRepresentation == 0) {
+			// logger.info("Running buildPNG with unsigned PixelData");
+			// } else {
+			// logger.info("Running buildPNG with signed PixelData");
+			// }
+			rawValuesDistribution = new Distribution(-40000.0f, 40000.0f);
+			rawValuesDistribution.setDesc("buildPng - Raw values");
+			highOrderBitsDistribution = new Distribution(0.0f, 256.0f);
+			highOrderBitsDistribution.setDesc("buildPng - high order bits");
+			lowOrderBitsDistribution = new Distribution(0.0f, 256.0f);
+			lowOrderBitsDistribution.setDesc("buildPng - low order bits");
+		}
+		for (int x = 0; x < raster.getWidth(); x++) {
+			for (int y = 0; y < raster.getHeight(); y++) {
+				grayArray = raster.getPixel(x, y, grayInputArray);
+				int pixelValue = dataValue(grayArray[0]);
+				if (debugLevel > 0) {
+					rawValuesDistribution.add(pixelValue);
+					highOrderBitsDistribution.add(high(pixelValue));
+					lowOrderBitsDistribution.add(low(pixelValue));
+				}
+				if (pixelValue==0) {
+					bgrArray[0] = 0;
+					bgrArray[1] = 0;
+					bgrArray[2] = 0;
+				}else {
+					bgrArray[0] = 255;
+					bgrArray[1] = 255;
+					bgrArray[2] = 255;
+				}
+				
+				writablePNGRaster.setPixel(x, y, bgrArray);
+				// writablePNGRaster.setPixel(x, y, pngGrayArray);
+			}
+		}
+		/*
+		 * logger.info("TestingXXXX"); int[] bgrInputArray = new int[3]; for (int x = 0; x < raster.getWidth(); x++) { for
+		 * (int y = 0; y < raster.getHeight(); y++) { grayArray = raster.getPixel(x, y, grayInputArray); int rawPixelValue =
+		 * grayArray[0]; int pixelValue = dataValue(rawPixelValue);
+		 * 
+		 * bgrArray = writablePNGRaster.getPixel(x, y, bgrInputArray); if (bgrArray[0] != high(pixelValue))
+		 * logger.info("Broken"); if (bgrArray[1] != low(pixelValue)) logger.info("Broken2"); if (x > 1 && bgrArray[2] != 0)
+		 * logger.info("Also broken"); } }
+		 */
+		if (debugLevel > 0) {
+			logger.info("Distribution of gray values");
+			rawValuesDistribution.print();
+			logger.info("Distribution of high order bits");
+			highOrderBitsDistribution.print();
+			logger.info("Distribution of low order bits");
+			lowOrderBitsDistribution.print();
+		}
+		return pngImage;
+	}
 	/**
 	 * Pack 16 bit PixelData in 2 channels of image.
 	 * <p>
