@@ -273,8 +273,9 @@ public class PluginAIMUtil
 	 		edu.stanford.hakan.aim4api.compability.aimv3.ImageStudy imageStudy = new edu.stanford.hakan.aim4api.compability.aimv3.ImageStudy();		
 	 		imageStudy.setCagridId(0);		
 	 		imageStudy.setInstanceUID(dsoStudyInstanceUID);		
-	 		imageStudy.setStartDate("2012-01-01T01:01:01"); // TODO		
-	 		imageStudy.setStartTime("12:00:00"); // TODO		
+	 		imageStudy.setStartDate("19000101000000"); // TODO		
+	 		imageStudy.setStartTime("00:00:00"); // TODO		
+	 		log.warning("DEPRECEATED! Do not use. Ignores study start date and time");
 	 		
 	 		edu.stanford.hakan.aim4api.compability.aimv3.ImageSeries imageSeries = new edu.stanford.hakan.aim4api.compability.aimv3.ImageSeries();		
 	 		imageSeries.setCagridId(0);		
