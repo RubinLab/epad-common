@@ -930,6 +930,54 @@ public class RasterProcessor
 		return pngImage;
 	}
 
+	
+	/**
+	 * Builds a binary mask for the raster. anything that is not 0 is 1
+	 * @param raster
+	 * @return
+	 */
+	public BufferedImage buildMask(Raster raster)
+	{
+		//write it as byte gray as not to mess up indexed color masks
+		BufferedImage pngImage = new BufferedImage(raster.getWidth(), raster.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+		WritableRaster writablePNGRaster = pngImage.getRaster();
+		Distribution rawValuesDistribution = null;
+		int[] grayInputArray = new int[1];
+		int[] grayArray = new int[1];
+		// int[] pngGrayArray = new int[2];
+
+		if (debugLevel > 0) {
+			// if (pixelRepresentation == 0) {
+			// logger.info("Running buildPNG with unsigned PixelData");
+			// } else {
+			// logger.info("Running buildPNG with signed PixelData");
+			// }
+			rawValuesDistribution = new Distribution(-40000.0f, 40000.0f);
+			rawValuesDistribution.setDesc("buildPng - Raw values");
+		}
+		for (int x = 0; x < raster.getWidth(); x++) {
+			for (int y = 0; y < raster.getHeight(); y++) {
+				grayArray = raster.getPixel(x, y, grayInputArray);
+				int pixelValue = dataValue(grayArray[0]);
+				if (debugLevel > 0) {
+					rawValuesDistribution.add(pixelValue);
+				}
+				if (pixelValue==0) {
+					grayArray[0] = 0;
+				}else {
+					grayArray[0] = 255;
+				}
+				
+				writablePNGRaster.setPixel(x, y, grayArray);
+			}
+		}
+		
+		if (debugLevel > 0) {
+			logger.info("Distribution of gray values");
+			rawValuesDistribution.print();
+		}
+		return pngImage;
+	}
 	/**
 	 * Pack 16 bit PixelData in 2 channels of image.
 	 * <p>
