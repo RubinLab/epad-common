@@ -261,11 +261,15 @@ public class PluginAIMUtil
 	{
 		return edu.stanford.hakan.aim4api.usage.AnnotationGetter.getImageAnnotationCollectionFromFile(getRealPath(file), xsdFilePathV4);
 	}
-        
-
-        //ml added sopclassuid from image		 +        
+        //backward compatibility
 	 public static edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference createDICOMImageReferenceV3Compability(String dsoStudyInstanceUID, String dsoSeriesInstanceUID,		
 				String dsoSOPInstanceUID, String sopClassUID) 		
+	 	{	
+		 	return createDICOMImageReferenceV3Compability(dsoStudyInstanceUID, dsoSeriesInstanceUID, dsoSOPInstanceUID, sopClassUID, null, null);
+	 	}
+        //ml added sopclassuid from image		 +        
+	 public static edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference createDICOMImageReferenceV3Compability(String dsoStudyInstanceUID, String dsoSeriesInstanceUID,		
+				String dsoSOPInstanceUID, String sopClassUID, String studyDate, String studyTime) 		
 	 	{		
 	 		edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference dicomImageReference = new edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference();		
 	 		dicomImageReference.setCagridId(0);		
@@ -273,8 +277,10 @@ public class PluginAIMUtil
 	 		edu.stanford.hakan.aim4api.compability.aimv3.ImageStudy imageStudy = new edu.stanford.hakan.aim4api.compability.aimv3.ImageStudy();		
 	 		imageStudy.setCagridId(0);		
 	 		imageStudy.setInstanceUID(dsoStudyInstanceUID);		
-	 		imageStudy.setStartDate("19000101000000"); // TODO		
-	 		imageStudy.setStartTime("00:00:00"); // TODO		
+	 		if (studyDate==null) imageStudy.setStartDate("19000101000000"); // TODO		
+	 		else imageStudy.setStartDate(studyDate);
+	 		if (studyTime==null) imageStudy.setStartTime("000000"); // TODO		
+	 		else imageStudy.setStartTime(studyTime);
 	 		log.warning("DEPRECEATED! Do not use. Ignores study start date and time");
 	 		
 	 		edu.stanford.hakan.aim4api.compability.aimv3.ImageSeries imageSeries = new edu.stanford.hakan.aim4api.compability.aimv3.ImageSeries();		
