@@ -235,7 +235,7 @@ public class Lexicon extends HashMap<String, CD> {
 			
 			
 			//datatypes, start with 99EPADD
-			this.put(dtPrefix+"1", new CD(dtPrefix+"1","Double",ePadDesignator,ePadLexVersion));
+			this.put("C48870", new CD("C48870","Double","NCI"));
 			
 			//plugins,  start with 99EPADP
 			this.put(pluginPrefix+"1", new CD(pluginPrefix+"1","JJVector",ePadDesignator,ePadLexVersion));
