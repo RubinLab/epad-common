@@ -122,15 +122,18 @@ import edu.stanford.epad.common.util.EPADConfig;
 import edu.stanford.epad.common.util.EPADLogger;
 import edu.stanford.hakan.aim4api.base.AimException;
 import edu.stanford.hakan.aim4api.base.CD;
+import edu.stanford.hakan.aim4api.base.DicomSegmentationEntity;
+import edu.stanford.hakan.aim4api.base.II;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
+import edu.stanford.hakan.aim4api.base.MarkupEntity;
+import edu.stanford.hakan.aim4api.base.MarkupEntityCollection;
 import edu.stanford.hakan.aim4api.base.Person;
-import edu.stanford.hakan.aim4api.compability.aimv3.GeometricShape;
-import edu.stanford.hakan.aim4api.compability.aimv3.GeometricShapeCollection;
-import edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation;
-import edu.stanford.hakan.aim4api.compability.aimv3.Segmentation;
-import edu.stanford.hakan.aim4api.compability.aimv3.SegmentationCollection;
-import edu.stanford.hakan.aim4api.compability.aimv3.SpatialCoordinate;
-import edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate;
+import edu.stanford.hakan.aim4api.base.ST;
+import edu.stanford.hakan.aim4api.base.TwoDimensionGeometricShapeEntity;
+import edu.stanford.hakan.aim4api.base.TwoDimensionGeometricShapeEntityIsComprisedOfTwoDimensionGeometricShapeEntityStatement;
+import edu.stanford.hakan.aim4api.base.TwoDimensionPolyline;
+import edu.stanford.hakan.aim4api.base.TwoDimensionSpatialCoordinate;
+import edu.stanford.hakan.aim4api.compability.aimv3.Converter;
 import edu.stanford.hakan.aim4api.usage.AnnotationBuilder;
 import edu.stanford.hakan.aim4api.usage.AnnotationExtender;
 //import edu.stanford.hakan.aim4api.compability.aimv3.Lexicon;
@@ -182,7 +185,7 @@ public class PluginAIMUtil
 			throw new edu.stanford.hakan.aim4api.base.AimException(e.getMessage());
 		}
 
-		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
+		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier().getRoot() + " saved to server; result: " + result);
 	}
 	
 	public static void sendImageAnnotationToServer(ImageAnnotationCollection imageAnnotation, String projectID) throws edu.stanford.hakan.aim4api.base.AimException
@@ -201,14 +204,13 @@ public class PluginAIMUtil
 			throw new edu.stanford.hakan.aim4api.base.AimException(e.getMessage());
 		}
 
-		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier() + " saved to server; result: " + result);
+		log.info("AIM file with ID " + imageAnnotation.getUniqueIdentifier().getRoot() + " saved to server; result: " + result);
 	}
 	
 	public static ImageAnnotationCollection generateAIMFileForDSO(ImageAnnotationCollection imageAnnotationCollection,
 			AttributeList dsoDICOMAttributes, String sourceStudyUID, String sourceSeriesUID, String sourceImageUID, String username)
 			throws Exception
 	{
-            edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation imageAnnotation = new edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation(imageAnnotationCollection);
 		String patientID = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientID);
 		String patientName = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientName);
 		String patientBirthDay = Attribute.getSingleStringValueOrEmptyString(dsoDICOMAttributes, TagFromName.PatientBirthDate);
@@ -234,20 +236,24 @@ public class PluginAIMUtil
 		String name = description;
 		if (name == null || name.trim().length() == 0) name = "segmentation";
 
-		// Hakan needs to give equivalent code for AIM4
-                edu.stanford.hakan.aim4api.compability.aimv3.SegmentationCollection sc = new edu.stanford.hakan.aim4api.compability.aimv3.SegmentationCollection();
-		sc.AddSegmentation(new edu.stanford.hakan.aim4api.compability.aimv3.Segmentation(0, imageUID, sopClassUID, sourceImageUID, 1));
-		
-		imageAnnotation.setSegmentationCollection(sc);
+//		// Hakan needs to give equivalent code for AIM4
+//                edu.stanford.hakan.aim4api.compability.aimv3.SegmentationCollection sc = new edu.stanford.hakan.aim4api.compability.aimv3.SegmentationCollection();
+//		sc.AddSegmentation(new edu.stanford.hakan.aim4api.compability.aimv3.Segmentation(0, imageUID, sopClassUID, sourceImageUID, 1));
+//		
+//		imageAnnotation.setSegmentationCollection(sc);
 
+		imageAnnotationCollection.getImageAnnotation().getSegmentationEntityCollection().getSegmentationEntityList().clear();
+		imageAnnotationCollection.getImageAnnotation().addSegmentationEntity(new DicomSegmentationEntity(new II(imageUID),new II(studyUID),new II(seriesUID),
+				new II(sopClassUID), new II(sourceImageUID), 1));
+		
 		//ml remove adding the second image ref
 //		edu.stanford.hakan.aim4api.compability.aimv3.DICOMImageReference dicomImageReference = createDICOMImageReferenceV3Compability(studyUID, seriesUID,
 //				imageUID);
 //		imageAnnotation.addImageReference(dicomImageReference);
 
 		
-		updateDSOAIMInDatabase(imageAnnotation.getUniqueIdentifier(), seriesUID);
-		return imageAnnotation.toAimV4();
+		updateDSOAIMInDatabase(imageAnnotationCollection.getUniqueIdentifier().getRoot(), seriesUID);
+		return imageAnnotationCollection;
 	}
 
 	public static void saveAnnotationToAnnotationsDirectory(ImageAnnotationCollection imageAnnotation) throws edu.stanford.hakan.aim4api.base.AimException
@@ -443,60 +449,68 @@ public class PluginAIMUtil
 		return person.getName().getValue();
 	}
 
-	public static ROIData extractROIData(edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation imageAnnotation)
+	public static ROIData extractROIData(ImageAnnotationCollection imageAnnotation)
 	{
 		int numROI;
 		double[] roixData = null;
 		double[] roiyData = null;
 
-		edu.stanford.hakan.aim4api.compability.aimv3.GeometricShapeCollection geometricShapeCollection = imageAnnotation.getGeometricShapeCollection();
-		edu.stanford.hakan.aim4api.compability.aimv3.GeometricShape geometricShape = null;
-		for (int i = 0; i < geometricShapeCollection.getGeometricShapeList().size(); i++) {
-			geometricShape = geometricShapeCollection.getGeometricShapeList().get(i);
-			if (geometricShape.getXsiType().equals("Polyline")) {
-				numROI = geometricShape.getSpatialCoordinateCollection().getSpatialCoordinateList().size();
+		MarkupEntityCollection geometricShapeCollection = imageAnnotation.getImageAnnotation().getMarkupEntityCollection();
+		for (int i = 0; i < geometricShapeCollection.getMarkupEntityList().size(); i++) {
+			if (geometricShapeCollection.getMarkupEntityList().get(i) instanceof TwoDimensionGeometricShapeEntity){
+				log.warning("Cannot process shapes that are not 2D");
+				continue;
+			}
+			TwoDimensionGeometricShapeEntity geometricShape = (TwoDimensionGeometricShapeEntity)geometricShapeCollection.getMarkupEntityList().get(i);
+			if (geometricShape.getXsiType().toLowerCase().contains("polyline")) {
+				numROI = geometricShape.getTwoDimensionSpatialCoordinateCollection().getTwoDimensionSpatialCoordinateList().size();
 				roixData = new double[numROI];
 				roiyData = new double[numROI];
 				for (int j = 0; j < numROI; j++) {
-					edu.stanford.hakan.aim4api.compability.aimv3.SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
-																										.getSpatialCoordinateList().get(j);
-					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
-						edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = 
-								(edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate)spatialCoordinate;
+					TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = geometricShape.getTwoDimensionSpatialCoordinateCollection()
+																										.getTwoDimensionSpatialCoordinateList().get(j);
+//					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
+//						edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = 
+//								(edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate)spatialCoordinate;
 						int idx = twoDimensionSpatialCoordinate.getCoordinateIndex();
 						roixData[idx] = twoDimensionSpatialCoordinate.getX();
 						roiyData[idx] = twoDimensionSpatialCoordinate.getY();
-					}
+//					}
 				}
 			}
 		}
 		return new ROIData(roixData, roiyData);
 	}
 
-	public static List<Double> extractPoints (ImageAnnotation templateImageAnnotation) {
+	public static List<Double> extractPoints (ImageAnnotationCollection templateImageAnnotation) {
 		List<Double> points = new ArrayList<Double>();
 		double[] roixData = null;
 		double[] roiyData = null;
 
-		GeometricShapeCollection geometricShapeCollection = templateImageAnnotation.getGeometricShapeCollection();
-		for (int i = 0; i < geometricShapeCollection.getGeometricShapeList().size(); i++) {
-			GeometricShape geometricShape = geometricShapeCollection.getGeometricShapeList().get(i);
-			if (geometricShape.getXsiType().equals("MultiPoint")) {
-				int numberOfROIs = geometricShape.getSpatialCoordinateCollection().getSpatialCoordinateList().size();
+		MarkupEntityCollection geometricShapeCollection = templateImageAnnotation.getImageAnnotation().getMarkupEntityCollection();
+		for (int i = 0; i < geometricShapeCollection.getMarkupEntityList().size(); i++) {
+			if (geometricShapeCollection.getMarkupEntityList().get(i) instanceof TwoDimensionGeometricShapeEntity){
+				log.warning("Cannot process shapes that are not 2D");
+				continue;
+			}
+			TwoDimensionGeometricShapeEntity geometricShape = (TwoDimensionGeometricShapeEntity)geometricShapeCollection.getMarkupEntityList().get(i);
+			if (geometricShape.getXsiType().toLowerCase().contains("multipoint")) {
+			
+				int numberOfROIs = geometricShape.getTwoDimensionSpatialCoordinateCollection().getTwoDimensionSpatialCoordinateList().size();
 				roixData = new double[numberOfROIs];
 				roiyData = new double[numberOfROIs];
 				for (int j = 0; j < numberOfROIs; j++) {
-					SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
-							.getSpatialCoordinateList().get(j);
-					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
-						TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
+					TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = geometricShape.getTwoDimensionSpatialCoordinateCollection()
+							.getTwoDimensionSpatialCoordinateList().get(j);
+//					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
+//						TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = (TwoDimensionSpatialCoordinate)spatialCoordinate;
 						int idx = twoDimensionSpatialCoordinate.getCoordinateIndex();
 						roixData[idx] = twoDimensionSpatialCoordinate.getX();
 						roiyData[idx] = twoDimensionSpatialCoordinate.getY();
 						
 						points.add(roixData[idx]);
 						points.add(roiyData[idx]);
-					}
+//					}
 				}
 			}
 		}
@@ -511,41 +525,40 @@ public class PluginAIMUtil
 
 		try { // Fill in roixData, roiyData
 //			ImageAnnotationCollection fileImageAnnotationCollection = edu.stanford.hakan.aim4api.usage.AnnotationGetter.getImageAnnotationCollectionFromFile(PluginAIMUtil.getRealPath(aimFile));
-			edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation fileImageAnnotation = new edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation(fileImageAnnotationCollection);
-			List<edu.stanford.hakan.aim4api.compability.aimv3.Person> listPerson = fileImageAnnotation.getListPerson();
-			if (listPerson.size() > 0) {
-				listPerson.get(0);
-			}
-
-			edu.stanford.hakan.aim4api.compability.aimv3.GeometricShapeCollection geometricShapeCollection = fileImageAnnotation.getGeometricShapeCollection();
-			for (int i = 0; i < geometricShapeCollection.getGeometricShapeList().size(); i++) {
-				edu.stanford.hakan.aim4api.compability.aimv3.GeometricShape geometricShape = geometricShapeCollection.getGeometricShapeList().get(i);
-				if (geometricShape.getXsiType().equals("MultiPoint")) {
-					int numberOfROIs = geometricShape.getSpatialCoordinateCollection().getSpatialCoordinateList().size();
+			
+			MarkupEntityCollection geometricShapeCollection = fileImageAnnotationCollection.getImageAnnotation().getMarkupEntityCollection();
+			for (int i = 0; i < geometricShapeCollection.getMarkupEntityList().size(); i++) {
+				if (geometricShapeCollection.getMarkupEntityList().get(i) instanceof TwoDimensionGeometricShapeEntity){
+					log.warning("Cannot process shapes that are not 2D");
+					continue;
+				}
+				TwoDimensionGeometricShapeEntity geometricShape = (TwoDimensionGeometricShapeEntity)geometricShapeCollection.getMarkupEntityList().get(i);
+				if (geometricShape.getXsiType().toLowerCase().contains("multipoint")) {
+					int numberOfROIs = geometricShape.getTwoDimensionSpatialCoordinateCollection().getTwoDimensionSpatialCoordinateList().size();
 					roixData = new double[numberOfROIs];
 					roiyData = new double[numberOfROIs];
 					for (int j = 0; j < numberOfROIs; j++) {
-						edu.stanford.hakan.aim4api.compability.aimv3.SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
-								.getSpatialCoordinateList().get(j);
-						if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
-							edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = 
-									(edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate)spatialCoordinate;
+						TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = geometricShape.getTwoDimensionSpatialCoordinateCollection()
+								.getTwoDimensionSpatialCoordinateList().get(j);
+//						if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
+//							edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = 
+//									(edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate)spatialCoordinate;
 							int idx = twoDimensionSpatialCoordinate.getCoordinateIndex();
 							roixData[idx] = twoDimensionSpatialCoordinate.getX();
 							roiyData[idx] = twoDimensionSpatialCoordinate.getY();
-						}
+//						}
 					}
-				} else if (geometricShape.getXsiType().equals("Point")) {
+				} else if (geometricShape.getXsiType().toLowerCase().contains("point")) {
 					roixData = new double[1];
 					roiyData = new double[1];
-					edu.stanford.hakan.aim4api.compability.aimv3.SpatialCoordinate spatialCoordinate = geometricShape.getSpatialCoordinateCollection()
-							.getSpatialCoordinateList().get(0);
-					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
-						edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = 
-								(edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate)spatialCoordinate;
+					TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = geometricShape.getTwoDimensionSpatialCoordinateCollection()
+							.getTwoDimensionSpatialCoordinateList().get(0);
+//					if ("TwoDimensionSpatialCoordinate".equals(spatialCoordinate.getXsiType())) {
+//						edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate twoDimensionSpatialCoordinate = 
+//								(edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate)spatialCoordinate;
 						roixData[0] = twoDimensionSpatialCoordinate.getX();
 						roiyData[0] = twoDimensionSpatialCoordinate.getY();
-					}
+//					}
 				}
 			}
 		} catch (Throwable t) {
@@ -569,21 +582,23 @@ public class PluginAIMUtil
 		return point;
 	}
 	
-	public static boolean setNewSegmentationPoints (edu.stanford.hakan.aim4api.compability.aimv3.ImageAnnotation imageAnnotation, String imageUID, String pluginName, double[] xVector, double[] yVector) {
-		edu.stanford.hakan.aim4api.compability.aimv3.Polyline polyline = new edu.stanford.hakan.aim4api.compability.aimv3.Polyline();
-		polyline.setCagridId(0);
+	public static boolean setNewSegmentationPoints (ImageAnnotationCollection imageAnnotation, String imageUID, String pluginName, double[] xVector, double[] yVector) {
+		TwoDimensionPolyline polyline = new TwoDimensionPolyline();
 		polyline.setIncludeFlag(true);
 		polyline.setShapeIdentifier(0);
-		polyline.setLineStyle("lineStyle");
+		polyline.setLineStyle(new ST("lineStyle"));
 		
 		// TODO referencedFrameNumber may be different than 0 (?)
 		for (int i = 0, ii = xVector.length; i < ii; i++) {
-		   polyline.addSpatialCoordinate(new edu.stanford.hakan.aim4api.compability.aimv3.TwoDimensionSpatialCoordinate(0, i, imageUID, 0, xVector[i], yVector[i]));
+			TwoDimensionSpatialCoordinate res=new TwoDimensionSpatialCoordinate(xVector[i], yVector[i],i);
+			res.getTwoDimensionGeometricShapeEntity().setReferencedFrameNumber(0);
+	        res.getTwoDimensionGeometricShapeEntity().setImageReferenceUid(Converter.toII(imageUID));
+		    polyline.addTwoDimensionSpatialCoordinate(res);
 		}
 		
 		// TODO use a different approach to replace the geometric shape
-		edu.stanford.hakan.aim4api.compability.aimv3.GeometricShapeCollection geometricShapeCollection = imageAnnotation.getGeometricShapeCollection();		
-		geometricShapeCollection.getGeometricShapeList().set(0, polyline);		
+		MarkupEntityCollection geometricShapeCollection = imageAnnotation.getImageAnnotation().getMarkupEntityCollection();		
+		geometricShapeCollection.getMarkupEntityList().set(0, polyline);		
 		return true;
 	}
 	
@@ -603,18 +618,17 @@ public class PluginAIMUtil
 	}
 
 	public static void addSegmentToImageAnnotation(String sopClassUID, String dsoSOPInstanceUID, String sourceImageUID,
-			ImageAnnotation dsoImageAnnotation)
+			ImageAnnotationCollection dsoImageAnnotation)
 	{
-		SegmentationCollection sc = new SegmentationCollection();
-		sc.AddSegmentation(new Segmentation(0, sourceImageUID, sopClassUID, dsoSOPInstanceUID, 1));
-		dsoImageAnnotation.setSegmentationCollection(sc);
+		dsoImageAnnotation.getImageAnnotation().addSegmentationEntity(new DicomSegmentationEntity(new II(dsoSOPInstanceUID),
+				new II(sopClassUID), new II(sourceImageUID), 1));
+		
 	}
 
-	public static String getOwnerFromImageAnnotation(ImageAnnotation aim) throws AimException
+	public static String getOwnerFromImageAnnotation(ImageAnnotationCollection aim) throws AimException
 	{
-		if (aim.getListUser() != null) {
-			if (!aim.getListUser().isEmpty())
-				return aim.getListUser().get(0).getLoginName();
+		if (aim.getUser()!= null) {
+			return aim.getUser().getLoginName().getValue();
 		}
 		throw new AimException("No User in image annotation");
 	}
