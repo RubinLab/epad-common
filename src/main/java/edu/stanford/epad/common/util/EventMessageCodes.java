@@ -27,7 +27,7 @@ public class EventMessageCodes {
 	public static final String RECIST_FAILED = "No target lesions. Recist table cannot be generated!";
 	public static final String LONGITUDINAL_FAILED = "Longitudinal table cannot be generated!";
 
-	public static final String AIM_VALIDATION_ERROR = "Please verify that you use current aim schema (xsdFileV4 in proxy-config should be AIM_v4_XMLStanford.xsd)";
+	public static final String AIM_VALIDATION_ERROR = "Please verify that you use current aim schema (xsdFileV4 in proxy-config should be AIM_v4.2_rv2_XML.xsd)";
 
 	public static final String NO_PATIENT = "Patient doesn't exist in ePAD";
 	public static final String STUDY_ALREADY_IN_EPAD = "Study already in ePAD";
