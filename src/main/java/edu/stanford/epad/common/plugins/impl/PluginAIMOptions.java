@@ -152,7 +152,9 @@ public class PluginAIMOptions
 		this.patientName = imageAnnotationCollection.getPerson().getName().getValue();
 		this.templateID = imageAnnotationV4.getListTypeCode().get(0).getCode();
 		//ml not code system, it should be code systemname
-		if (imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName()==null || imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName().isEmpty()) {
+		if (imageAnnotationV4.getListTypeCode().get(0).getDisplayName()!=null && !imageAnnotationV4.getListTypeCode().get(0).getDisplayName().getValue().isEmpty()) {
+			this.templateName = imageAnnotationV4.getListTypeCode().get(0).getDisplayName().getValue();
+		}else if (imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName()==null || imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName().isEmpty()) {
 			this.templateName = imageAnnotationV4.getListTypeCode().get(0).getCodeSystem();
 		} else {
 			this.templateName = imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName();
@@ -176,7 +178,9 @@ public class PluginAIMOptions
 		this.templateID = imageAnnotationV4.getListTypeCode().get(0).getCode();
 //		this.templateName = imageAnnotationV4.getListTypeCode().get(0).getCodeSystem();
 		//ml not code system, it should be code systemname
-		if (imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName()==null || imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName().isEmpty()) {
+		if (imageAnnotationV4.getListTypeCode().get(0).getDisplayName()!=null && !imageAnnotationV4.getListTypeCode().get(0).getDisplayName().getValue().isEmpty()) {
+			this.templateName = imageAnnotationV4.getListTypeCode().get(0).getDisplayName().getValue();
+		}else if (imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName()==null || imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName().isEmpty()) {
 			this.templateName = imageAnnotationV4.getListTypeCode().get(0).getCodeSystem();
 		} else {
 			this.templateName = imageAnnotationV4.getListTypeCode().get(0).getCodeSystemName();
