@@ -457,7 +457,7 @@ public class PluginAIMUtil
 
 		MarkupEntityCollection geometricShapeCollection = imageAnnotation.getImageAnnotation().getMarkupEntityCollection();
 		for (int i = 0; i < geometricShapeCollection.getMarkupEntityList().size(); i++) {
-			if (geometricShapeCollection.getMarkupEntityList().get(i) instanceof TwoDimensionGeometricShapeEntity){
+			if (!(geometricShapeCollection.getMarkupEntityList().get(i) instanceof TwoDimensionGeometricShapeEntity)){
 				log.warning("Cannot process shapes that are not 2D");
 				continue;
 			}
