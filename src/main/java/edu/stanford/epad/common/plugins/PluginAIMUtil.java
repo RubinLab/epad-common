@@ -591,8 +591,9 @@ public class PluginAIMUtil
 		// TODO referencedFrameNumber may be different than 0 (?)
 		for (int i = 0, ii = xVector.length; i < ii; i++) {
 			TwoDimensionSpatialCoordinate res=new TwoDimensionSpatialCoordinate(xVector[i], yVector[i],i);
-			res.getTwoDimensionGeometricShapeEntity().setReferencedFrameNumber(0);
-	        res.getTwoDimensionGeometricShapeEntity().setImageReferenceUid(Converter.toII(imageUID));
+			polyline.setReferencedFrameNumber(1);
+	        polyline.setImageReferenceUid(Converter.toII(imageUID));
+	        res.setTwoDimensionGeometricShapeEntity(polyline);
 		    polyline.addTwoDimensionSpatialCoordinate(res);
 		}
 		
