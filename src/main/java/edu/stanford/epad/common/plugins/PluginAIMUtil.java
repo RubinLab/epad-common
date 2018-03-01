@@ -462,7 +462,7 @@ public class PluginAIMUtil
 				continue;
 			}
 			TwoDimensionGeometricShapeEntity geometricShape = (TwoDimensionGeometricShapeEntity)geometricShapeCollection.getMarkupEntityList().get(i);
-			if (geometricShape.getXsiType().toLowerCase().contains("polyline")) {
+//			if (geometricShape.getXsiType().toLowerCase().contains("polyline")) {
 				numROI = geometricShape.getTwoDimensionSpatialCoordinateCollection().getTwoDimensionSpatialCoordinateList().size();
 				roixData = new double[numROI];
 				roiyData = new double[numROI];
@@ -477,7 +477,7 @@ public class PluginAIMUtil
 						roiyData[idx] = twoDimensionSpatialCoordinate.getY();
 //					}
 				}
-			}
+//			}
 		}
 		return new ROIData(roixData, roiyData);
 	}
@@ -590,6 +590,7 @@ public class PluginAIMUtil
 		
 		// TODO referencedFrameNumber may be different than 0 (?)
 		for (int i = 0, ii = xVector.length; i < ii; i++) {
+			log.info("x= "+ xVector[i] + " y="+ yVector[i]);
 			TwoDimensionSpatialCoordinate res=new TwoDimensionSpatialCoordinate(xVector[i], yVector[i],i);
 			polyline.setReferencedFrameNumber(1);
 	        polyline.setImageReferenceUid(Converter.toII(imageUID));
