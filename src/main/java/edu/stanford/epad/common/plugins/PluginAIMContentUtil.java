@@ -178,6 +178,23 @@ public class PluginAIMContentUtil
 		log.info("Parameters "+parameters);
 		return parameters;
 	}
+	
+	public static List<PluginParameter> getPluginParametersFromIAC(ImageAnnotationCollection iac,String pluginId) throws Exception {
+		List<PluginParameter> parameters=null;
+		
+		for (PluginV4 p : iac.getImageAnnotation().getPluginCollection().getListPlugin()) {
+	        log.info("Plugins "+p.getName());
+	        
+	        if (p.getName().equals(pluginId)) {
+	        	parameters=p.getPluginParemeterCollection().getListPluginParameter();
+	        }
+	       
+			
+			
+		}
+		log.info("Parameters "+parameters);
+		return parameters;
+	}
 
 	public static String getStudyUID(String aimFileContents) throws PluginServletException
 	{
