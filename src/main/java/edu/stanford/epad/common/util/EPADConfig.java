@@ -214,6 +214,8 @@ public class EPADConfig
 	public static int olderThan_Days = EPADConfig.getInstance().getIntegerPropertyValue("olderThan_Days", 360);
 	public static int logOlderThan_Days = EPADConfig.getInstance().getIntegerPropertyValue("logOlderThan_Days", 30);
 	
+	public static String exportURL = EPADConfig.getInstance().getParamValue("exportURL", null);
+	
 	private Properties properties;
 
 	private static EPADConfig getInstance()

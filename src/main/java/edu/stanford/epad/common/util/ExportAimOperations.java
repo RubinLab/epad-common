@@ -109,11 +109,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
 import org.json.XML;
 
 import edu.stanford.hakan.aim4api.base.DicomImageReferenceEntity;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
+import edu.stanford.hakan.aim4api.project.epad.Aim4;
 
 
 /**
@@ -137,8 +143,7 @@ public class ExportAimOperations {
 		protocol.put("source", "source");
 		protocol.put("aimdata", "aimdata");
 		protocol.put("userid", "userid");
-		//TODO get from config
-		protocol.put("URL", "http://dart-test.acr.org/epad/aim");
+		protocol.put("URL", EPADConfig.exportURL);
 		
 		return protocol;
 				
@@ -151,20 +156,58 @@ public class ExportAimOperations {
 	 * @param collection
 	 * @throws Exception
 	 */
-	public static void sendJsonToApi(String annotationID, ImageAnnotationCollection aim, String aimXML, HashMap<String,String> protocol, HashMap<String,String> sessionInfo ) throws Exception
+	public static void sendJsonToApi(String annotationID, ImageAnnotationCollection aim, String aimXML ) throws Exception
 	{
 		try {
-			//check connection
+			//do we have export user in aim's programmed comment
+			String userid=null;
+			if (aim.getImageAnnotation().getComment().getValue().split(Aim4.commentSeperator)[0].contains("USER:")){
+				String[] commentParts=aim.getImageAnnotation().getComment().getValue().split(Aim4.commentSeperator)[0].split("/");
+				for (String commentPart: commentParts){
+					if(commentPart.trim().startsWith("USER:"))
+						userid=commentPart.replace("USER:", "").trim();
+				}
+			}
+			//TODO read from config
+			HashMap<String,String> protocol=ExportAimOperations.getDARTProtocol();
+			HashMap<String,String> sessionInfo=new HashMap<>();
+			sessionInfo.put("exportUserId", userid);
 			
 			if (aimXML == null || aimXML.trim().length() == 0) return;
 			JSONObject jo=putValues(protocol,sessionInfo, aim, aimXML);
 	        log.info("json" + jo.toString());
-			
 	        //post json
+	        if(protocol.containsKey("URL"))
+	        	makePostRequest(protocol.get("URL"), jo);
+	        else
+	        	log.info("No URL in protocol, not sending");
 		} catch (Exception e) {
 			log.warning("Error sending AIM to api:", e);
 			throw e;
 		}
+	}
+	
+	public static int makePostRequest(String url,JSONObject json){
+		int returnCode=0;
+
+		try{
+			CloseableHttpClient client = HttpClients.createDefault();
+			HttpPost httpPost = new HttpPost(url);
+			
+			StringEntity entity = new StringEntity(json.toString());
+			httpPost.setEntity(entity);
+			httpPost.setHeader("Accept", "application/json");
+			httpPost.setHeader("Content-type", "application/json");
+			
+			CloseableHttpResponse response = client.execute(httpPost);
+			returnCode=response.getStatusLine().getStatusCode();
+			
+			client.close();
+			
+		}catch(Exception e){
+			log.warning("Error in sending the json to the api", e);
+		}
+		return returnCode;
 	}
 	
 	/**
