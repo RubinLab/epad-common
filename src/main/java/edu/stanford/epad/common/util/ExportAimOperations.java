@@ -177,9 +177,10 @@ public class ExportAimOperations {
 			JSONObject jo=putValues(protocol,sessionInfo, aim, aimXML);
 	        log.info("json" + jo.toString());
 	        //post json
-	        if(protocol.containsKey("URL"))
-	        	makePostRequest(protocol.get("URL"), jo);
-	        else
+	        if(protocol.containsKey("URL")){
+	        	int returnCode=makePostRequest(protocol.get("URL"), jo);
+	        	log.info("The site returned "+ returnCode);
+	        }else
 	        	log.info("No URL in protocol, not sending");
 		} catch (Exception e) {
 			log.warning("Error sending AIM to api:", e);
