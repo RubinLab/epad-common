@@ -141,6 +141,7 @@ public class ExportAimOperations {
 		HashMap<String,String> protocol=new HashMap<>();
 		protocol.put("studyUID", "studyinstanceuid");
 		protocol.put("source", "source");
+		protocol.put("aimuid", "aimuid");
 		protocol.put("aimdata", "aimdata");
 		protocol.put("userid", "userid");
 		protocol.put("URL", EPADConfig.exportURL);
@@ -202,7 +203,7 @@ public class ExportAimOperations {
 			
 			CloseableHttpResponse response = client.execute(httpPost);
 			returnCode=response.getStatusLine().getStatusCode();
-			
+			log.info("return code "+returnCode);
 			client.close();
 			
 		}catch(Exception e){
@@ -230,6 +231,13 @@ public class ExportAimOperations {
 		    case "studyUID":
 		    	try{
 		    		jo.put(value,((DicomImageReferenceEntity)aim.getImageAnnotation().getImageReferenceEntityCollection().get(0)).getImageStudy().getInstanceUid().getRoot());
+		    	}catch(Exception e){
+		    		log.warning("Couldn't get studyuid from aim", e);
+		    	}
+		    	break;
+		    case "aimuid":
+		    	try{
+		    		jo.put(value,aim.getUniqueIdentifier().getRoot());
 		    	}catch(Exception e){
 		    		log.warning("Couldn't get studyuid from aim", e);
 		    	}
