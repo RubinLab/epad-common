@@ -284,7 +284,10 @@ public class TIFFMasksToDSOConverter
 			// imageHeight, imageFrames
 			log.info("Getting attributes from DICOM files");
 			int minInstanceNo = getAttributesFromDICOMFiles(dicomFilePaths);
-			if (minInstanceNo > 1) removeEmptyFrames = false; //TODO this check is wrong. it should see mask and dicomfile are same number and ok
+//			if (minInstanceNo > 1) removeEmptyFrames = false; //TODO this check is wrong. it should see mask and dicomfile are same number and ok
+			//assuming they are in the same order
+			if (maskFilePaths.size()!=dicomFilePaths.size()) removeEmptyFrames = false;
+				
 			log.info("Reading pixels from mask files");
 			byte[] pixels = getPixelsFromMaskFiles(maskFilePaths, dicomFilePaths, removeEmptyFrames, dsoInstanceUID);
 			if (dicomFilePaths.size() != dicomAttributes.length)
