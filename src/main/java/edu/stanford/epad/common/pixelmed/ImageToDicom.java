@@ -68,6 +68,9 @@ import com.pixelmed.slf4j.LoggerFactory;
  * <p>A class for converting RGB consumer image format input files (anything JIIO can recognize) into DICOM images of a specified SOP Class, or single or multi frame DICOM Secondary Capture images.</p>
  *
  * @author	dclunie
+ * 
+ * Class ported from pixelmed and extended with the ability to accept studyUID, seriesUID, study description and series description as input
+ * by emel alkim
  */
 
 public class ImageToDicom {
