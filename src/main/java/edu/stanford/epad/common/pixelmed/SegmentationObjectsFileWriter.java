@@ -240,6 +240,13 @@ public class SegmentationObjectsFileWriter
 		if (original_attrs_list == null || original_attrs_list.length == 0)
 			throw (new DicomException("The original attributes must not be null!"));
 		AttributeList original_attrs = original_attrs_list[0];
+		//remove referenced sequences to avoid having multiple uids
+		original_attrs.remove(TagFromName.RequestAttributesSequence);
+        original_attrs.remove(TagFromName.ReferencedRequestSequence);
+        original_attrs.remove(TagFromName.ReferencedStudySequence);
+        original_attrs.remove(TagFromName.ReferencedSeriesSequence);
+        original_attrs.remove(TagFromName.ReferencedImageSequence);
+        
 		/*********************************************************************
 		 * Generate a unique name for the temporary pixel data file.
 		 *********************************************************************/
