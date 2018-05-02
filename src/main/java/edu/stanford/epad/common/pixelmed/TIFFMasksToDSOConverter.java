@@ -140,6 +140,7 @@ public class TIFFMasksToDSOConverter
 {
 	private AttributeList[] dicomAttributes;
 	private final short[] orientation = new short[] { 1, 0, 0, 0, 0, 1 };
+	private short[][] orientations = null;
 	private double[] spacing = new double[] { 0.65, 0.8 };
 	private double thickness = 0.5;
 	private double[][] positions = null;
@@ -211,16 +212,28 @@ public class TIFFMasksToDSOConverter
 			log.info("Getting attributes from DICOM files");
 			int minInstanceNo = getAttributesFromDICOMFiles(dicomFilePaths);
 			if (minInstanceNo > 1) removeEmptyFrames = false;
-			log.info("Reading pixels from mask files");
+			log.info("Reading pixels from mask files, mininstanceno:" + minInstanceNo);
 			//send dso instance uid so it can be used in the map for framenumbers
 			byte[] pixels = getPixelsFromMaskFiles(maskFilePaths, dicomFilePaths, removeEmptyFrames, dsoInstanceUID);
 			if (dicomFilePaths.size() != dicomAttributes.length)
 			{
 				AttributeList[] dicomAttributesNew = new AttributeList[dicomFilePaths.size()];
 				int i = 0;
+				int k = -1;
+				boolean first = true;
 				for (AttributeList attrs: dicomAttributes)
 				{
+					k++;
 					if (attrs == null) continue;
+					if (first)
+					{
+						for (int j = 0; j < 6; j++)
+						{
+							orientation[j] = orientations[k][j];
+							log.info("orientation:" + k + ":" +j + ":" + orientation[j]);
+						}
+						first = false;
+					}
 					dicomAttributesNew[i++] = attrs;
 				}
 				dicomAttributes = dicomAttributesNew;
@@ -284,16 +297,31 @@ public class TIFFMasksToDSOConverter
 			// imageHeight, imageFrames
 			log.info("Getting attributes from DICOM files");
 			int minInstanceNo = getAttributesFromDICOMFiles(dicomFilePaths);
-			if (minInstanceNo > 1) removeEmptyFrames = false;
+//			if (minInstanceNo > 1) removeEmptyFrames = false; //TODO this check is wrong. it should see mask and dicomfile are same number and ok
+			//assuming they are in the same order
+			if (maskFilePaths.size()!=dicomFilePaths.size()) removeEmptyFrames = false;
+				
 			log.info("Reading pixels from mask files");
 			byte[] pixels = getPixelsFromMaskFiles(maskFilePaths, dicomFilePaths, removeEmptyFrames, dsoInstanceUID);
 			if (dicomFilePaths.size() != dicomAttributes.length)
 			{
 				AttributeList[] dicomAttributesNew = new AttributeList[dicomFilePaths.size()];
 				int i = 0;
+				int k = -1;
+				boolean first = true;
 				for (AttributeList attrs: dicomAttributes)
 				{
+					k++;
 					if (attrs == null) continue;
+					if (first)
+					{
+						for (int j = 0; j < 6; j++)
+						{
+							orientation[j] = orientations[k][j];
+							log.info("orientation:" + k + ":" +j + ":" + orientation[j]);
+						}
+						first = false;
+					}
 					dicomAttributesNew[i++] = attrs;
 				}
 				dicomAttributes = dicomAttributesNew;
@@ -493,6 +521,7 @@ public class TIFFMasksToDSOConverter
 		log.info("largest image height:"+largestImageHeight + " width:"+ largestImageWidth);
 		
 		if (dicomAttributes == null) dicomAttributes = new AttributeList[dicomFilePaths.size()];
+		if (orientations == null) orientations = new short[dicomFilePaths.size()][6];
 		this.dicomAttributes[0] = (AttributeList)localDICOMAttributes.clone();
 		this.imageWidth = largestImageWidth;//(short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Columns, 1);
 		this.imageHeight = largestImageHeight;//(short)Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.Rows, 1);
@@ -512,6 +541,7 @@ public class TIFFMasksToDSOConverter
 				String[] s = dicomAttribute.getStringValues();
 				for (int i = 0; i < s.length; i++) {
 					this.orientation[i] = (short)Float.parseFloat(s[i]);
+					this.orientations[0][i] = (short)Float.parseFloat(s[i]);
 				}
 			}
 		}
@@ -547,6 +577,13 @@ public class TIFFMasksToDSOConverter
 				if (i > 0)
 				{
 					dicomAttributes[i] = (AttributeList) localDICOMAttributes.clone();
+				}
+				attribute = localDICOMAttributes.get(TagFromName.ImageOrientationPatient);
+				if (attribute != null) {
+					String[] s = attribute.getStringValues();
+					for (int j = 0; j < s.length; j++) {
+						this.orientations[i][j] = (short)Float.parseFloat(s[j]);
+					}
 				}
 				instanceNos[i] = Attribute.getSingleIntegerValueOrDefault(localDICOMAttributes, TagFromName.InstanceNumber, 1);
 				log.info("instance "+i+ " no:"+instanceNos[i]);

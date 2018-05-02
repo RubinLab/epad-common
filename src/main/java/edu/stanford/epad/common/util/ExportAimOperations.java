@@ -102,283 +102,176 @@
  * of non-limiting example, you will not contribute any code obtained by you under the GNU General Public License or other 
  * so-called "reciprocal" license.)
  *******************************************************************************/
-package edu.stanford.epad.common.plugins;
+package edu.stanford.epad.common.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import edu.stanford.epad.common.util.EPADConfig;
-import edu.stanford.epad.common.util.EPADLogger;
-import edu.stanford.hakan.aim4api.base.AimException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.json.JSONObject;
+import org.json.XML;
+
+import edu.stanford.hakan.aim4api.base.DicomImageReferenceEntity;
 import edu.stanford.hakan.aim4api.base.ImageAnnotationCollection;
-import edu.stanford.hakan.aim4api.base.TwoDimensionGeometricShapeEntity;
-import edu.stanford.hakan.aim4api.plugin.PluginParameter;
-import edu.stanford.hakan.aim4api.plugin.v4.PluginV4;
-import edu.stanford.hakan.aim4api.usage.AnnotationBuilder;
-import edu.stanford.hakan.aim4api.usage.AnnotationGetter;
+import edu.stanford.hakan.aim4api.project.epad.Aim4;
+
 
 /**
- * TODO This text-based approach to extracting content from an AIM file is terrible and should be replaced.
- * <p>
- * It is used only by the TedSeg and JJJector plugins.
+ * Class for jsonAnnotations operations to be forwarded to external api (dart)
+ * The class is here instead of epad-ws, because plugins may need to call it
+ * 
+ * @author Emel Alkim
+ *
  */
-public class PluginAIMContentUtil
-{
+public class ExportAimOperations {
 	private static final EPADLogger log = EPADLogger.getInstance();
-
-	public static String getAimFileContents(File aimFile) throws AimException
-	{
-		if (aimFile.exists()) {
-			StringBuilder sb = new StringBuilder();
-			try {
-				BufferedReader in = new BufferedReader(new FileReader(aimFile));
-				try {
-					String line = null;
-					while ((line = in.readLine()) != null) {
-						sb.append(line);
-						sb.append(System.getProperty("line.separator"));
-					}
-				} finally {
-					in.close();
-				}
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-			}
-			return sb.toString();
-		} else {
-			log.warning("AIM file " + aimFile.getAbsolutePath() + "does not exist");
-			throw new AimException("input error - AIM.xml does not exist. file: " + aimFile.getAbsolutePath());
-		}
-	}
-	
-	public static List<PluginParameter> getPluginParametersFromFile(File aimFile,String pluginId) throws Exception {
-		List<PluginParameter> parameters=null;
-		ImageAnnotationCollection iac = null;
-		try {
-			iac = AnnotationGetter.getImageAnnotationCollectionFromFile(aimFile.getPath(),
-					EPADConfig.xsdFilePathV4);
-		} catch (Exception e) {
-
-			throw new PluginServletException("Invalid input.", "Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac));
-		}
-		for (PluginV4 p : iac.getImageAnnotation().getPluginCollection().getListPlugin()) {
-	        log.info("Plugins "+p.getName());
-	        
-	        if (p.getName().equals(pluginId)) {
-	        	parameters=p.getPluginParemeterCollection().getListPluginParameter();
-	        }
-	       
-			
-			
-		}
-		log.info("Parameters "+parameters);
-		return parameters;
-	}
-	
-	public static List<PluginParameter> getPluginParametersFromIAC(ImageAnnotationCollection iac,String pluginId) throws Exception {
-		List<PluginParameter> parameters=null;
-		
-		for (PluginV4 p : iac.getImageAnnotation().getPluginCollection().getListPlugin()) {
-	        log.info("Plugins "+p.getName());
-	        
-	        if (p.getName().equals(pluginId)) {
-	        	parameters=p.getPluginParemeterCollection().getListPluginParameter();
-	        }
-	       
-			
-			
-		}
-		log.info("Parameters "+parameters);
-		return parameters;
-	}
-
-	public static String getStudyUID(String aimFileContents) throws PluginServletException
-	{
-		return getUIDFromAIM("Study", "instanceUID", aimFileContents);
-	}
-
-	public static String getSeriesUID(String aimFileContents) throws PluginServletException
-	{
-		return getUIDFromAIM("Series", "instanceUID", aimFileContents);
-	}
-
-	public static String getSOPInstanceUID(String aimFileContents) throws PluginServletException
-	{
-		return getUIDFromAIM("Image", "sopInstanceUID", aimFileContents);
-	}
-
-	public static String getSecondSeriesUID(String aimFileContents) throws PluginServletException
-	{
-		return getUIDFromAIM("<ImageSeries ", "instanceUID", aimFileContents, 2);
-	}
-
-	public static String getSecondSOPInstanceUID(String aimFileContents) throws PluginServletException
-	{
-		return getUIDFromAIM("<Image ", "sopInstanceUID", aimFileContents, 2);
-	}
-
-	/**
-	 * Get shapes from an aim file
-	 * 
-	 * 
-	 * @param aimFileContents String
-	 * @return List<String> A list of shape xsi types 
-	 * Possible values are TwoDimensionPolyline, TwoDimensionSpline, TwoDimensionMultiPoint, TwoDimensionPoint, TwoDimensionCircle, TwoDimensionEllipse 
-	 * for two dimension
-	 * @throws edu.stanford.epad.common.plugins.PluginServletException
-	 */
-	public static List<String> getShapesFromAimFile(File aimFile) throws Exception
-	{
-	
-		List<String> shapeXsis=new ArrayList<>();
-		ImageAnnotationCollection iac = null;
-		try {
-			iac = AnnotationGetter.getImageAnnotationCollectionFromFile(aimFile.getPath(),
-					EPADConfig.xsdFilePathV4);
-			for (TwoDimensionGeometricShapeEntity ge:iac.getImageAnnotations().get(0).getTwoDimensionShapes()){
-				shapeXsis.add(ge.getXsiType());
-			}
-			return shapeXsis;
-			
-			
-		} catch (Exception e) {
-
-			throw new PluginServletException("Invalid input.", "Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac));
-		}
-			
-	}
-	
 	
 	/**
-	 * Check if aim has closed shape
-	 * 
-	 * 
-	 * @param aimFileContents String
-	 * @return boolean
-	 * @throws edu.stanford.epad.common.plugins.PluginServletException
+	 * generates static dart protocol
+	 *TODO create dynamically
+	 * @return
 	 */
-	public static boolean hasClosedShape(File aimFile) throws Exception
-	{
+	public static HashMap<String,String> getDARTProtocol(){
+		HashMap<String,String> protocol=new HashMap<>();
+		protocol.put("studyUID", "studyinstanceuid");
+		protocol.put("source", "source");
+		protocol.put("aimuid", "aimuid");
+		protocol.put("aimdata", "aimdata");
+		protocol.put("userid", "userid");
+		protocol.put("URL", EPADConfig.exportURL);
 		
-		List<String> shapes=getShapesFromAimFile(aimFile);
-		
-		for (String ge:shapes){
-			if (ge.equals("TwoDimensionPolyline") || ge.equals("TwoDimensionSpline") || ge.equals("TwoDimensionCircle")) {
-				return true;
-			}
-            
-		}
-		return false;
-			
-	}
-	
-	
-	
-	/**
-	 * This data comes from a AIM-Template.
-	 * 
-	 * Look for: <AnatomicEntity annotatorConfidence="0.0" cagridId="0" codeMeaning="Lung CT" codeValue="jjv-1"
-	 * codingSchemeDesignator="JJV" label="Organ Type"/>
-	 * 
-	 * @param aimFileContents String
-	 * @return String
-	 * @throws edu.stanford.epad.common.plugins.PluginServletException
-	 */
-	public static String getOrganFromAimFile(File aimFile) throws Exception
-	{
-		String templateOrganValue = null;
-		ImageAnnotationCollection iac = null;
-		try {
-			iac = AnnotationGetter.getImageAnnotationCollectionFromFile(aimFile.getPath(),
-					EPADConfig.xsdFilePathV4);
-			//ml not code system, it should be display name
-			if (iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getDisplayName()==null || iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getDisplayName().getValue().isEmpty()) {
-				templateOrganValue = iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getCodeSystem();
-			} else {
-				templateOrganValue = iac.getImageAnnotations().get(0).getImagingPhysicalEntityCollection().get(0).getListTypeCode().get(0).getDisplayName().getValue();
-			}
-
-		} catch (Exception e) {
-					
-			if (iac!=null){
-				log.warning("Invalid input. Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac)+ ". Defaulting to lung",e);				
-				//default template organ value = lung
-				if (templateOrganValue==null){
-					log.warning("Defaulting to lung");				
-					templateOrganValue="lung";
-				}
-			}else {
-				throw new PluginServletException("Invalid input.", "Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac));
-			}
-		}
+		return protocol;
 				
-		log.info("organ name " + templateOrganValue);
-		if (templateOrganValue.toLowerCase().contains("liver")) {
-			return "Liver";
-		} else if (templateOrganValue.toLowerCase().contains("lung")) {
-			return "Lung";
-		} else if (templateOrganValue.toLowerCase().contains("breast")) {
-			return "Breast";
-		} else if (templateOrganValue.toLowerCase().contains("bone")) {
-			return "Bone";
-		} 
-		//missing organ types (removing ifs doesn't work as the data coming from template is not just liver, it is Liver CT)
-		else if (templateOrganValue.toLowerCase().contains("brain")) {
-			return "Brain";
-		} else if (templateOrganValue.toLowerCase().contains("rats")) {
-			return "Rats";
-		} else if (templateOrganValue.toLowerCase().contains("knee")) {
-			return "Knee";
-		}
-		throw new PluginServletException("Invalid input.", "Invalid input: templateOrganValue=" + templateOrganValue);
-		
 	}
-
-	private static String getUIDFromAIM(String tag, String attribute, String aimFileContents)
-			throws PluginServletException
+	
+	/**
+	 * Converts and sends an annotation to api
+	 * @param annotationID
+	 * @param aimXML
+	 * @param collection
+	 * @throws Exception
+	 */
+	public static void sendJsonToApi(String annotationID, ImageAnnotationCollection aim, String aimXML ) throws Exception
 	{
-		return getUIDFromAIM(tag, attribute, aimFileContents, 1);
-	}
-	private static String getUIDFromAIM(String tag, String attribute, String aimFileContents, int index)
-			throws PluginServletException
-	{
-
-		tag = tag.toLowerCase();
-		attribute = attribute.toLowerCase();
-		aimFileContents = aimFileContents.toLowerCase();
-
-		int fromIndex = 0;
-		int tagIndex = 0;
-		while (fromIndex < aimFileContents.length() && tagIndex != -1 && index > 0)
-		{
-			tagIndex = aimFileContents.indexOf(tag, fromIndex);
-			index--;
-			fromIndex = tagIndex + tag.length();
-			//log.info(" tagIndex=" + tagIndex + " fromIndex=" + fromIndex + " index=" + index);
-		}
-		
-		if (tagIndex > 0) {
-			int attribIndex = aimFileContents.indexOf(attribute, tagIndex);
-
-			if (attribIndex > 0) {
-
-				int start = aimFileContents.indexOf("\"", attribIndex);
-				int end = aimFileContents.indexOf("\"", start + 1);
-
-				String retVal = aimFileContents.substring(start, end + 1);
-				retVal = retVal.replace('"', ' ').trim();
-				return retVal;
-			} else {
-				throw new PluginServletException("input error", "Didn't find attribute: " + attribute + " in tag:" + tag);
+		try {
+			//do we have export user in aim's programmed comment
+			String userid=null;
+			if (aim.getImageAnnotation().getComment().getValue().split(Aim4.commentSeperator)[0].contains("USER:")){
+				String[] commentParts=aim.getImageAnnotation().getComment().getValue().split(Aim4.commentSeperator)[0].split("/");
+				for (String commentPart: commentParts){
+					if(commentPart.trim().startsWith("USER:"))
+						userid=commentPart.replace("USER:", "").trim();
+				}
 			}
-		} else {
-			log.warning("Didn't find tag: " + tag);
-			return null;
+			//TODO read from config
+			HashMap<String,String> protocol=ExportAimOperations.getDARTProtocol();
+			HashMap<String,String> sessionInfo=new HashMap<>();
+			sessionInfo.put("exportUserId", userid);
+			
+			if (aimXML == null || aimXML.trim().length() == 0) return;
+			JSONObject jo=putValues(protocol,sessionInfo, aim, aimXML);
+	        log.info("json" + jo.toString());
+	        //post json
+	        if(protocol.containsKey("URL")){
+	        	int returnCode=makePostRequest(protocol.get("URL"), jo);
+	        	log.info("The site returned "+ returnCode);
+	        }else
+	        	log.info("No URL in protocol, not sending");
+		} catch (Exception e) {
+			log.warning("Error sending AIM to api:", e);
+			throw e;
 		}
 	}
+	
+	public static int makePostRequest(String url,JSONObject json){
+		int returnCode=0;
+
+		try{
+			CloseableHttpClient client = HttpClients.createDefault();
+			HttpPost httpPost = new HttpPost(url);
+			
+			StringEntity entity = new StringEntity(json.toString());
+			httpPost.setEntity(entity);
+			httpPost.setHeader("Accept", "application/json");
+			httpPost.setHeader("Content-type", "application/json");
+			
+			CloseableHttpResponse response = client.execute(httpPost);
+			returnCode=response.getStatusLine().getStatusCode();
+			log.info("return code "+returnCode);
+			client.close();
+			
+		}catch(Exception e){
+			log.warning("Error in sending the json to the api", e);
+		}
+		return returnCode;
+	}
+	
+	/**
+	 * put values in the protocol in json
+	 * @param protocol
+	 * @param sessionInfo
+	 * @param aim
+	 * @param aimXML
+	 * @return
+	 * @throws Exception
+	 */
+	public static JSONObject putValues(HashMap<String,String> protocol,HashMap<String,String> sessionInfo, ImageAnnotationCollection aim, String aimXML) throws Exception{
+		JSONObject jo=new JSONObject();
+		for (Map.Entry<String, String> entry : protocol.entrySet()) {
+		    String key = entry.getKey();//key tells what to get, like studyUID or userID
+		    String value = entry.getValue(); //value tells the json field name to put the value to
+		    
+		    switch (key){
+		    case "studyUID":
+		    	try{
+		    		jo.put(value,((DicomImageReferenceEntity)aim.getImageAnnotation().getImageReferenceEntityCollection().get(0)).getImageStudy().getInstanceUid().getRoot());
+		    	}catch(Exception e){
+		    		log.warning("Couldn't get studyuid from aim", e);
+		    	}
+		    	break;
+		    case "aimuid":
+		    	try{
+		    		jo.put(value,aim.getUniqueIdentifier().getRoot());
+		    	}catch(Exception e){
+		    		log.warning("Couldn't get studyuid from aim", e);
+		    	}
+		    	break;
+		    case "aimdata":
+		    	if (protocol.containsKey("aimFormat") && protocol.get("aimFormat").equals("XML")){
+		        	jo.put(value,aimXML);
+		        }else{//default is json
+					JSONObject jsonString =  XML.toJSONObject(aimXML);
+			        if (jsonString == null)
+			        	throw new Exception("Error converting to json");
+			        jo.put(value,jsonString);
+		        }
+		    	break;
+		    case "source":
+		    	jo.put(value,"epad");
+		    	break;
+		    case "userid":
+		    	try{
+		    		if (sessionInfo!=null && sessionInfo.containsKey("exportUserId"))
+		    			jo.put(value,(sessionInfo.get("exportUserId")));
+		    		else{
+		    			log.warning("No userid in session");
+		    		}
+		    	}catch(Exception e){
+		    		log.warning("Couldn't get studyuid from aim", e);
+		    	}
+		    	break;
+		    }
+		    
+		}
+		return jo;
+	}
+	
+	
 
 }
