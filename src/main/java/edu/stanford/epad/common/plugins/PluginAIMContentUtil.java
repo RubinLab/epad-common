@@ -286,9 +286,19 @@ public class PluginAIMContentUtil
 			}
 
 		} catch (Exception e) {
-
-			throw new PluginServletException("Invalid input.", "Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac));
+					
+			if (iac!=null){
+				log.warning("Invalid input. Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac)+ ". Defaulting to lung",e);				
+				//default template organ value = lung
+				if (templateOrganValue==null){
+					log.warning("Defaulting to lung");				
+					templateOrganValue="lung";
+				}
+			}else {
+				throw new PluginServletException("Invalid input.", "Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac));
+			}
 		}
+				
 		log.info("organ name " + templateOrganValue);
 		if (templateOrganValue.toLowerCase().contains("liver")) {
 			return "Liver";
