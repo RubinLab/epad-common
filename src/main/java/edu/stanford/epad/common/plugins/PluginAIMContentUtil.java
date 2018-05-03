@@ -305,10 +305,10 @@ public class PluginAIMContentUtil
 		} catch (Exception e) {
 					
 			if (iac!=null){
-				log.warning("Invalid input. Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac)+ ". Defaulting to lung",e);				
+//				log.warning("Invalid input. Had: " + e.getMessage() + ". data:" + AnnotationBuilder.convertToString(iac)+ ". Defaulting to lung",e);				
 				//default template organ value = lung
 				if (templateOrganValue==null){
-					log.warning("Defaulting to lung");				
+					log.warning("No organ name in the aim file. Defaulting to lung");				
 					templateOrganValue="lung";
 				}
 			}else {
