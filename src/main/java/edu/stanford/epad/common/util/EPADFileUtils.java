@@ -372,7 +372,7 @@ public class EPADFileUtils
 
 			while (zipFileEntries.hasMoreElements()) {
 				ZipEntry entry = (ZipEntry)zipFileEntries.nextElement();
-				String currentEntry = entry.getName();
+				String currentEntry = entry.getName().replace(' ', '_');
 				File destFile = new File(newPath, currentEntry);
 				File destinationParent = destFile.getParentFile();
 
