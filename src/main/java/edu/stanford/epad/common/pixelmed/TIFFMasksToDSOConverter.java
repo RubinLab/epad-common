@@ -728,7 +728,7 @@ public class TIFFMasksToDSOConverter
 					pixel_data[k] = 0;
 					for (int l = 0; l < 4*8; l=l+4)
 					{
-						if (new_frame[index + l] != 0)
+						if (index + l<new_frame.length && new_frame[index + l] != 0)
 						{
 							int setBit =  pixel_data[k] + (1 << (l/4));
 							pixel_data[k] =(byte) setBit;
