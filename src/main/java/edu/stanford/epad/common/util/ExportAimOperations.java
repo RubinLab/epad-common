@@ -145,9 +145,46 @@ public class ExportAimOperations {
 		protocol.put("aimdata", "aimdata");
 		protocol.put("userid", "userid");
 		protocol.put("URL", EPADConfig.exportURL);
-		
+		protocol.put("deleteURL", EPADConfig.deleteURL);
 		return protocol;
 				
+	}
+	//Sends a delete request to the export api for an annotation id
+	
+	/**
+	 * Converts and sends an annotation to api
+	 * @param annotationID
+	 * @param aimXML
+	 * @param collection
+	 * @throws Exception
+	 */
+	public static void sendDeleteJsonToApi(String annotationID, ImageAnnotationCollection aim) throws Exception
+	{
+		try {
+			//do we have export user in aim's programmed comment
+			String userid=null;
+			if (aim.getUser().getLoginName().getValue()!=null) 
+				userid=aim.getUser().getLoginName().getValue();
+			//TODO read from config
+			HashMap<String,String> protocol=ExportAimOperations.getDARTProtocol();
+			HashMap<String,String> sessionInfo=new HashMap<>();
+			sessionInfo.put("exportUserId", userid);
+			
+			JSONObject jo=putValues(protocol,sessionInfo, aim, null);
+	        log.info("json" + jo.toString());
+	        //post json
+	        if(protocol.containsKey("deleteURL")){
+	        	int returnCode=makePostRequest(protocol.get("deleteURL"), jo);
+	        	log.info("The site returned "+ returnCode);
+	        	if (returnCode!=202){
+	        		log.warning("Couldn't delete the aim file in export location");
+	        	}
+	        }else
+	        	log.info("No URL in protocol, not sending");
+		} catch (Exception e) {
+			log.warning("Error sending AIM to api:", e);
+			throw e;
+		}
 	}
 	
 	/**
@@ -157,18 +194,13 @@ public class ExportAimOperations {
 	 * @param collection
 	 * @throws Exception
 	 */
-	public static void sendJsonToApi(String annotationID, ImageAnnotationCollection aim, String aimXML ) throws Exception
+	public static void sendJsonToApi(String annotationID, ImageAnnotationCollection aim, String aimXML) throws Exception
 	{
 		try {
 			//do we have export user in aim's programmed comment
 			String userid=null;
-			if (aim.getImageAnnotation().getComment().getValue().split(Aim4.commentSeperator)[0].contains("USER:")){
-				String[] commentParts=aim.getImageAnnotation().getComment().getValue().split(Aim4.commentSeperator)[0].split("/");
-				for (String commentPart: commentParts){
-					if(commentPart.trim().startsWith("USER:"))
-						userid=commentPart.replace("USER:", "").trim();
-				}
-			}
+			if (aim.getUser().getLoginName().getValue()!=null) 
+				userid=aim.getUser().getLoginName().getValue();
 			//TODO read from config
 			HashMap<String,String> protocol=ExportAimOperations.getDARTProtocol();
 			HashMap<String,String> sessionInfo=new HashMap<>();
@@ -181,6 +213,9 @@ public class ExportAimOperations {
 	        if(protocol.containsKey("URL")){
 	        	int returnCode=makePostRequest(protocol.get("URL"), jo);
 	        	log.info("The site returned "+ returnCode);
+	        	if (returnCode!=202){
+	        		log.warning("Couldn't export the aim file");
+	        	}
 	        }else
 	        	log.info("No URL in protocol, not sending");
 		} catch (Exception e) {
@@ -243,14 +278,16 @@ public class ExportAimOperations {
 		    	}
 		    	break;
 		    case "aimdata":
-		    	if (protocol.containsKey("aimFormat") && protocol.get("aimFormat").equals("XML")){
-		        	jo.put(value,aimXML);
-		        }else{//default is json
-					JSONObject jsonString =  XML.toJSONObject(aimXML);
-			        if (jsonString == null)
-			        	throw new Exception("Error converting to json");
-			        jo.put(value,jsonString);
-		        }
+		    	if (aimXML!=null){
+			    	if (protocol.containsKey("aimFormat") && protocol.get("aimFormat").equals("XML")){
+			        	jo.put(value,aimXML);
+			        }else{//default is json
+						JSONObject jsonString =  XML.toJSONObject(aimXML);
+				        if (jsonString == null)
+				        	throw new Exception("Error converting to json");
+				        jo.put(value,jsonString);
+			        }
+		    	}
 		    	break;
 		    case "source":
 		    	jo.put(value,"epad");
