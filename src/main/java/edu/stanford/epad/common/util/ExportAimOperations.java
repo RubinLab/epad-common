@@ -110,6 +110,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -145,9 +147,46 @@ public class ExportAimOperations {
 		protocol.put("aimdata", "aimdata");
 		protocol.put("userid", "userid");
 		protocol.put("URL", EPADConfig.exportURL);
-		
+		protocol.put("deleteURL", EPADConfig.deleteURL);
 		return protocol;
 				
+	}
+	//Sends a delete request to the export api for an annotation id
+	
+	/**
+	 * Converts and sends an annotation to api
+	 * @param annotationID
+	 * @param aimXML
+	 * @param collection
+	 * @throws Exception
+	 */
+	public static void sendDeleteJsonToApi(String annotationID, ImageAnnotationCollection aim) throws Exception
+	{
+		try {
+			//do we have export user in aim's programmed comment
+			String userid=null;
+			if (aim.getUser().getLoginName().getValue()!=null) 
+				userid=aim.getUser().getLoginName().getValue();
+			//TODO read from config
+			HashMap<String,String> protocol=ExportAimOperations.getDARTProtocol();
+			HashMap<String,String> sessionInfo=new HashMap<>();
+			sessionInfo.put("exportUserId", userid);
+			
+			JSONObject jo=putValues(protocol,sessionInfo, aim, null);
+	        log.info("json" + jo.toString());
+	        //post json
+	        if(protocol.containsKey("deleteURL")){
+	        	int returnCode=makeDeleteRequest(protocol.get("deleteURL"), jo);
+	        	log.info("The site returned "+ returnCode);
+	        	if (returnCode!=200){
+	        		log.warning("Couldn't delete the aim file in export location");
+	        	}
+	        }else
+	        	log.info("No URL in protocol, not sending");
+		} catch (Exception e) {
+			log.warning("Error sending AIM to api:", e);
+			throw e;
+		}
 	}
 	
 	/**
@@ -157,18 +196,13 @@ public class ExportAimOperations {
 	 * @param collection
 	 * @throws Exception
 	 */
-	public static void sendJsonToApi(String annotationID, ImageAnnotationCollection aim, String aimXML ) throws Exception
+	public static void sendJsonToApi(String annotationID, ImageAnnotationCollection aim, String aimXML) throws Exception
 	{
 		try {
 			//do we have export user in aim's programmed comment
 			String userid=null;
-			if (aim.getImageAnnotation().getComment().getValue().split(Aim4.commentSeperator)[0].contains("USER:")){
-				String[] commentParts=aim.getImageAnnotation().getComment().getValue().split(Aim4.commentSeperator)[0].split("/");
-				for (String commentPart: commentParts){
-					if(commentPart.trim().startsWith("USER:"))
-						userid=commentPart.replace("USER:", "").trim();
-				}
-			}
+			if (aim.getUser().getLoginName().getValue()!=null) 
+				userid=aim.getUser().getLoginName().getValue();
 			//TODO read from config
 			HashMap<String,String> protocol=ExportAimOperations.getDARTProtocol();
 			HashMap<String,String> sessionInfo=new HashMap<>();
@@ -181,12 +215,37 @@ public class ExportAimOperations {
 	        if(protocol.containsKey("URL")){
 	        	int returnCode=makePostRequest(protocol.get("URL"), jo);
 	        	log.info("The site returned "+ returnCode);
+	        	if (returnCode!=202){
+	        		log.warning("Couldn't export the aim file");
+	        	}
 	        }else
 	        	log.info("No URL in protocol, not sending");
 		} catch (Exception e) {
 			log.warning("Error sending AIM to api:", e);
 			throw e;
 		}
+	}
+	
+	public static int makeDeleteRequest(String url,JSONObject json){
+		int returnCode=0;
+
+		try{
+			CloseableHttpClient client = HttpClients.createDefault();
+			HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(url);
+			
+			StringEntity entity = new StringEntity(json.toString());
+			httpDelete.setEntity(entity);
+			httpDelete.setHeader("Accept", "application/json");
+			httpDelete.setHeader("Content-type", "application/json");
+			
+			CloseableHttpResponse response = client.execute(httpDelete);
+			returnCode=response.getStatusLine().getStatusCode();
+			client.close();
+			
+		}catch(Exception e){
+			log.warning("Error in sending the json to the api", e);
+		}
+		return returnCode;
 	}
 	
 	public static int makePostRequest(String url,JSONObject json){
@@ -203,7 +262,6 @@ public class ExportAimOperations {
 			
 			CloseableHttpResponse response = client.execute(httpPost);
 			returnCode=response.getStatusLine().getStatusCode();
-			log.info("return code "+returnCode);
 			client.close();
 			
 		}catch(Exception e){
@@ -243,14 +301,16 @@ public class ExportAimOperations {
 		    	}
 		    	break;
 		    case "aimdata":
-		    	if (protocol.containsKey("aimFormat") && protocol.get("aimFormat").equals("XML")){
-		        	jo.put(value,aimXML);
-		        }else{//default is json
-					JSONObject jsonString =  XML.toJSONObject(aimXML);
-			        if (jsonString == null)
-			        	throw new Exception("Error converting to json");
-			        jo.put(value,jsonString);
-		        }
+		    	if (aimXML!=null){
+			    	if (protocol.containsKey("aimFormat") && protocol.get("aimFormat").equals("XML")){
+			        	jo.put(value,aimXML);
+			        }else{//default is json
+						JSONObject jsonString =  XML.toJSONObject(aimXML);
+				        if (jsonString == null)
+				        	throw new Exception("Error converting to json");
+				        jo.put(value,jsonString);
+			        }
+		    	}
 		    	break;
 		    case "source":
 		    	jo.put(value,"epad");
