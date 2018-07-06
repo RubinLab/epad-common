@@ -718,6 +718,9 @@ public class TIFFMasksToDSOConverter
 
 				int numpixels = new_frame.length/4;
   				int numbytes = numpixels/8;		  				
+  				if (numbytes*8!=numpixels)// if it is not exact division add one more (not square)
+  					numbytes++;
+  				
   				pixel_data = new byte[numbytes];	
 				for (int k = 0; k < numbytes; k++)
 				{
@@ -725,7 +728,7 @@ public class TIFFMasksToDSOConverter
 					pixel_data[k] = 0;
 					for (int l = 0; l < 4*8; l=l+4)
 					{
-						if (new_frame[index + l] != 0)
+						if (index + l<new_frame.length && new_frame[index + l] != 0)
 						{
 							int setBit =  pixel_data[k] + (1 << (l/4));
 							pixel_data[k] =(byte) setBit;
