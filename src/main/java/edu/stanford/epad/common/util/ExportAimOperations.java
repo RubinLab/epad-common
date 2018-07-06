@@ -110,6 +110,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -174,9 +176,9 @@ public class ExportAimOperations {
 	        log.info("json" + jo.toString());
 	        //post json
 	        if(protocol.containsKey("deleteURL")){
-	        	int returnCode=makePostRequest(protocol.get("deleteURL"), jo);
+	        	int returnCode=makeDeleteRequest(protocol.get("deleteURL"), jo);
 	        	log.info("The site returned "+ returnCode);
-	        	if (returnCode!=202){
+	        	if (returnCode!=200){
 	        		log.warning("Couldn't delete the aim file in export location");
 	        	}
 	        }else
@@ -224,6 +226,28 @@ public class ExportAimOperations {
 		}
 	}
 	
+	public static int makeDeleteRequest(String url,JSONObject json){
+		int returnCode=0;
+
+		try{
+			CloseableHttpClient client = HttpClients.createDefault();
+			HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(url);
+			
+			StringEntity entity = new StringEntity(json.toString());
+			httpDelete.setEntity(entity);
+			httpDelete.setHeader("Accept", "application/json");
+			httpDelete.setHeader("Content-type", "application/json");
+			
+			CloseableHttpResponse response = client.execute(httpDelete);
+			returnCode=response.getStatusLine().getStatusCode();
+			client.close();
+			
+		}catch(Exception e){
+			log.warning("Error in sending the json to the api", e);
+		}
+		return returnCode;
+	}
+	
 	public static int makePostRequest(String url,JSONObject json){
 		int returnCode=0;
 
@@ -238,7 +262,6 @@ public class ExportAimOperations {
 			
 			CloseableHttpResponse response = client.execute(httpPost);
 			returnCode=response.getStatusLine().getStatusCode();
-			log.info("return code "+returnCode);
 			client.close();
 			
 		}catch(Exception e){
