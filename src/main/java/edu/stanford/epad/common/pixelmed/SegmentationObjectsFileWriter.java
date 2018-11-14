@@ -429,7 +429,7 @@ public class SegmentationObjectsFileWriter
 			list.put(a);
 		}
 		{
-			Attribute a = new LongStringAttribute(TagFromName.SoftwareVersion);
+			Attribute a = new LongStringAttribute(TagFromName.SoftwareVersions);
 			a.addValue(SoftwareVersion);
 			list.put(a);
 		}

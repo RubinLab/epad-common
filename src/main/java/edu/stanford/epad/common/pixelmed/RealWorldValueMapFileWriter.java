@@ -331,7 +331,7 @@ public class RealWorldValueMapFileWriter
 		}
 		
 		{
-			Attribute a = new LongStringAttribute(TagFromName.SoftwareVersion);
+			Attribute a = new LongStringAttribute(TagFromName.SoftwareVersions);
 			a.addValue(SoftwareVersion);
 			list.put(a);
 		}

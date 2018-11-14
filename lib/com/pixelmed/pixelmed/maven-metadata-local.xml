@@ -3,11 +3,12 @@
   <groupId>com.pixelmed</groupId>
   <artifactId>pixelmed</artifactId>
   <versioning>
-    <release>20160907</release>
+    <release>20181021</release>
     <versions>
       <version>20140326</version>
        <version>20160907</version>
+        <version>20181021</version>
     </versions>
-    <lastUpdated>20160907141640</lastUpdated>
+    <lastUpdated>201811131634</lastUpdated>
   </versioning>
 </metadata>

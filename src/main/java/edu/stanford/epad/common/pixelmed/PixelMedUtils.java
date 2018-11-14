@@ -169,8 +169,8 @@ public class PixelMedUtils
 	public static final String ManufacturerTagName = dicomDictionary.getFullNameFromTag(TagFromName.Manufacturer);
 	public static final String ModelNameCode = getTagCode(TagFromName.ManufacturerModelName);
 	public static final String ModelNameTagName = dicomDictionary.getFullNameFromTag(TagFromName.ManufacturerModelName);
-	public static final String SoftwareVersionCode = getTagCode(TagFromName.SoftwareVersion);
-	public static final String SoftwareVersionTagName = dicomDictionary.getFullNameFromTag(TagFromName.SoftwareVersion);
+	public static final String SoftwareVersionCode = getTagCode(TagFromName.SoftwareVersions);
+	public static final String SoftwareVersionTagName = dicomDictionary.getFullNameFromTag(TagFromName.SoftwareVersions);
 
 	public static final String BitsStoredCode = getTagCode(TagFromName.BitsStored);
 	public static final String BitsStoredTagName = dicomDictionary.getFullNameFromTag(TagFromName.BitsStored);
