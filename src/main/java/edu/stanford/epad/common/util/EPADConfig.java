@@ -217,6 +217,8 @@ public class EPADConfig
 	public static String exportURL = EPADConfig.getInstance().getParamValue("exportURL", null);
 	public static String deleteURL = EPADConfig.getInstance().getParamValue("deleteURL", null);
 	
+	public static boolean saveDSOStats =  EPADConfig.getInstance().getBooleanPropertyValue("saveDSOStats",false);
+	
 	private Properties properties;
 
 	private static EPADConfig getInstance()
