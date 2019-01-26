@@ -124,7 +124,9 @@ import com.pixelmed.dicom.Attribute;
 import com.pixelmed.dicom.AttributeList;
 import com.pixelmed.dicom.DicomException;
 import com.pixelmed.dicom.DicomInputStream;
+import com.pixelmed.dicom.GeometryOfSliceFromAttributeList;
 import com.pixelmed.dicom.TagFromName;
+import com.pixelmed.geometry.GeometryOfSlice;
 
 import edu.stanford.epad.common.pixelmed.SegmentedProperty;
 import edu.stanford.epad.common.util.EPADLogger;
@@ -139,9 +141,9 @@ import edu.stanford.epad.common.util.EPADLogger;
 public class TIFFMasksToDSOConverter
 {
 	private AttributeList[] dicomAttributes;
-	private final short[] orientation = new short[] { 1, 0, 0, 0, 0, 1 };
+	private final short[] orientation = new short[] { 1, 0, 0, 0, 1, 0 };
 	private short[][] orientations = null;
-	private double[] spacing = new double[] { 0.65, 0.8 };
+	private double[] spacing = new double[] { 1.0, 1.0 };
 	private double thickness = 0.5;
 	private double[][] positions = null;
 	private double[] sliceLocations = null;
@@ -530,9 +532,11 @@ public class TIFFMasksToDSOConverter
 
 		{ // Get geometric info.
 			Attribute dicomAttribute = localDICOMAttributes.get(TagFromName.SliceThickness);
-			this.thickness = dicomAttribute == null ? 0.1 : dicomAttribute.getSingleDoubleValueOrDefault(0.1);
+			// Note: Value of thickness is over written below with spacing between slices
+			this.thickness = dicomAttribute == null ? 1.0 : dicomAttribute.getSingleDoubleValueOrDefault(1.0);
 			dicomAttribute = localDICOMAttributes.get(TagFromName.PixelSpacing);
-
+			if (dicomAttribute == null)
+				dicomAttribute = localDICOMAttributes.get(TagFromName.ImagerPixelSpacing);
 			if (dicomAttribute != null)
 				this.spacing = dicomAttribute.getDoubleValues();
 
@@ -657,6 +661,18 @@ public class TIFFMasksToDSOConverter
 				}
 				mininstance = 1;
 				
+			}
+			if (dicomAttributes.length > 1)
+			{
+				// For a DSO slice thickness is the spacing between two slices
+				try
+				{
+					GeometryOfSlice gos1 = new GeometryOfSliceFromAttributeList(dicomAttributes[0]);
+					GeometryOfSlice gos2 = new GeometryOfSliceFromAttributeList(dicomAttributes[1]);
+					double spacing = Math.abs(gos1.getDistanceAlongNormalFromOrigin() - gos2.getDistanceAlongNormalFromOrigin());
+					if (spacing > 0) this.thickness = spacing;
+				}
+				catch (Exception e) {}
 			}
 			return mininstance;
 		} finally {
