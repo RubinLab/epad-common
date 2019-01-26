@@ -272,6 +272,14 @@ public class SegmentationObjectsFileWriter
 		 *********************************************************************/
 		{
 			Attribute a = new DecimalStringAttribute(TagFromName.ImageOrientationPatient); 
+			if (patient_orientation[0] == 0
+					&& patient_orientation[1] == 0
+					&& patient_orientation[2] == 0
+					&& patient_orientation[3] == 0
+					&& patient_orientation[4] == 0
+					&& patient_orientation[5] == 0
+				)
+				patient_orientation = new short[] { 1, 0, 0, 0, 1, 0 };
 			for(int i = 0; i < patient_orientation.length; i++)
 				a.addValue(patient_orientation[i]);
 			geometry_list.put(a);
